@@ -1,0 +1,115 @@
+.buy-card {
+  min-height: 100vh;
+  background: #0a0a0a;
+  padding: 20px 0;
+}
+
+.card-preview-section {
+  margin-bottom: 30px;
+}
+
+.card-preview {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  border-radius: 20px;
+  padding: 30px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 123, 255, 0.3);
+  max-width: 400px;
+  margin: 0 auto;
+  height: 220px;
+}
+
+.card-chip {
+  width: 50px;
+  height: 40px;
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.card-number {
+  font-size: 20px;
+  letter-spacing: 3px;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.card-balance {
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.card-type {
+  font-size: 14px;
+  text-align: right;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.form-section {
+  background: #1a1a1a;
+  border-radius: 16px;
+  padding: 25px;
+  border: 1px solid #333;
+}
+
+.price-card {
+  background: #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.price-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+}
+
+.price-item:last-child {
+  border-bottom: none;
+}
+
+.price-item span {
+  color: #cccccc;
+}
+
+.price-item strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.buy-btn {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.buy-btn.active {
+  background: #28a745;
+  color: white;
+}
+
+.buy-btn.active:hover {
+  background: #218838;
+  transform: translateY(-2px);
+}
+
+.buy-btn.disabled {
+  background: #6c757d;
+  color: #cccccc;
+  cursor: not-allowed;
+}

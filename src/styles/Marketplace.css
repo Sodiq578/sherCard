@@ -1,0 +1,113 @@
+.marketplace {
+  min-height: 100vh;
+  background: #0a0a0a;
+  padding: 20px 0;
+}
+
+.sell-section {
+  background: #1a1a1a;
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 30px;
+  border: 1px solid #333;
+}
+
+.sell-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.sell-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sell-btn:hover {
+  background: #218838;
+  transform: translateY(-2px);
+}
+
+.market-cards-section {
+  background: #1a1a1a;
+  border-radius: 16px;
+  padding: 25px;
+  border: 1px solid #333;
+}
+
+.cards-grid {
+  display: grid;
+  gap: 15px;
+}
+
+.market-card {
+  background: #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #333;
+  transition: all 0.3s ease;
+}
+
+.market-card:hover {
+  border-color: #007bff;
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.card-id {
+  font-weight: 600;
+  color: #ffffff;
+  font-family: 'Courier New', monospace;
+}
+
+.card-balance {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.card-info {
+  margin-bottom: 15px;
+}
+
+.card-seller {
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.card-price {
+  color: #007bff;
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.card-date {
+  color: #666;
+  font-size: 12px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}

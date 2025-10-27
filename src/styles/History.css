@@ -1,0 +1,33 @@
+.history {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  width: 100%;
+}
+
+.history h2 {
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
+
+.history-list {
+  list-style: none;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.history-item {
+  padding: 15px;
+  margin: 10px 0;
+  background: #f8f9fa;
+  border-left: 4px solid #667eea;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.history-item:nth-child(even) {
+  background: #e9ecef;
+}

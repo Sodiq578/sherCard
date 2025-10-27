@@ -1,0 +1,173 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #f3f4f7 0%, #e9eef5 100%);
+  min-height: 100vh;
+  color: #333;
+}
+
+.cards-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f3f4f7 0%, #e9eef5 100%);
+  padding: 20px;
+  padding-bottom: 80px;
+}
+
+.cards-container {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  max-width: 500px;
+  margin: 0 auto;
+  transition: all 0.3s ease;
+}
+
+.cards-container:hover {
+  transform: translateY(-3px);
+}
+
+.cards-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2d2f39;
+  font-size: 22px;
+}
+
+.cards-grid {
+  display: grid;
+  gap: 20px;
+}
+
+/* Karta dizayni */
+.card-item-real {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-item-real:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Old tomon */
+.card-front {
+  background: linear-gradient(135deg, #ffffff, #e9f1ff);
+  padding: 20px;
+  color: #1e1e1e;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-chip {
+  width: 40px;
+  height: 30px;
+  background: linear-gradient(45deg, #f5d76e, #ffe791);
+  border-radius: 6px;
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
+}
+
+.card-type {
+  font-size: 11px;
+  opacity: 0.8;
+  color: #4a4a4a;
+}
+
+.card-number {
+  font-size: 16px;
+  letter-spacing: 2px;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  margin: 10px 0;
+  color: #333;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-balance {
+  font-size: 18px;
+  font-weight: bold;
+  color: #3a3fef;
+}
+
+.card-design {
+  background: #eef3ff;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 10px;
+  color: #3a3fef;
+  font-weight: 500;
+}
+
+/* Tugmalar */
+.card-actions {
+  background: #f9faff;
+  padding: 15px;
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid #e4e7ee;
+}
+
+.card-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.card-btn.primary {
+  background: #667eea;
+  color: white;
+}
+
+.card-btn.secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.card-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+/* Karta yo‘q bo‘lganda */
+.no-cards {
+  text-align: center;
+  padding: 40px;
+  color: #777;
+}
+
+.no-cards-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  color: #a0a0a0;
+}
+
+.no-cards p {
+  margin: 10px 0;
+}

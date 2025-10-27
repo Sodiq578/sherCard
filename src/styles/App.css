@@ -14,50 +14,11 @@ body {
 .App {
   min-height: 100vh;
   background: #0a0a0a;
-  padding-bottom: 70px; /* Bottom nav uchun joy */
 }
 
-/* Bottom Navigation */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #1a1a1a;
-  display: flex;
-  justify-content: space-around;
-  padding: 12px 0;
-  border-top: 1px solid #333;
-  z-index: 1000;
-}
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  color: #888;
-  padding: 8px 12px;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  flex: 1;
-  max-width: 80px;
-}
-
-.nav-item:hover {
-  color: #007bff;
-  background: rgba(0, 123, 255, 0.1);
-}
-
-.nav-icon {
-  font-size: 20px;
-  margin-bottom: 4px;
-  transition: all 0.3s ease;
-}
-
-.nav-item span {
-  font-size: 12px;
-  font-weight: 500;
+.app-container {
+  min-height: 100vh;
+  padding-bottom: 70px;
 }
 
 /* Umumiy container */
