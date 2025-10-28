@@ -1,10 +1,12 @@
-// components/MainMenu.js
+// components/MainMenu.jsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/MainMenu.css';
 
-function MainMenu({ user, updateUser }) {
+function MainMenu({ user, updateUser, onLogout }) {
   const [topUpAmount, setTopUpAmount] = useState('');
   const [currentTime, setCurrentTime] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updateTime = () => {
@@ -16,7 +18,6 @@ function MainMenu({ user, updateUser }) {
         })
       );
     };
-
     updateTime();
     const interval = setInterval(updateTime, 60000);
     return () => clearInterval(interval);
@@ -51,8 +52,12 @@ function MainMenu({ user, updateUser }) {
     <div className="onboarding-container">
       {/* Status Bar */}
       <div className="status-bar">
-         
-        
+        <span className="time">{currentTime}</span>
+        <div className="status-icons">
+          <i className="fas fa-signal"></i>
+          <i className="fas fa-wifi"></i>
+          <i className="fas fa-battery-full"></i>
+        </div>
       </div>
 
       <div className="main-content">
@@ -60,27 +65,27 @@ function MainMenu({ user, updateUser }) {
         <div className="welcome-header">
           <div className="user-info">
             <div className="avatar">
-              <img
-                src={user.profile?.avatar || '/default-avatar.png'}
-                alt="Avatar"
-                className="avatar-img"
-              />
+              {user.profile?.avatar ? (
+                <img src={user.profile.avatar} alt="Avatar" className="avatar-img" />
+              ) : (
+                <div className="avatar-placeholder">
+                  {displayName.charAt(0).toUpperCase()}
+                </div>
+              )}
             </div>
             <div className="greeting">
               <span className="welcome-text">Welcome back,</span>
               <span className="user-name">{displayName}</span>
             </div>
           </div>
-          <button className="search-btn">
-            <i className="fas fa-search"></i>
-          </button>
+         
         </div>
 
         {/* Balance Card */}
         <div className="balance-card-large">
           <div className="balance-display">
             <span className="balance-amount">
-              {user.balance.toLocaleString()}
+              {user.balance?.toLocaleString() || 0}
             </span>
             <span className="currency">UZS</span>
           </div>
@@ -108,16 +113,16 @@ function MainMenu({ user, updateUser }) {
       {/* Bottom Navigation */}
       <div className="bottom-nav">
         <button className="nav-item active">
-          <i className="fas fa-home"></i>
+          Home
         </button>
-        <button className="nav-item">
-          <i className="fas fa-wallet"></i>
+        <button className="nav-item" onClick={() => navigate('/marketplace')}>
+          Wallet
         </button>
-        <button className="nav-item">
-          <i className="fas fa-chart-line"></i>
+        <button className="nav-item" onClick={() => navigate('/history')}>
+          Chart
         </button>
-        <button className="nav-item">
-          <i className="fas fa-cog"></i>
+        <button className="nav-item" onClick={() => navigate('/profile')}>
+          Settings
         </button>
       </div>
     </div>

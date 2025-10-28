@@ -1,12 +1,23 @@
-// components/Profile.js
+// components/Profile.jsx
 import React, { useState, useEffect } from 'react';
+import { 
+  FiCamera, 
+  FiDollarSign, 
+  FiCreditCard, 
+  FiClock,
+  FiEdit2,
+  FiSave,
+  FiX,
+  FiLogOut
+} from 'react-icons/fi';
 import '../styles/Profile.css';
 
-function Profile({ user, updateUser }) {
+function Profile({ user, updateUser, onLogout }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [avatar, setAvatar] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (user && user.profile) {
@@ -23,7 +34,8 @@ function Profile({ user, updateUser }) {
     const updatedUser = {
       ...user,
       profile: {
-        name: name || user.login, // Agar ism bo'sh bo'lsa, login ishlatiladi
+        ...user.profile,
+        name: name || user.login,
         phone,
         email,
         avatar,
@@ -31,6 +43,7 @@ function Profile({ user, updateUser }) {
     };
 
     updateUser(updatedUser);
+    setIsEditing(false);
     alert('Profil muvaffaqiyatli yangilandi!');
   };
 
@@ -45,118 +58,150 @@ function Profile({ user, updateUser }) {
     }
   };
 
+  const handleLogout = () => {
+    if (window.confirm('Chiqishni xohlaysizmi?')) {
+      onLogout(); // faqat onLogout() chaqiramiz
+    }
+  };
+
   if (!user) {
-    return <p className="loading-text">Yuklanmoqda...</p>;
+    return <div className="loading">Yuklanmoqda...</div>;
   }
 
-  // YANGI: Ism yoki login
-  const displayName = user.profile?.name || user.login;
+  const displayName = name || user.login;
 
   return (
-    <div className="profile">
-      <div className="container">
-        <div className="header">
-          <h1 className="page-title">Profil</h1>
+    <div className="profile-container">
+      <div className="profile-header">
+        <h1>Profil</h1>
+        <button 
+          onClick={() => setIsEditing(!isEditing)} 
+          className="edit-btn"
+        >
+          {isEditing ? (
+            <>
+              <FiX className="btn-icon" />
+              Bekor qilish
+            </>
+          ) : (
+            <>
+              <FiEdit2 className="btn-icon" />
+              Tahrirlash
+            </>
+          )}
+        </button>
+      </div>
+
+      <div className="profile-card">
+        {/* Avatar */}
+        <div className="avatar-section">
+          <div className="avatar-wrapper">
+            {avatar ? (
+              <img src={avatar} alt="Avatar" className="avatar-img" />
+            ) : (
+              <div className="avatar-placeholder">
+                {displayName.charAt(0).toUpperCase()}
+              </div>
+            )}
+            {isEditing && (
+              <label htmlFor="avatar-upload" className="camera-icon">
+                <FiCamera />
+              </label>
+            )}
+          </div>
+          <input
+            id="avatar-upload"
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarChange}
+            className="avatar-input"
+            disabled={!isEditing}
+          />
+          <h2 className="user-name">{displayName}</h2>
+          <p className="user-role">Foydalanuvchi</p>
         </div>
 
-        <div className="profile-card">
-          <div className="user-info">
-            <div className="avatar-section">
-              <div className="avatar-container">
-                {avatar ? (
-                  <img src={avatar} alt="Avatar" className="avatar-image" />
-                ) : (
-                  <div className="avatar">
-                    {displayName.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <label htmlFor="avatar-upload" className="avatar-upload-btn">
-                  Camera
-                </label>
-                <input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                  className="avatar-input"
-                />
-              </div>
-              <h2>{displayName}</h2>
-              <p className="user-role">Foydalanuvchi</p>
-            </div>
+        {/* Form */}
+        <div className="profile-form">
+          <div className="input-group">
+            <label>Ism</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ismingiz"
+              disabled={!isEditing}
+            />
           </div>
 
-          <div className="profile-form">
-            <div className="input-group">
-              <label>Ism</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Ismingiz"
-                className="form-input"
-              />
-            </div>
-
-            <div className="input-group">
-              <label>Telefon</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+998 ** *** ****"
-                className="form-input"
-              />
-            </div>
-
-            <div className="input-group">
-              <label>Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="email@example.com"
-                className="form-input"
-              />
-            </div>
-
-            <button onClick={handleSave} className="save-btn">
-              Saqlash
-            </button>
+          <div className="input-group">
+            <label>Telefon</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+998 ** *** ****"
+              disabled={!isEditing}
+            />
           </div>
 
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-icon">Money</div>
-              <div className="stat-content">
-                <div className="stat-number">
-                  {user.balance ? user.balance.toLocaleString() : 0}
-                </div>
-                <div className="stat-label">Ball</div>
-              </div>
+          <div className="input-group">
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email@example.com"
+              disabled={!isEditing}
+            />
+          </div>
+
+          {isEditing && (
+            <div className="form-actions">
+              <button onClick={handleSave} className="save-btn">
+                <FiSave className="btn-icon" />
+                Saqlash
+              </button>
+              <button onClick={() => setIsEditing(false)} className="cancel-btn">
+                <FiX className="btn-icon" />
+                Bekor qilish
+              </button>
             </div>
-            
-            <div className="stat-card">
-              <div className="stat-icon">Credit Card</div>
-              <div className="stat-content">
-                <div className="stat-number">
-                  {user.cards ? user.cards.length : 0}
-                </div>
-                <div className="stat-label">Karta</div>
-              </div>
+          )}
+        </div>
+
+        {/* Stats */}
+        <div className="stats-grid">
+          <div className="stat-item">
+            <div className="stat-icon">
+              <FiDollarSign />
             </div>
-            
-            <div className="stat-card">
-              <div className="stat-icon">History</div>
-              <div className="stat-content">
-                <div className="stat-number">
-                  {user.history ? user.history.length : 0}
-                </div>
-                <div className="stat-label">Tarix</div>
-              </div>
+            <div className="stat-value">{user.balance?.toLocaleString() || 0}</div>
+            <div className="stat-label">Ball</div>
+          </div>
+
+          <div className="stat-item">
+            <div className="stat-icon">
+              <FiCreditCard />
             </div>
+            <div className="stat-value">{user.cards?.length || 0}</div>
+            <div className="stat-label">Karta</div>
+          </div>
+
+          <div className="stat-item">
+            <div className="stat-icon">
+              <FiClock />
+            </div>
+            <div className="stat-value">{user.history?.length || 0}</div>
+            <div className="stat-label">Tarix</div>
           </div>
         </div>
+
+        {/* Logout */}
+        <button onClick={handleLogout} className="logout-btn">
+          <FiLogOut className="btn-icon" />
+          Chiqish
+        </button>
       </div>
     </div>
   );
