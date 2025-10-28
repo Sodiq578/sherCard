@@ -1,61 +1,284 @@
-.login-container {
-  background: white;
+/* Asosiy konteyner */
+.loginx-app {
+  min-height: 100vh;
+  background: #000;
+  display: flex;
+  position: relative;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+}
+
+@keyframes loginx-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.75; }
+  50% { transform: scale(1.2); opacity: 0.95; }
+}
+
+/* Asosiy kontent */
+.loginx-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px;
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+}
+
+/* Logo - chapda */
+.loginx-logo {
+  font-size: 42px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 2px;
+  align-self: flex-start;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Forma konteyneri - MARKAZLASHTIRILGAN */
+.loginx-form {
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+  gap: 40px;
+}
+
+/* Sarlavha */
+.loginx-title {
+  color: white;
+  font-size: 32px;
+  margin-bottom: 0;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Inputlar */
+.loginx-inputs {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loginx-input {
+  padding: 18px 24px;
+  border: none;
   border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  max-width: 400px;
+  background: rgba(56, 56, 56, 0.95);
+  font-size: 17px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  font-weight: 500;
+  color: white;
+  text-align: center;
+}
+
+.loginx-input::placeholder {
+  color: #aaa;
+  font-weight: 400;
+}
+
+.loginx-input:focus {
+  background: white;
+  color: #333;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  transform: translateY(-3px);
+}
+
+/* Tugmalar */
+.loginx-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 380px;
+  align-items: center;
+}
+
+.loginx-btn-primary {
+  width: 100%;
+  padding: 18px 24px;
+  border: none;
+  border-radius: 32px;
+  background: #0066FF;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 102, 255, 0.3);
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.loginx-btn-primary:hover {
+  background: #FF5252;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(255, 82, 82, 0.4);
+}
+
+.loginx-btn-primary:active {
+  transform: translateY(-1px);
+}
+
+.loginx-btn-toggle {
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
   width: 100%;
   text-align: center;
 }
 
-.login-container h2 {
-  margin-bottom: 20px;
-  color: #333;
-  font-size: 24px;
+.loginx-btn-toggle:hover {
+  background: white;
+  color: #667eea;
+  border-color: white;
 }
 
-.login-container form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+/* Footer */
+.loginx-footer {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 15px;
+  text-align: center;
+  margin-top: auto;
+  padding-bottom: 20px;
+  font-weight: 500;
 }
 
-.login-container input {
-  padding: 12px;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 0.3s;
+/* ================================================= */
+/* YUQORI O'NGDA FON RASMI - OQ VA ANIQROQ */
+/* ================================================= */
+.loginx-background {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 50%;
+  z-index: 1; /* Kontent ustida, lekin forma ostida */
+  pointer-events: none;
+  overflow: hidden;
+  filter: brightness(0) invert(1); /* RASMINI TO'LIQ OQ QILISH */
 }
 
-.login-container input:focus {
-  outline: none;
-  border-color: #667eea;
+.loginx-bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: top right;
+  opacity: 0.45; /* Ko'rinadi, lekin hali dekorativ */
+  transition: opacity 0.4s ease;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
 }
 
-.login-container button {
-  padding: 12px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.2s;
+/* Hoverda yanada aniqroq bo'lsin */
+.loginx-app:hover .loginx-bg-image {
+  opacity: 0.65;
 }
 
-.login-container button:hover {
-  transform: translateY(-2px);
+/* Kontent – rasm ustida */
+.loginx-content {
+  z-index: 2 !important;
 }
 
-.toggle-btn {
-  margin-top: 15px;
-  background: transparent !important;
-  color: #667eea !important;
-  border: 2px solid #667eea !important;
+/* ================================================= */
+/* MOBILDA MARGIN-TOP (faqat mobil uchun) */
+/* ================================================= */
+@media (max-width: 768px) {
+  .loginx-content {
+    padding: 20px;
+    padding-top: 100px;
+  }
+
+  .loginx-logo {
+    font-size: 36px;
+  }
+
+  .loginx-title {
+    font-size: 28px;
+  }
+
+  .loginx-form {
+    padding: 30px 0;
+    gap: 30px;
+  }
+
+  .loginx-inputs {
+    margin-top: 114px;
+  }
+
+  .loginx-buttons {
+    margin-top: 180px;
+  }
+
+  /* Mobil uchun fon rasmi kichraytiriladi */
+  .loginx-background {
+    width: 70%;
+    height: 40%;
+  }
 }
 
-.toggle-btn:hover {
-  background: #667eea !important;
-  color: white !important;
+@media (max-width: 480px) {
+  .loginx-content {
+    padding: 15px;
+    padding-top: 80px;
+  }
+
+  .loginx-logo {
+    font-size: 32px;
+  }
+
+  .loginx-form {
+    max-width: 100%;
+    padding: 20px 0;
+    gap: 25px;
+  }
+
+  .loginx-input,
+  .loginx-btn-primary,
+  .loginx-btn-toggle {
+    padding: 16px 20px;
+    font-size: 16px;
+  }
+
+  .loginx-inputs {
+    margin-top: 114px;
+  }
+
+  .loginx-buttons {
+    margin-top: 200px;
+  }
+
+  .loginx-background {
+    width: 80%;
+    height: 35%;
+  }
+}
+
+/* ================================================= */
+/* DESKTOPDA MARGIN-TOP BUTUNLAY YO'Q */
+/* ================================================= */
+@media (min-width: 769px) {
+  .loginx-inputs,
+  .loginx-buttons {
+    margin-top: 0 !important;
+  }
+
+  .loginx-background {
+    width: 50%;
+    height: 50%;
+  }
 }

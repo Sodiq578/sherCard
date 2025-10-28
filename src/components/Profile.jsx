@@ -1,3 +1,4 @@
+// components/Profile.js
 import React, { useState, useEffect } from 'react';
 import '../styles/Profile.css';
 
@@ -22,7 +23,7 @@ function Profile({ user, updateUser }) {
     const updatedUser = {
       ...user,
       profile: {
-        name,
+        name: name || user.login, // Agar ism bo'sh bo'lsa, login ishlatiladi
         phone,
         email,
         avatar,
@@ -30,7 +31,7 @@ function Profile({ user, updateUser }) {
     };
 
     updateUser(updatedUser);
-    alert('✅ Profil muvaffaqiyatli yangilandi!');
+    alert('Profil muvaffaqiyatli yangilandi!');
   };
 
   const handleAvatarChange = (e) => {
@@ -48,6 +49,9 @@ function Profile({ user, updateUser }) {
     return <p className="loading-text">Yuklanmoqda...</p>;
   }
 
+  // YANGI: Ism yoki login
+  const displayName = user.profile?.name || user.login;
+
   return (
     <div className="profile">
       <div className="container">
@@ -63,11 +67,11 @@ function Profile({ user, updateUser }) {
                   <img src={avatar} alt="Avatar" className="avatar-image" />
                 ) : (
                   <div className="avatar">
-                    {user.login ? user.login.charAt(0).toUpperCase() : '?'}
+                    {displayName.charAt(0).toUpperCase()}
                   </div>
                 )}
                 <label htmlFor="avatar-upload" className="avatar-upload-btn">
-                  📷
+                  Camera
                 </label>
                 <input
                   id="avatar-upload"
@@ -77,7 +81,7 @@ function Profile({ user, updateUser }) {
                   className="avatar-input"
                 />
               </div>
-              <h2>@{user.login}</h2>
+              <h2>{displayName}</h2>
               <p className="user-role">Foydalanuvchi</p>
             </div>
           </div>
@@ -123,7 +127,7 @@ function Profile({ user, updateUser }) {
 
           <div className="stats-grid">
             <div className="stat-card">
-              <div className="stat-icon">💰</div>
+              <div className="stat-icon">Money</div>
               <div className="stat-content">
                 <div className="stat-number">
                   {user.balance ? user.balance.toLocaleString() : 0}
@@ -133,7 +137,7 @@ function Profile({ user, updateUser }) {
             </div>
             
             <div className="stat-card">
-              <div className="stat-icon">💳</div>
+              <div className="stat-icon">Credit Card</div>
               <div className="stat-content">
                 <div className="stat-number">
                   {user.cards ? user.cards.length : 0}
@@ -143,7 +147,7 @@ function Profile({ user, updateUser }) {
             </div>
             
             <div className="stat-card">
-              <div className="stat-icon">📊</div>
+              <div className="stat-icon">History</div>
               <div className="stat-content">
                 <div className="stat-number">
                   {user.history ? user.history.length : 0}
