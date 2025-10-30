@@ -1,128 +1,151 @@
-// components/MainMenu.jsx
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../styles/MainMenu.css';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "../styles/MainMenu.css";
+import {
+  FiHome,
+  FiCreditCard,
+  FiClock,
+  FiUser,
+  FiPlusCircle,
+  FiShoppingBag,
+} from "react-icons/fi";
+import Logo from "../assets/images/logo.png";
 
-function MainMenu({ user, updateUser, onLogout }) {
-  const [topUpAmount, setTopUpAmount] = useState('');
-  const [currentTime, setCurrentTime] = useState('');
+function MainMenu({ user, updateUser }) {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setCurrentTime(
-        now.toLocaleTimeString('uz-UZ', {
-          hour: '2-digit',
-          minute: '2-digit',
-        })
-      );
+  const handleTopUp = (amount) => {
+    const updatedUser = {
+      ...user,
+      balance: user.balance + amount,
+      history: [
+        ...(user.history || []),
+        {
+          time: new Date().toLocaleString(),
+          action: "Balans to‘ldirildi",
+          amount,
+        },
+      ],
     };
-    updateTime();
-    const interval = setInterval(updateTime, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleTopUp = () => {
-    const amount = parseInt(topUpAmount);
-    if (amount > 0) {
-      const updatedUser = {
-        ...user,
-        balance: user.balance + amount,
-        history: [
-          ...(user.history || []),
-          {
-            time: new Date().toLocaleString(),
-            action: 'Balans to\'ldirildi',
-            amount: amount,
-          },
-        ],
-      };
-      updateUser(updatedUser);
-      alert(`${amount.toLocaleString()} UZS muvaffaqiyatli qo'shildi!`);
-      setTopUpAmount('');
-    } else {
-      alert('Iltimos, 0 dan katta miqdor kiriting!');
-    }
+    updateUser(updatedUser);
+    alert(`${amount.toLocaleString()} UZS qo‘shildi!`);
   };
 
-  const displayName = user.profile?.name || user.login || 'Foydalanuvchi';
+  const displayName = user.profile?.name || user.login || "Foydalanuvchi";
 
   return (
-    <div className="onboarding-container">
-      {/* Status Bar */}
-      <div className="status-bar">
-        <span className="time">{currentTime}</span>
-        <div className="status-icons">
-          <i className="fas fa-signal"></i>
-          <i className="fas fa-wifi"></i>
-          <i className="fas fa-battery-full"></i>
+    <div className="menu-container">
+      {/* Salomlashuv */}
+      <div className="welcome-section">
+        <div className="avatar-circle">
+          {user.profile?.avatar ? (
+            <img src={user.profile.avatar} alt="Avatar" className="avatar-img" />
+          ) : (
+            <div className="avatar-placeholder">
+              {displayName.charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+        <div className="welcome-texts">
+          <span className="welcome">Salom,</span>
+          <span className="username">{displayName}</span>
         </div>
       </div>
 
-      <div className="main-content">
-        {/* Welcome Header */}
-        <div className="welcome-header">
-          <div className="user-info">
-            <div className="avatar">
-              {user.profile?.avatar ? (
-                <img src={user.profile.avatar} alt="Avatar" className="avatar-img" />
-              ) : (
-                <div className="avatar-placeholder">
-                  {displayName.charAt(0).toUpperCase()}
-                </div>
-              )}
-            </div>
-            <div className="greeting">
-              <span className="welcome-text">Welcome back,</span>
-              <span className="user-name">{displayName}</span>
-            </div>
+      {/* Balans */}
+      <div className="balance-card">
+        <div className="balance-top">
+          <div className="balance-icon">
+            <FiCreditCard size={32} />
           </div>
-         
+          <div className="balance-amount">
+            {user.balance?.toLocaleString() || 0}{" "}
+            <img src={Logo} alt="Logo" className="balance-logo" />
+          </div>
         </div>
+        <div className="balance-label">Joriy balans</div>
+      </div>
 
-        {/* Balance Card */}
-        <div className="balance-card-large">
-          <div className="balance-display">
-            <span className="balance-amount">
-              {user.balance?.toLocaleString() || 0}
-            </span>
-            <span className="currency">UZS</span>
-          </div>
-          <div className="balance-label">Joriy balans</div>
-        </div>
-
-        {/* Top Up Section */}
-        <div className="topup-card">
-          <div className="topup-title">Balans to'ldirish</div>
-          <div className="topup-input-wrapper">
-            <input
-              type="number"
-              value={topUpAmount}
-              onChange={(e) => setTopUpAmount(e.target.value)}
-              placeholder="000"
-              className="topup-input"
-            />
-          </div>
-          <button onClick={handleTopUp} className="topup-submit-btn">
-            Kirish
-          </button>
+      {/* Balansni to‘ldirish */}
+      <div className="topup-section">
+        <h3>
+          <FiPlusCircle /> Balansni to‘ldirish
+        </h3>
+        <div className="topup-options">
+          {[500, 1000, 5000, 10000].map((amount) => (
+            <button
+              key={amount}
+              className="topup-btn"
+              onClick={() => handleTopUp(amount)}
+            >
+              +{amount.toLocaleString()}{" "}
+              <img src={Logo} alt="Logo" className="topup-logo" />
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Bottom Navigation */}
+      {/* Do‘konlar */}
+      <div className="shops-section">
+        <h3>
+          <FiShoppingBag /> Tokenlar bilan yegulik olsa bo‘ladigan joylar
+        </h3>
+        <div className="shops-grid">
+          {[
+            {
+              name: "Evos",
+              logo: "https://upload.wikimedia.org/wikipedia/commons/6/6b/Evos_logo.png",
+            },
+            {
+              name: "Bellissimo",
+              logo: "https://bellissimo.uz/images/logo_new.svg",
+            },
+            {
+              name: "KFC",
+              logo: "https://upload.wikimedia.org/wikipedia/commons/b/bf/KFC_logo.svg",
+            },
+            {
+              name: "McDonald's",
+              logo: "https://upload.wikimedia.org/wikipedia/commons/4/4c/McDonald%27s_logo.svg",
+            },
+            {
+              name: "Korzinka",
+              logo: "https://upload.wikimedia.org/wikipedia/commons/a/aa/Korzinka_logo.svg",
+            },
+            {
+              name: "Chopar Pizza",
+              logo: "https://static.tildacdn.com/tild3864-3935-4665-b837-343230396133/choparlogo.svg",
+            },
+            {
+              name: "FeedUp",
+              logo: "https://feedup.uz/_nuxt/img/logo.2e4ff10.svg",
+            },
+            {
+              name: "Lavash House",
+              logo: "https://upload.wikimedia.org/wikipedia/commons/7/7a/Lavash_House_logo.png",
+            },
+          ].map((shop, i) => (
+            <div key={i} className="shop-card">
+              <img src={shop.logo} alt={shop.name} />
+              <p>{shop.name}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Navigatsiya */}
       <div className="bottom-nav">
         <button className="nav-item active">
-          Home
+          <FiHome size={20} /> <span>Bosh sahifa</span>
         </button>
-        <button className="nav-item" onClick={() => navigate('/marketplace')}>
-          Wallet
+        <button className="nav-item" onClick={() => navigate("/marketplace")}>
+          <FiCreditCard size={20} /> <span>To‘lovlar</span>
         </button>
-        <button className="nav-item" onClick={() => navigate('/history')}>
-          Chart
+        <button className="nav-item" onClick={() => navigate("/history")}>
+          <FiClock size={20} /> <span>Tarix</span>
         </button>
-        <button className="nav-item" onClick={() => navigate('/profile')}>
-          Settings
+        <button className="nav-item" onClick={() => navigate("/profile")}>
+          <FiUser size={20} /> <span>Profil</span>
         </button>
       </div>
     </div>

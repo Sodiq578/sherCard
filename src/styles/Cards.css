@@ -1,173 +1,561 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root {
+  --gold-light: #ffd700;
+  --gold-dark: #ffa500;
+  --black: #0f172a;
+  --white: #ffffff;
+  --glass: rgba(255, 255, 255, 0.1);
+  --border-glass: rgba(255, 255, 255, 0.2);
 }
 
-body {
-  font-family: 'Arial', sans-serif;
-  background: linear-gradient(135deg, #f3f4f7 0%, #e9eef5 100%);
-  min-height: 100vh;
-  color: #333;
-}
-
+/* ======= ASOSIY SAHIFA ======= */
 .cards-page {
+  background: linear-gradient(135deg, #111, #222);
   min-height: 100vh;
-  background: linear-gradient(135deg, #f3f4f7 0%, #e9eef5 100%);
-  padding: 20px;
-  padding-bottom: 80px;
+  color: var(--white);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
 }
 
 .cards-container {
-  background: white;
-  border-radius: 20px;
-  padding: 25px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  max-width: 500px;
-  margin: 0 auto;
+  max-width: 900px;
+  width: 100%;
+}
+
+/* ======= HEADER ======= */
+.cards-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.cards-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold-light);
+  margin-bottom: 10px;
+}
+
+.total-cards {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+/* ======= VIRTUAL KARTA ======= */
+.virtual-card-section {
+  background: var(--glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  margin-bottom: 40px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-header h3 {
+  font-size: 20px;
+  color: var(--gold-light);
+}
+
+.card-balance-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.balance-logo {
+  width: 22px;
+  height: 22px;
+}
+
+/* ======= KARTA KONTEYNER ======= */
+.card-container {
+  perspective: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-wrapper {
+  width: 320px;
+  height: 200px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.8s ease;
+  cursor: pointer;
+}
+
+.card-wrapper.flipped {
+  transform: rotateY(180deg);
+}
+
+/* ======= OLD TOMON ======= */
+.card-side {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  backface-visibility: hidden;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.card-front {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+  color: var(--black);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.card-login {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.card-phone {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.card-balance-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.balance-label {
+  opacity: 0.8;
+}
+
+.balance-logo-small {
+  width: 16px;
+  height: 16px;
+}
+
+.card-number-display {
+  font-family: "Courier New", monospace;
+  letter-spacing: 2px;
+  font-size: 16px;
+  margin-top: auto;
+  font-weight: 600;
+}
+
+/* ======= ORQA TOMON ======= */
+.card-back {
+  background: linear-gradient(135deg, #222, #000);
+  color: var(--gold-light);
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.qr-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+}
+
+.qr-container {
+  background: var(--gold-light);
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.hamyon-text {
+  font-size: 22px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  color: var(--gold-light);
+}
+
+/* ======= TUGMALAR ======= */
+.flip-hint {
+  margin-top: 12px;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.pay-btn {
+  margin-top: 16px;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+  color: var(--black);
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.cards-container:hover {
-  transform: translateY(-3px);
+.pay-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.5);
 }
 
-.cards-container h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #2d2f39;
-  font-size: 22px;
+/* ======= REAL KARTALAR ======= */
+.real-cards-section {
+  margin-top: 40px;
 }
 
 .cards-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 20px;
+  margin-top: 20px;
 }
 
-/* Karta dizayni */
 .card-item-real {
-  background: white;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card-item-real:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-/* Old tomon */
-.card-front {
-  background: linear-gradient(135deg, #ffffff, #e9f1ff);
-  padding: 20px;
-  color: #1e1e1e;
-  height: 180px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
 }
 
-.card-chip {
-  width: 40px;
-  height: 30px;
-  background: linear-gradient(45deg, #f5d76e, #ffe791);
-  border-radius: 6px;
-  box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
+.card-wrapper-real {
+  width: 260px;
+  height: 160px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.8s ease;
+  cursor: pointer;
 }
 
-.card-type {
-  font-size: 11px;
-  opacity: 0.8;
-  color: #4a4a4a;
+.card-wrapper-real.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-side-real {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  backface-visibility: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+.card-front-real {
+  color: #fff;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+    background: radial-gradient(circle at center,  #ffd700 40%, #ffa500 100%);
+}
+
+.logo-img-small {
+  width: 40px;
 }
 
 .card-number {
-  font-size: 16px;
+  font-family: "Courier New", monospace;
   letter-spacing: 2px;
-  font-family: 'Courier New', monospace;
-  text-align: center;
-  margin: 10px 0;
-  color: #333;
+  font-size: 14px;
+}
+
+.card-balance-real {
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .card-footer {
   display: flex;
   justify-content: space-between;
+  font-size: 12px;
+}
+
+.card-back-real {
+  background: #000;
+  color: #fff;
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
 }
 
-.card-balance {
-  font-size: 18px;
-  font-weight: bold;
-  color: #3a3fef;
-}
-
-.card-design {
-  background: #eef3ff;
-  padding: 4px 8px;
-  border-radius: 5px;
-  font-size: 10px;
-  color: #3a3fef;
-  font-weight: 500;
-}
-
-/* Tugmalar */
-.card-actions {
-  background: #f9faff;
-  padding: 15px;
-  display: flex;
-  gap: 10px;
-  border-top: 1px solid #e4e7ee;
-}
-
-.card-btn {
-  flex: 1;
-  padding: 10px;
-  border: none;
+.qr-container-real {
+  background: #fff;
+  padding: 6px;
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-weight: 600;
-  font-size: 14px;
 }
 
-.card-btn.primary {
-  background: #667eea;
-  color: white;
+.card-number-back {
+  margin-top: 10px;
+  font-family: "Courier New", monospace;
+  letter-spacing: 2px;
+  font-size: 12px;
 }
 
-.card-btn.secondary {
-  background: #6c757d;
-  color: white;
+/* ======= UMUMIY BALANS ======= */
+.total-balance-section {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
 }
 
-.card-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-2px);
-}
-
-/* Karta yo‘q bo‘lganda */
-.no-cards {
+.total-balance-card {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+  color: var(--black);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
   text-align: center;
-  padding: 40px;
-  color: #777;
+  width: 300px;
 }
 
-.no-cards-icon {
-  font-size: 48px;
-  margin-bottom: 15px;
-  color: #a0a0a0;
+.total-balance-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
-.no-cards p {
-  margin: 10px 0;
+.total-balance-logo {
+  width: 28px;
+  height: auto;
+}
+
+.total-balance-amount {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* ======= RESPONSIVE ======= */
+@media (max-width: 600px) {
+  .card-wrapper,
+  .card-wrapper-real {
+    width: 100%;
+    height: 180px;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-front {
+    padding: 14px;
+  }
+
+  .card-number-display {
+    font-size: 14px;
+  }
+}
+
+
+
+.logo-img-cart {
+  width: 40px; /* Reduced from 50px to 40px */
+  height: auto;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ======= KARTA ORQA TOMON (YANGI STIL) ======= */
+.card-back {
+  background: radial-gradient(circle at center, #fff7cc 0%, #ffd700 40%, #ffa500 100%);
+  color: var(--black);
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+}
+
+/* Ichidagi oq "shakl" (light pattern efekti) */
+.card-back::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: repeating-radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.25) 0,
+    rgba(255, 255, 255, 0.25) 2px,
+    transparent 4px
+  );
+  opacity: 0.3;
+  transform: rotate(25deg);
+}
+
+/* QR va yozuv joylashuvi */
+.qr-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  position: relative;
+  z-index: 1;
+}
+
+.qr-container {
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(255, 165, 0, 0.5);
+}
+
+.hamyon-text {
+  font-size: 22px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  color: #000;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.7);
+}
+
+
+
+.card-middle{
+  display: flex;
+   justify-content: space-between;
+  align-items: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Swipe o'chirish ko'rsatkichi */
+.delete-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(220, 38, 38, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 10;
+  pointer-events: none;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* Tasdiqlash oynasi */
+.delete-confirm-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.delete-confirm-modal {
+  background: var(--glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  max-width: 300px;
+  width: 90%;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.delete-confirm-modal h3 {
+  color: var(--gold-light);
+  margin-bottom: 12px;
+  font-size: 20px;
+}
+
+.delete-confirm-modal p {
+  margin-bottom: 20px;
+  opacity: 0.9;
+  font-size: 15px;
+}
+
+.delete-confirm-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-cancel, .btn-confirm {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel {
+  background: #555;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #777;
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white;
+}
+
+.btn-confirm:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
 }

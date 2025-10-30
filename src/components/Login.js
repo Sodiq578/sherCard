@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Backround from '../assets/images/backround.svg';
 import '../styles/Login.css';
+import Logo from '../assets/images/logo.png';
 
 const Login = ({ onLogin }) => {
   const [login, setLogin] = useState('');
@@ -48,7 +49,10 @@ const Login = ({ onLogin }) => {
           phone: phone,
           email: '',
           avatar: ''
-        }
+        },
+        balance: 10000, // Boshlang'ich balans
+        cards: [],
+        history: []
       };
 
       // Virtual karta raqamini yaratish
@@ -62,6 +66,7 @@ const Login = ({ onLogin }) => {
 
       const cardNumber = generateCardNumber();
       localStorage.setItem(`cardNumber_${login}`, cardNumber);
+      localStorage.setItem("userData", JSON.stringify(newUser));
 
       alert(`Tabriklaymiz, ${fullName}! Virtual karta yaratildi.`);
       onLogin(newUser);
@@ -85,7 +90,11 @@ const Login = ({ onLogin }) => {
       </div>
 
       <div className="loginx-content">
-        <div className="loginx-logo">Mahalla Obodligi</div>
+        {/* Logo qo'shildi */}
+        <div className="loginx-logo-container">
+          <img src={Logo} alt="Hamyon Logo" className="loginx-logo-img" />
+          
+        </div>
 
         <div className="loginx-form">
           <h2 className="loginx-title">
@@ -148,7 +157,7 @@ const Login = ({ onLogin }) => {
           </form>
         </div>
 
-        <p className="loginx-footer">© 2025 Mahalla Obodligi</p>
+        <p className="loginx-footer">© 2025 Sodiqov</p>
       </div>
     </div>
   );

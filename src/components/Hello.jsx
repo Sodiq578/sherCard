@@ -6,11 +6,11 @@ import gift from '../assets/images/hello1.svg';
 import flower from '../assets/images/hello2.svg';
 import star from '../assets/images/hello1.svg';
 
-const slides = [
+const slidesData = [
   {
     image: gift,
     title: 'Salom',
-    name: 'Abdulbosit!',
+    name: '', // Bu joy keyinchalik foydalanuvchi ismi bilan to‘ldiriladi
     text: 'Tarot savollarini bizning ilovamiz orqali yoki shaxsan so‘rashingiz mumkin. Natijalarni saqlang, solishtiring va tahlil qiling.',
     bonus: '+500 bonus ball'
   },
@@ -30,17 +30,32 @@ const slides = [
   },
 ];
 
-
 const Hello = () => {
   const [index, setIndex] = useState(0);
+  const [slides, setSlides] = useState(slidesData);
   const navigate = useNavigate();
 
+  // 🔹 Ro‘yxatdan o‘tgan foydalanuvchi ismini olish
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    if (userData && userData.profile && userData.profile.name) {
+      const userName = userData.profile.name.split(' ')[0]; // faqat ismini olish
+      // Birinchi slaydda ismni chiqarish
+      setSlides((prev) => {
+        const updated = [...prev];
+        updated[0].name = `${userName}!`;
+        return updated;
+      });
+    }
+  }, []);
+
+  // 🔁 Slayd avtomatik almashish
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((i) => (i + 1) % slides.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides.length]);
 
   const next = () => setIndex((i) => (i + 1) % slides.length);
   const skip = () => {

@@ -1,11 +1,11 @@
 // src/components/Profile.jsx
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   FiCamera, FiDollarSign, FiCreditCard, FiClock,
   FiEdit2, FiSave, FiX, FiLogOut
 } from 'react-icons/fi';
-import CardGenerator from './CardGenerator';
 import '../styles/Profile.css';
+import Logo from '../assets/images/logo.png';
 
 function Profile({ user, updateUser, onLogout }) {
   const [name, setName] = useState('');
@@ -13,7 +13,6 @@ function Profile({ user, updateUser, onLogout }) {
   const [email, setEmail] = useState('');
   const [avatar, setAvatar] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [isCardFlipped, setIsCardFlipped] = useState(false);
 
   // Profilni yuklash
   useEffect(() => {
@@ -24,8 +23,6 @@ function Profile({ user, updateUser, onLogout }) {
       setAvatar(user.profile.avatar || '');
     }
   }, [user]);
-
-  const toggleCardFlip = () => setIsCardFlipped(!isCardFlipped);
 
   const handleSave = () => {
     const updatedUser = {
@@ -74,7 +71,6 @@ function Profile({ user, updateUser, onLogout }) {
           )}
         </button>
       </div>
-
       <div className="profile-card">
         {/* Avatar */}
         <div className="avatar-section">
@@ -102,19 +98,9 @@ function Profile({ user, updateUser, onLogout }) {
           />
           <h2 className="user-name">{name}</h2>
           <p className="user-role">Foydalanuvchi</p>
-        </div>
-
-        {/* Virtual Karta */}
-        <div className="card-section">
-          <h3>Virtual Kartangiz</h3>
-          <div className="card-container">
-            <div
-              className={`card-wrapper ${isCardFlipped ? 'flipped' : ''}`}
-              onClick={toggleCardFlip}
-            >
-              <CardGenerator user={user} />
-            </div>
-            <small className="flip-hint">Kartani aylantirish uchun bosing</small>
+          <div className="user-balance-badge">
+            {user.balance?.toLocaleString() || 0} 
+              <img src={Logo} alt="Logo" className="balance-logo" />
           </div>
         </div>
 
@@ -129,7 +115,6 @@ function Profile({ user, updateUser, onLogout }) {
               disabled={!isEditing}
             />
           </div>
-
           <div className="input-group">
             <label>Telefon</label>
             <input
@@ -140,7 +125,6 @@ function Profile({ user, updateUser, onLogout }) {
               disabled={!isEditing}
             />
           </div>
-
           <div className="input-group">
             <label>Email</label>
             <input
@@ -151,7 +135,6 @@ function Profile({ user, updateUser, onLogout }) {
               disabled={!isEditing}
             />
           </div>
-
           {isEditing && (
             <div className="form-actions">
               <button onClick={handleSave} className="save-btn">
@@ -173,7 +156,7 @@ function Profile({ user, updateUser, onLogout }) {
           </div>
           <div className="stat-item">
             <FiCreditCard className="stat-icon" />
-            <div className="stat-value">{user.cards?.length || 1}</div>
+            <div className="stat-value">{user.cards?.length || 0}</div>
             <div className="stat-label">Karta</div>
           </div>
           <div className="stat-item">

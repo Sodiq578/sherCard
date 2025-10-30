@@ -18,7 +18,7 @@ import './styles/App.css';
 const BottomNavWrapper = ({ isAuthenticated, isAdmin }) => {
   const location = useLocation();
   const userPages = [
-    '/main', '/marketplace', '/buy-card', '/cards', 
+    '/main', '/marketplace', '/buy-card', '/cards',
     '/profile', '/transfer', '/banner-transfer', '/history'
   ];
   return isAuthenticated && !isAdmin && userPages.includes(location.pathname)
@@ -34,12 +34,10 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // 🌀 Foydalanuvchini yuklash
   useEffect(() => {
     const stored = localStorage.getItem('user');
     const usersData = JSON.parse(localStorage.getItem('allUsers') || '[]');
     setAllUsers(usersData);
-
     if (stored) {
       const parsed = JSON.parse(stored);
       setUser(parsed);
@@ -49,13 +47,10 @@ function App() {
     setIsLoading(false);
   }, []);
 
-  // 🔐 Token generatsiya
   const generateToken = () =>
     'token_' + Math.random().toString(36).substr(2, 9) + Date.now();
 
-  // 🔑 LOGIN
   const handleLogin = (data) => {
-    // Token orqali kirish
     if (data.token) {
       const found = allUsers.find((u) => u.token === data.token);
       if (found) {
@@ -71,7 +66,6 @@ function App() {
       }
     }
 
-    // ADMIN uchun maxfiy login
     if (data.login === 'sodiqjon' && data.password === 'sodiqjon123') {
       const admin = {
         login: 'sodiqjon',
@@ -89,13 +83,18 @@ function App() {
       return;
     }
 
-    // Oddiy foydalanuvchi
+    // YANGI FOYDALANUVCHI – 500 BALL
     const newUser = {
       login: data.login,
-      balance: 10000,
+      balance: 500, // 500 ball
       cards: [],
       history: [],
-      profile: { name: data.login, phone: '', email: '', avatar: '' },
+      profile: {
+        name: data.profile.name,
+        phone: data.profile.phone,
+        email: '',
+        avatar: ''
+      },
       token: generateToken(),
     };
 
@@ -103,6 +102,7 @@ function App() {
       ...allUsers.filter((u) => u.login !== data.login),
       newUser,
     ];
+
     localStorage.setItem('allUsers', JSON.stringify(updatedUsers));
     localStorage.setItem('user', JSON.stringify(newUser));
     setAllUsers(updatedUsers);
@@ -112,7 +112,6 @@ function App() {
     navigate('/hello');
   };
 
-  // 🚪 LOGOUT
   const handleLogout = () => {
     localStorage.removeItem('user');
     setUser(null);
@@ -121,11 +120,9 @@ function App() {
     navigate('/');
   };
 
-  // 🔁 UPDATE USER
   const updateUser = (updated) => {
     localStorage.setItem('user', JSON.stringify(updated));
     setUser(updated);
-
     const updatedAll = allUsers.map((u) =>
       u.login === updated.login ? updated : u
     );
@@ -133,7 +130,6 @@ function App() {
     setAllUsers(updatedAll);
   };
 
-  // ⌨️ Ctrl + Alt + E → Token orqali kirish
   useEffect(() => {
     const handleTokenPaste = (e) => {
       if (e.ctrlKey && e.altKey && e.key === 'e') {
@@ -172,8 +168,6 @@ function App() {
             )
           }
         />
-
-        {/* Admin panel */}
         <Route
           path="/admin"
           element={
@@ -188,8 +182,6 @@ function App() {
             )
           }
         />
-
-        {/* Oddiy foydalanuvchilar sahifalari */}
         <Route
           path="/hello"
           element={
@@ -270,8 +262,6 @@ function App() {
             )
           }
         />
-
-        {/* ✅ PROFIL (tuzatilgan joy) */}
         <Route
           path="/profile"
           element={
@@ -279,18 +269,15 @@ function App() {
               <Profile
                 user={user}
                 updateUser={updateUser}
-                onLogout={handleLogout}  // ✅ MUHIM QO‘SHILDI
+                onLogout={handleLogout}
               />
             ) : (
               <Navigate to="/" />
             )
           }
         />
-
-        {/* Not found */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-
       <BottomNavWrapper isAuthenticated={isAuthenticated} isAdmin={isAdmin} />
     </div>
   );
@@ -303,6 +290,3 @@ export default function AppWrapper() {
     </BrowserRouter>
   );
 }
-
-
-

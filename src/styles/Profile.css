@@ -239,6 +239,7 @@
   font-weight: bold;
   margin-bottom: 5px;
   color: #000;
+  margin-top: 20px;
 }
 
 .card-phone {
@@ -333,6 +334,7 @@
   font-size: 12px;
   opacity: 0.7;
   margin-top: 10px;
+  margin-top: 30px;
 }
 
 /* Qolgan CSS qismlari */
@@ -547,4 +549,26 @@
     width: 80px;
     height: 80px;
   }
+}
+
+
+
+
+/* Profile.css ga qo'shimcha */
+.user-balance-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  margin-top: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.balance-logo {
+  height: 20px;
+  width: auto;
 }

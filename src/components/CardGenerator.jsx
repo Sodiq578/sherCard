@@ -1,6 +1,7 @@
 // src/components/CardGenerator.jsx
 import React from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
+import Logo from '../assets/images/logo.png';
 
 const CardGenerator = ({ user }) => {
   // 12 xonali karta raqamini yaratish
@@ -35,7 +36,7 @@ const CardGenerator = ({ user }) => {
         <div className="card-background-front">
           <div className="geometric-pattern-front"></div>
         </div>
-        <div className="card-logo">H</div>
+        <div className="card-logo"></div>
         <div className="card-content">
           <div className="card-user-info">
             <div className="card-login">{user.login}</div>

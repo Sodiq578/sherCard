@@ -1,115 +1,333 @@
-.buy-card {
+/* BuyCard.css */
+.buy-card-page {
+  background: linear-gradient(135deg, #111, #222);
   min-height: 100vh;
-  background: #0a0a0a;
-  padding: 20px 0;
+  color: var(--white);
+  padding: 30px 20px;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-.card-preview-section {
+.buy-card-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Header */
+.buy-card-header {
+  text-align: center;
   margin-bottom: 30px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.title-icon {
+  font-size: 32px;
+}
+
+.user-balance-info {
+  font-size: 18px;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.balance-header-icon {
+  color: var(--gold-light);
+}
+
+/* Content */
+.buy-card-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+/* Karta ko'rinishi */
+.card-preview-section {
+  background: var(--glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(12px);
+}
+
+.preview-title {
+  font-size: 20px;
+  color: var(--gold-light);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview-icon {
+  font-size: 22px;
 }
 
 .card-preview {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  border-radius: 20px;
-  padding: 30px;
-  color: white;
+  perspective: 1000px;
+}
+
+.preview-card {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+  color: var(--black);
+  border-radius: 16px;
+  padding: 20px;
+  height: 200px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 15px 35px rgba(0, 123, 255, 0.3);
-  max-width: 400px;
-  margin: 0 auto;
-  height: 220px;
 }
 
-.card-chip {
-  width: 50px;
-  height: 40px;
-  background: linear-gradient(45deg, #ffd700, #ffed4e);
-  border-radius: 8px;
-  margin-bottom: 30px;
-}
-
-.card-number {
-  font-size: 20px;
-  letter-spacing: 3px;
-  font-family: 'Courier New', monospace;
+.preview-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
+}
+
+.preview-chip {
+  width: 40px;
+  height: 30px;
+  background: #ccc;
+  border-radius: 6px;
+  background-image: linear-gradient(45deg, #ddd 25%, #bbb 25%, #bbb 50%, #ddd 50%, #ddd 75%, #bbb 75%);
+  background-size: 10px 10px;
+}
+
+.preview-logo {
+  font-weight: bold;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.preview-card-number {
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
   text-align: center;
+}
+
+.preview-card-balance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.preview-balance-icon {
+  color: var(--black);
+}
+
+.preview-card-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  opacity: 0.8;
   font-weight: 600;
 }
 
-.card-balance {
-  font-size: 24px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 15px;
-}
-
-.card-type {
-  font-size: 14px;
-  text-align: right;
-  opacity: 0.8;
-  font-weight: 500;
-}
-
+/* Forma */
 .form-section {
-  background: #1a1a1a;
+  background: var(--glass);
+  border: 1px solid var(--border-glass);
   border-radius: 16px;
-  padding: 25px;
-  border: 1px solid #333;
+  padding: 24px;
+  backdrop-filter: blur(12px);
 }
 
-.price-card {
-  background: #2a2a2a;
+.form-title {
+  font-size: 20px;
+  color: var(--gold-light);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-title-icon {
+  font-size: 22px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: var(--gold-light);
+}
+
+.label-icon {
+  color: var(--gold-light);
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border-glass);
   border-radius: 12px;
-  padding: 20px;
-  margin: 20px 0;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--white);
+  font-size: 16px;
+  backdrop-filter: blur(5px);
+}
+
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--gold-light);
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3);
+}
+
+.input-hint {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-top: 6px;
+}
+
+/* Narx kartasi */
+.price-info-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
 }
 
 .price-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #333;
+  padding: 8px 0;
+  font-size: 15px;
 }
 
-.price-item:last-child {
-  border-bottom: none;
-}
-
-.price-item span {
-  color: #cccccc;
-}
-
-.price-item strong {
-  color: #ffffff;
+.price-item.total {
+  border-top: 1px dashed var(--border-glass);
+  padding-top: 12px;
+  margin-top: 8px;
   font-weight: 600;
 }
 
+.price-icon {
+  color: var(--gold-light);
+  margin-right: 8px;
+}
+
+.total-price {
+  color: var(--gold-light);
+  font-size: 18px;
+}
+
+/* Tugma */
 .buy-btn {
   width: 100%;
-  padding: 16px;
+  padding: 14px;
   border: none;
   border-radius: 12px;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .buy-btn.active {
-  background: #28a745;
-  color: white;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+  color: var(--black);
 }
 
 .buy-btn.active:hover {
-  background: #218838;
   transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
 }
 
 .buy-btn.disabled {
-  background: #6c757d;
-  color: #cccccc;
+  background: #444;
+  color: #aaa;
   cursor: not-allowed;
+}
+
+.buy-btn.loading {
+  opacity: 0.8;
+  cursor: wait;
+}
+
+.loading-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--black);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn-success-icon, .btn-error-icon {
+  font-size: 18px;
+}
+
+/* Yetarli emas */
+.insufficient-balance {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(220, 38, 38, 0.2);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 14px;
+  color: #ff6b6b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .buy-card-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-title {
+    font-size: 24px;
+  }
+  
+  .preview-card {
+    height: 180px;
+    padding: 16px;
+  }
+  
+  .preview-card-number {
+    font-size: 14px;
+  }
 }

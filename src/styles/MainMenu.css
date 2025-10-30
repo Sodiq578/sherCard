@@ -1,211 +1,205 @@
-/* styles/MainMenu.css */
-.onboarding-container {
+.menu-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  background-color: #0d1117;
   color: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding: 20px;
+  padding-bottom: 100px;
+  box-sizing: border-box;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Salomlashuv */
+.welcome-section {
   display: flex;
-  flex-direction: column;
-}
-
-.status-bar {
-  padding: 12px 20px 8px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.status-icons i {
-  margin-left: 8px;
-  font-size: 16px;
-}
-
-.main-content {
-  flex: 1;
-  padding: 0 20px;
-  padding-bottom: 90px;
-}
-
-.welcome-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 16px;
   margin-bottom: 30px;
-  padding-top: 10px;
 }
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.avatar {
-  width: 44px;
-  height: 44px;
+.avatar-circle {
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.avatar-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background: #4e54c8;
+  background-color: #1e1e1e;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 26px;
+  color: #0C73FE;
+  border: 2px solid #0C73FE;
+  box-shadow: 0 0 10px rgba(12, 115, 254, 0.3);
 }
-
-.greeting {
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.welcome-texts {
   display: flex;
   flex-direction: column;
 }
-
-.welcome-text {
-  font-size: 13px;
-  opacity: 0.7;
+.welcome {
+  font-size: 14px;
+  color: #aaa;
 }
-
-.user-name {
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.search-btn {
-  background: none;
-  border: none;
-  color: white;
+.username {
   font-size: 20px;
-  opacity: 0.7;
+  font-weight: 600;
+  color: white;
 }
 
-.balance-card-large {
-  background: linear-gradient(135deg, #4e54c8, #8f94fb);
-  border-radius: 24px;
-  padding: 28px 24px;
+/* Balans */
+.balance-card {
+  background: linear-gradient(135deg, #0C73FE, #0056d6);
+  border-radius: 16px;
+  padding: 20px;
   text-align: center;
   margin-bottom: 30px;
-  box-shadow: 0 10px 30px rgba(78, 84, 200, 0.3);
+  box-shadow: 0 4px 12px rgba(12, 115, 254, 0.4);
 }
-
-.balance-display {
+.balance-top {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
 }
-
-.balance-amount {
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: -1px;
-}
-
-.currency {
-  font-size: 24px;
-  font-weight: 500;
+.balance-icon {
+  color: white;
   opacity: 0.9;
 }
-
+.balance-logo {
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6));
+}
+.balance-amount {
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+}
 .balance-label {
   font-size: 14px;
-  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 6px;
 }
 
-.topup-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.topup-title {
+/* To‘ldirish */
+.topup-section h3 {
   font-size: 16px;
-  margin-bottom: 16px;
-  opacity: 0.9;
-}
-
-.topup-input-wrapper {
-  position: relative;
-  margin-bottom: 16px;
-}
-
-.topup-input {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
-  border-radius: 16px;
-  padding: 18px 20px;
-  font-size: 18px;
   color: white;
-  text-align: center;
-  font-weight: 500;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-
-.topup-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+.topup-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
-
-.topup-input:focus {
-  outline: none;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.topup-submit-btn {
-  width: 100%;
-  background: #4e54c8;
+.topup-btn {
+  background-color: transparent;
   color: white;
-  border: none;
-  border-radius: 16px;
-  padding: 16px;
-  font-size: 17px;
+  border: 2px solid #0C73FE;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 16px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.topup-btn:hover {
+  background-color: #0C73FE;
+  transform: scale(1.05);
 }
 
-.topup-submit-btn:active {
-  transform: scale(0.98);
+/* Do‘konlar */
+.shops-section h3 {
+  font-size: 16px;
+  color: white;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.shops-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.shop-card {
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.shop-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(12, 115, 254, 0.3);
+}
+.shop-card img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  margin-bottom: 8px;
+}
+.shop-card p {
+  font-size: 13px;
+  color: #ccc;
+  margin: 0;
 }
 
+/* Navigatsiya */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(26, 26, 46, 0.95);
-  backdrop-filter: blur(20px);
-  padding: 12px 0;
+  background-color: #0d1117;
+  border-top: 1px solid #333;
   display: flex;
   justify-content: space-around;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 0;
 }
-
 .nav-item {
+  flex: 1;
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 24px;
-  padding: 8px;
+  color: #888;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
   transition: color 0.2s;
 }
-
-.nav-item.active {
-  color: #4e54c8;
+.nav-item.active,
+.nav-item:hover {
+  color: #0C73FE;
 }
 
-.nav-item:active {
-  transform: scale(0.9);
+/* Responsive */
+@media (max-width: 480px) {
+  .topup-options {
+    grid-template-columns: 1fr;
+  }
+  .shops-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .balance-logo {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+
+
+.topup-logo{
+  width: 24px;
+  height: 24px;
 }
