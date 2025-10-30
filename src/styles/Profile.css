@@ -122,6 +122,220 @@
   opacity: 0.7;
 }
 
+/* Card Section Styles */
+.card-section {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.card-section h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  opacity: 0.9;
+}
+
+.card-container {
+  perspective: 1000px;
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-wrapper {
+  width: 320px;
+  height: 200px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+  cursor: pointer;
+}
+
+.card-wrapper.flipped {
+  transform: rotateY(180deg);
+}
+
+/* Card Generator Styles */
+.card-generator-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.card-side {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: 'Arial', sans-serif;
+  overflow: hidden;
+}
+
+/* Old tomon - Yangi sariq fon */
+.card-front {
+  background: linear-gradient(135deg, #FFC400, #FFB300);
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-background-front {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
+    linear-gradient(45deg, #FFC400 0%, #FFB300 100%);
+  z-index: 1;
+}
+
+.geometric-pattern-front {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 140px;
+  height: 140px;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+  border-radius: 30px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  z-index: 1;
+}
+
+.card-logo {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #000;
+  z-index: 2;
+}
+
+.card-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.card-user-info {
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.card-login {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #000;
+}
+
+.card-phone {
+  font-size: 14px;
+  color: #000;
+  opacity: 0.8;
+}
+
+.card-number-display {
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #000;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 8px 12px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+/* Orqa tomon - Yangi sariq fon */
+.card-back {
+  background: linear-gradient(135deg, #FFC400, #FFB300);
+  color: #000;
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 20px;
+}
+
+.card-background-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+    linear-gradient(135deg, #FFC400 0%, #FFB300 100%);
+  z-index: 1;
+}
+
+.geometric-pattern-back {
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+  border-radius: 25px;
+  transform: rotate(-15deg);
+  z-index: 1;
+}
+
+.card-logo-back {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #000;
+  z-index: 2;
+}
+
+.qr-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 2;
+}
+
+.qr-container {
+  background: #FFC400;
+  padding: 5px;
+  border-radius: 8px;
+  border: 2px solid #000;
+}
+
+.hamyon-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.flip-hint {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 10px;
+}
+
+/* Qolgan CSS qismlari */
 .profile-form .input-group {
   margin-bottom: 16px;
 }
@@ -266,10 +480,6 @@
   background: rgba(220, 20, 60, 0.25);
 }
 
-.logout-btn:active {
-  transform: scale(0.98);
-}
-
 .loading {
   display: flex;
   justify-content: center;
@@ -280,302 +490,61 @@
 }
 
 /* Responsive Design */
-
-/* Tablet (768px va undan kichik) */
 @media (max-width: 768px) {
-  .profile-container {
-    padding: 16px;
-    padding-bottom: 80px;
+  .card-wrapper {
+    width: 280px;
+    height: 180px;
   }
   
-  .profile-header h1 {
-    font-size: 22px;
-  }
-  
-  .profile-card {
-    padding: 20px;
-    border-radius: 20px;
-  }
-  
-  .avatar-wrapper {
-    width: 90px;
-    height: 90px;
-  }
-  
-  .avatar-placeholder {
-    font-size: 32px;
-  }
-  
-  .user-name {
-    font-size: 18px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-  
-  .stat-item {
-    padding: 14px;
-  }
-  
-  .stat-icon {
-    font-size: 24px;
-  }
-  
-  .stat-value {
+  .card-number-display {
     font-size: 16px;
+  }
+  
+  .geometric-pattern-front {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .geometric-pattern-back {
+    width: 100px;
+    height: 100px;
   }
 }
 
-/* Kichik tablet va katta telefonlar (600px va undan kichik) */
-@media (max-width: 600px) {
-  .profile-container {
-    padding: 12px;
-    padding-bottom: 70px;
+@media (max-width: 480px) {
+  .card-wrapper {
+    width: 260px;
+    height: 160px;
   }
   
-  .profile-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 20px;
+  .card-number-display {
+    font-size: 14px;
+    padding: 6px 10px;
   }
   
-  .profile-header h1 {
-    font-size: 20px;
+  .card-login {
+    font-size: 14px;
   }
   
-  .edit-btn {
-    width: 100%;
-    text-align: center;
-    justify-content: center;
+  .card-phone {
+    font-size: 12px;
   }
   
-  .profile-card {
-    padding: 16px;
-    border-radius: 16px;
+  .qr-container {
+    transform: scale(0.8);
   }
   
-  .avatar-wrapper {
+  .hamyon-text {
+    font-size: 16px;
+  }
+  
+  .geometric-pattern-front {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .geometric-pattern-back {
     width: 80px;
     height: 80px;
-  }
-  
-  .avatar-placeholder {
-    font-size: 28px;
-  }
-  
-  .camera-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
-  }
-  
-  .user-name {
-    font-size: 18px;
-  }
-  
-  .profile-form input {
-    padding: 12px 14px;
-    font-size: 15px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin: 20px 0;
-  }
-  
-  .stat-item {
-    padding: 12px;
-  }
-  
-  .stat-icon {
-    font-size: 22px;
-  }
-  
-  .stat-value {
-    font-size: 15px;
-  }
-  
-  .stat-label {
-    font-size: 11px;
-  }
-  
-  .save-btn,
-  .cancel-btn {
-    padding: 12px;
-    font-size: 15px;
-  }
-  
-  .logout-btn {
-    padding: 12px;
-    margin-top: 20px;
-  }
-}
-
-/* Kichik telefonlar (480px va undan kichik) */
-@media (max-width: 480px) {
-  .profile-container {
-    padding: 10px;
-    padding-bottom: 60px;
-  }
-  
-  .profile-card {
-    padding: 14px;
-    border-radius: 14px;
-  }
-  
-  .avatar-section {
-    margin-bottom: 20px;
-  }
-  
-  .avatar-wrapper {
-    width: 70px;
-    height: 70px;
-    margin-bottom: 12px;
-  }
-  
-  .avatar-placeholder {
-    font-size: 24px;
-  }
-  
-  .camera-icon {
-    width: 24px;
-    height: 24px;
-    font-size: 12px;
-  }
-  
-  .user-name {
-    font-size: 16px;
-  }
-  
-  .user-role {
-    font-size: 13px;
-  }
-  
-  .profile-form .input-group {
-    margin-bottom: 14px;
-  }
-  
-  .profile-form label {
-    font-size: 13px;
-  }
-  
-  .profile-form input {
-    padding: 10px 12px;
-    font-size: 14px;
-    border-radius: 10px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-    margin: 16px 0;
-  }
-  
-  .stat-item {
-    padding: 10px;
-    border-radius: 12px;
-  }
-  
-  .stat-icon {
-    font-size: 20px;
-    margin-bottom: 6px;
-  }
-  
-  .stat-value {
-    font-size: 14px;
-  }
-  
-  .stat-label {
-    font-size: 10px;
-  }
-  
-  .form-actions {
-    gap: 8px;
-    margin-top: 16px;
-  }
-  
-  .save-btn,
-  .cancel-btn {
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 10px;
-    min-width: 100px;
-  }
-  
-  .logout-btn {
-    padding: 10px;
-    margin-top: 16px;
-    border-radius: 10px;
-    font-size: 14px;
-  }
-}
-
-/* Juda kichik telefonlar (360px va undan kichik) */
-@media (max-width: 360px) {
-  .profile-container {
-    padding: 8px;
-    padding-bottom: 50px;
-  }
-  
-  .profile-card {
-    padding: 12px;
-  }
-  
-  .avatar-wrapper {
-    width: 60px;
-    height: 60px;
-  }
-  
-  .avatar-placeholder {
-    font-size: 20px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-  
-  .stat-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    text-align: left;
-    padding: 12px 16px;
-  }
-  
-  .stat-icon {
-    margin-bottom: 0;
-    margin-right: 12px;
-    font-size: 20px;
-  }
-  
-  .stat-content {
-    flex: 1;
-  }
-  
-  .stat-value {
-    font-size: 16px;
-    margin-bottom: 2px;
-  }
-  
-  .stat-label {
-    font-size: 12px;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .save-btn,
-  .cancel-btn {
-    width: 100%;
-  }
-  
-  .btn-icon {
-    font-size: 14px;
   }
 }

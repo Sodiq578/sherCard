@@ -1,0 +1,21 @@
+.card-generator {
+  background: linear-gradient(135deg, #2e7d32, #66bb6a);
+  color: white;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  margin: 20px auto;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.card-number {
+  margin-top: 10px;
+  font-size: 1.6rem;
+  letter-spacing: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 10px;
+  font-family: monospace;
+}

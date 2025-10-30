@@ -1,15 +1,10 @@
-// components/Profile.jsx
+// src/components/Profile.jsx
 import React, { useState, useEffect } from 'react';
 import { 
-  FiCamera, 
-  FiDollarSign, 
-  FiCreditCard, 
-  FiClock,
-  FiEdit2,
-  FiSave,
-  FiX,
-  FiLogOut
+  FiCamera, FiDollarSign, FiCreditCard, FiClock,
+  FiEdit2, FiSave, FiX, FiLogOut
 } from 'react-icons/fi';
+import CardGenerator from './CardGenerator';
 import '../styles/Profile.css';
 
 function Profile({ user, updateUser, onLogout }) {
@@ -18,75 +13,63 @@ function Profile({ user, updateUser, onLogout }) {
   const [email, setEmail] = useState('');
   const [avatar, setAvatar] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [isCardFlipped, setIsCardFlipped] = useState(false);
 
+  // Profilni yuklash
   useEffect(() => {
     if (user && user.profile) {
-      setName(user.profile.name || '');
+      setName(user.profile.name || user.login);
       setPhone(user.profile.phone || '');
       setEmail(user.profile.email || '');
       setAvatar(user.profile.avatar || '');
     }
   }, [user]);
 
-  const handleSave = () => {
-    if (!user) return;
+  const toggleCardFlip = () => setIsCardFlipped(!isCardFlipped);
 
+  const handleSave = () => {
     const updatedUser = {
       ...user,
       profile: {
         ...user.profile,
-        name: name || user.login,
+        name,
         phone,
         email,
         avatar,
       },
     };
-
     updateUser(updatedUser);
     setIsEditing(false);
-    alert('Profil muvaffaqiyatli yangilandi!');
+    alert('Profil maʼlumotlari yangilandi!');
   };
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setAvatar(e.target.result);
-      };
+      reader.onload = (ev) => setAvatar(ev.target.result);
       reader.readAsDataURL(file);
     }
   };
 
   const handleLogout = () => {
-    if (window.confirm('Chiqishni xohlaysizmi?')) {
-      onLogout(); // faqat onLogout() chaqiramiz
-    }
+    if (window.confirm('Chiqishni xohlaysizmi?')) onLogout();
   };
 
-  if (!user) {
-    return <div className="loading">Yuklanmoqda...</div>;
-  }
-
-  const displayName = name || user.login;
+  if (!user) return <div className="loading">Yuklanmoqda...</div>;
 
   return (
     <div className="profile-container">
       <div className="profile-header">
         <h1>Profil</h1>
-        <button 
-          onClick={() => setIsEditing(!isEditing)} 
-          className="edit-btn"
-        >
+        <button onClick={() => setIsEditing(!isEditing)} className="edit-btn">
           {isEditing ? (
             <>
-              <FiX className="btn-icon" />
-              Bekor qilish
+              <FiX className="btn-icon" /> Bekor qilish
             </>
           ) : (
             <>
-              <FiEdit2 className="btn-icon" />
-              Tahrirlash
+              <FiEdit2 className="btn-icon" /> Tahrirlash
             </>
           )}
         </button>
@@ -100,7 +83,7 @@ function Profile({ user, updateUser, onLogout }) {
               <img src={avatar} alt="Avatar" className="avatar-img" />
             ) : (
               <div className="avatar-placeholder">
-                {displayName.charAt(0).toUpperCase()}
+                {name.charAt(0).toUpperCase()}
               </div>
             )}
             {isEditing && (
@@ -117,19 +100,32 @@ function Profile({ user, updateUser, onLogout }) {
             className="avatar-input"
             disabled={!isEditing}
           />
-          <h2 className="user-name">{displayName}</h2>
+          <h2 className="user-name">{name}</h2>
           <p className="user-role">Foydalanuvchi</p>
         </div>
 
-        {/* Form */}
+        {/* Virtual Karta */}
+        <div className="card-section">
+          <h3>Virtual Kartangiz</h3>
+          <div className="card-container">
+            <div
+              className={`card-wrapper ${isCardFlipped ? 'flipped' : ''}`}
+              onClick={toggleCardFlip}
+            >
+              <CardGenerator user={user} />
+            </div>
+            <small className="flip-hint">Kartani aylantirish uchun bosing</small>
+          </div>
+        </div>
+
+        {/* Profil formasi */}
         <div className="profile-form">
           <div className="input-group">
-            <label>Ism</label>
+            <label>To'liq ism</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Ismingiz"
               disabled={!isEditing}
             />
           </div>
@@ -159,48 +155,37 @@ function Profile({ user, updateUser, onLogout }) {
           {isEditing && (
             <div className="form-actions">
               <button onClick={handleSave} className="save-btn">
-                <FiSave className="btn-icon" />
-                Saqlash
+                <FiSave /> Saqlash
               </button>
               <button onClick={() => setIsEditing(false)} className="cancel-btn">
-                <FiX className="btn-icon" />
-                Bekor qilish
+                <FiX /> Bekor qilish
               </button>
             </div>
           )}
         </div>
 
-        {/* Stats */}
+        {/* Statistika */}
         <div className="stats-grid">
           <div className="stat-item">
-            <div className="stat-icon">
-              <FiDollarSign />
-            </div>
+            <FiDollarSign className="stat-icon" />
             <div className="stat-value">{user.balance?.toLocaleString() || 0}</div>
             <div className="stat-label">Ball</div>
           </div>
-
           <div className="stat-item">
-            <div className="stat-icon">
-              <FiCreditCard />
-            </div>
-            <div className="stat-value">{user.cards?.length || 0}</div>
+            <FiCreditCard className="stat-icon" />
+            <div className="stat-value">{user.cards?.length || 1}</div>
             <div className="stat-label">Karta</div>
           </div>
-
           <div className="stat-item">
-            <div className="stat-icon">
-              <FiClock />
-            </div>
+            <FiClock className="stat-icon" />
             <div className="stat-value">{user.history?.length || 0}</div>
             <div className="stat-label">Tarix</div>
           </div>
         </div>
 
-        {/* Logout */}
+        {/* Chiqish */}
         <button onClick={handleLogout} className="logout-btn">
-          <FiLogOut className="btn-icon" />
-          Chiqish
+          <FiLogOut /> Chiqish
         </button>
       </div>
     </div>
