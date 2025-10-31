@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   FiCamera, FiDollarSign, FiCreditCard, FiClock,
   FiEdit2, FiSave, FiX, FiLogOut, FiArrowUpRight, FiArrowDownLeft
@@ -7,6 +8,8 @@ import '../styles/Profile.css';
 import Logo from '../assets/images/logo.png';
 
 function Profile({ user, updateUser, onLogout }) {
+  const navigate = useNavigate(); // 🟢 navigate funksiyasi qo‘shildi
+
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -149,17 +152,24 @@ function Profile({ user, updateUser, onLogout }) {
             <div className="stat-value">{user.balance?.toLocaleString() || 0}</div>
             <div className="stat-label">Ball</div>
           </div>
+
           <div className="stat-item">
             <FiCreditCard className="stat-icon" />
             <div className="stat-value">{user.cards?.length || 0}</div>
             <div className="stat-label">Karta</div>
           </div>
+
           <div className="stat-item">
             <FiClock className="stat-icon" />
             <div className="stat-value">{user.history?.length || 0}</div>
             <div className="stat-label">Tarix</div>
           </div>
         </div>
+
+        {/* Kartalar sahifasiga o‘tish tugmasi */}
+        <button onClick={() => navigate('/cards')} className="cards-btn">
+          Kartalarimni ko‘rish
+        </button>
 
         {/* === OXIRGI TARIX BO‘LIMI === */}
         <div className="history-section">

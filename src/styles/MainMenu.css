@@ -1,7 +1,7 @@
 .menu-container {
   min-height: 100vh;
   background-color: #0d1117;
-  color: white;
+  color: #fff;
   padding: 20px;
   padding-bottom: 100px;
   box-sizing: border-box;
@@ -15,38 +15,46 @@
   gap: 16px;
   margin-bottom: 30px;
 }
+
 .avatar-circle {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: #1e1e1e;
+  overflow: hidden;
+  border: 2px solid #0C73FE;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  font-size: 26px;
-  color: #0C73FE;
-  border: 2px solid #0C73FE;
-  box-shadow: 0 0 10px rgba(12, 115, 254, 0.3);
+  background-color: #1e1e1e;
+  box-shadow: 0 0 10px rgba(12, 115, 254, 0.4);
 }
+
 .avatar-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
 }
+
+.avatar-placeholder-img {
+  width: 80%;
+  height: 80%;
+  opacity: 0.85;
+}
+
 .welcome-texts {
   display: flex;
   flex-direction: column;
 }
+
 .welcome {
   font-size: 14px;
   color: #aaa;
 }
+
 .username {
   font-size: 20px;
   font-weight: 600;
-  color: white;
+  color: #fff;
 }
 
 /* Balans */
@@ -58,26 +66,37 @@
   margin-bottom: 30px;
   box-shadow: 0 4px 12px rgba(12, 115, 254, 0.4);
 }
+
 .balance-top {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
 }
+
 .balance-icon {
   color: white;
   opacity: 0.9;
 }
+
 .balance-logo {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
+  margin-left: 6px;
+  vertical-align: middle;
   filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6));
 }
+
 .balance-amount {
   font-size: 28px;
   font-weight: 700;
   color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
+
 .balance-label {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.85);
@@ -93,11 +112,13 @@
   align-items: center;
   gap: 8px;
 }
+
 .topup-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
+
 .topup-btn {
   background-color: transparent;
   color: white;
@@ -111,10 +132,17 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
+  cursor: pointer;
 }
+
 .topup-btn:hover {
   background-color: #0C73FE;
   transform: scale(1.05);
+}
+
+.topup-logo {
+  width: 22px;
+  height: 22px;
 }
 
 /* Do‘konlar */
@@ -126,11 +154,13 @@
   align-items: center;
   gap: 8px;
 }
+
 .shops-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 16px;
 }
+
 .shop-card {
   background-color: #1e1e1e;
   border-radius: 12px;
@@ -138,16 +168,19 @@
   text-align: center;
   transition: transform 0.2s, box-shadow 0.2s;
 }
+
 .shop-card:hover {
   transform: scale(1.05);
   box-shadow: 0 0 10px rgba(12, 115, 254, 0.3);
 }
+
 .shop-card img {
   width: 60px;
   height: 60px;
   object-fit: contain;
   margin-bottom: 8px;
 }
+
 .shop-card p {
   font-size: 13px;
   color: #ccc;
@@ -165,7 +198,9 @@
   display: flex;
   justify-content: space-around;
   padding: 10px 0;
+  z-index: 10;
 }
+
 .nav-item {
   flex: 1;
   background: none;
@@ -177,7 +212,9 @@
   align-items: center;
   gap: 3px;
   transition: color 0.2s;
+  cursor: pointer;
 }
+
 .nav-item.active,
 .nav-item:hover {
   color: #0C73FE;
@@ -188,18 +225,297 @@
   .topup-options {
     grid-template-columns: 1fr;
   }
+
   .shops-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
   .balance-logo {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .avatar-circle {
+    width: 56px;
+    height: 56px;
+  }
+
+  .username {
+    font-size: 18px;
+    color: #fff;
   }
 }
 
 
 
-.topup-logo{
-  width: 24px;
-  height: 24px;
+
+
+
+
+
+
+
+
+
+/* Do‘kon ichidagi modal */
+.shop-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-shop-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  flex: 1;
+  margin-left: 12px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.menu-list {
+  padding: 16px;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-name {
+  font-weight: 600;
+  display: block;
+}
+
+.item-price {
+  color: #e91e63;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.buy-btn {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.buy-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.modal-footer {
+  padding: 16px;
+  text-align: center;
+  background: #f9f9f9;
+  border-top: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Do‘kon ichidagi modal */
+.shop-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
+
+.modal-shop-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  flex: 1;
+  margin-left: 12px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px;
+  color: #666;
+}
+
+.menu-list {
+  padding: 16px;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-name {
+  font-weight: 600;
+  display: block;
+  font-size: 1rem;
+}
+
+.item-price {
+  color: #e91e63;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.buy-btn {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.2s;
+}
+
+.buy-btn:hover {
+  background: #43a047;
+}
+
+.buy-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.modal-footer {
+  padding: 16px;
+  text-align: center;
+  background: #f9f9f9;
+  border-top: 1px solid #eee;
+  font-size: 0.95rem;
+  position: sticky;
+  bottom: 0;
+}
+
+.no-shops, .no-menu {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  padding: 16px;
+  margin: 0;
 }

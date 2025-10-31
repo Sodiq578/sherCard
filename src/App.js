@@ -12,18 +12,22 @@ import BannerTransfer from './components/BannerTransfer';
 import Profile from './components/Profile';
 import Cards from './components/Cards';
 import AdminPanel from './components/AdminPanel';
+import ShopDetail from './components/ShopDetail'; // YANGI
 import BottomNav from './components/BottomNav';
 import './styles/App.css';
 
 const BottomNavWrapper = ({ isAuthenticated, isAdmin }) => {
   const location = useLocation();
+
   const userPages = [
     '/main', '/marketplace', '/buy-card', '/cards',
     '/profile', '/transfer', '/banner-transfer', '/history'
   ];
-  return isAuthenticated && !isAdmin && userPages.includes(location.pathname)
-    ? <BottomNav />
-    : null;
+
+  const isUserPage = userPages.some(page => location.pathname.startsWith(page)) ||
+                     /^\/shop\/\d+$/.test(location.pathname);
+
+  return isAuthenticated && !isAdmin && isUserPage ? <BottomNav /> : null;
 };
 
 function App() {
@@ -83,10 +87,9 @@ function App() {
       return;
     }
 
-    // YANGI FOYDALANUVCHI – 500 BALL
     const newUser = {
       login: data.login,
-      balance: 500, // 500 ball
+      balance: 500,
       cards: [],
       history: [],
       profile: {
@@ -192,11 +195,17 @@ function App() {
           path="/main"
           element={
             isAuthenticated && !isAdmin ? (
-              <MainMenu
-                user={user}
-                onLogout={handleLogout}
-                updateUser={updateUser}
-              />
+              <MainMenu user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/shop/:id"
+          element={
+            isAuthenticated && !isAdmin ? (
+              <ShopDetail user={user} updateUser={updateUser} />
             ) : (
               <Navigate to="/" />
             )

@@ -1,3 +1,4 @@
+// src/components/MainMenu.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/MainMenu.css";
@@ -10,6 +11,7 @@ import {
   FiShoppingBag,
 } from "react-icons/fi";
 import Logo from "../assets/images/logo.png";
+import { getShops } from "../data/shops";
 
 function MainMenu({ user, updateUser }) {
   const navigate = useNavigate();
@@ -17,7 +19,7 @@ function MainMenu({ user, updateUser }) {
   const handleTopUp = (amount) => {
     const updatedUser = {
       ...user,
-      balance: user.balance + amount,
+      balance: (user.balance || 0) + amount,
       history: [
         ...(user.history || []),
         {
@@ -31,19 +33,22 @@ function MainMenu({ user, updateUser }) {
     alert(`${amount.toLocaleString()} UZS qo‘shildi!`);
   };
 
-  const displayName = user.profile?.name || user.login || "Foydalanuvchi";
+  const displayName = user?.profile?.name || user?.login || "Foydalanuvchi";
+  const shops = getShops();
 
   return (
     <div className="menu-container">
       {/* Salomlashuv */}
       <div className="welcome-section">
         <div className="avatar-circle">
-          {user.profile?.avatar ? (
+          {user?.profile?.avatar ? (
             <img src={user.profile.avatar} alt="Avatar" className="avatar-img" />
           ) : (
-            <div className="avatar-placeholder">
-              {displayName.charAt(0).toUpperCase()}
-            </div>
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+              alt="Default Avatar"
+              className="avatar-placeholder-img"
+            />
           )}
         </div>
         <div className="welcome-texts">
@@ -59,14 +64,14 @@ function MainMenu({ user, updateUser }) {
             <FiCreditCard size={32} />
           </div>
           <div className="balance-amount">
-            {user.balance?.toLocaleString() || 0}{" "}
+            {(user?.balance || 0).toLocaleString()}
             <img src={Logo} alt="Logo" className="balance-logo" />
           </div>
         </div>
         <div className="balance-label">Joriy balans</div>
       </div>
 
-      {/* Balansni to‘ldirish */}
+      {/* Balans to‘ldirish */}
       <div className="topup-section">
         <h3>
           <FiPlusCircle /> Balansni to‘ldirish
@@ -91,45 +96,20 @@ function MainMenu({ user, updateUser }) {
           <FiShoppingBag /> Tokenlar bilan yegulik olsa bo‘ladigan joylar
         </h3>
         <div className="shops-grid">
-          {[
-            {
-              name: "Evos",
-              logo: "https://upload.wikimedia.org/wikipedia/commons/6/6b/Evos_logo.png",
-            },
-            {
-              name: "Bellissimo",
-              logo: "https://bellissimo.uz/images/logo_new.svg",
-            },
-            {
-              name: "KFC",
-              logo: "https://upload.wikimedia.org/wikipedia/commons/b/bf/KFC_logo.svg",
-            },
-            {
-              name: "McDonald's",
-              logo: "https://upload.wikimedia.org/wikipedia/commons/4/4c/McDonald%27s_logo.svg",
-            },
-            {
-              name: "Korzinka",
-              logo: "https://upload.wikimedia.org/wikipedia/commons/a/aa/Korzinka_logo.svg",
-            },
-            {
-              name: "Chopar Pizza",
-              logo: "https://static.tildacdn.com/tild3864-3935-4665-b837-343230396133/choparlogo.svg",
-            },
-            {
-              name: "FeedUp",
-              logo: "https://feedup.uz/_nuxt/img/logo.2e4ff10.svg",
-            },
-            {
-              name: "Lavash House",
-              logo: "https://upload.wikimedia.org/wikipedia/commons/7/7a/Lavash_House_logo.png",
-            },
-          ].map((shop, i) => (
-            <div key={i} className="shop-card">
-              <img src={shop.logo} alt={shop.name} />
-              <p>{shop.name}</p>
-            </div>
-          ))}
+          {Array.isArray(shops) && shops.length > 0 ? (
+            shops.map((shop) => (
+              <div
+                key={shop.id}
+                className="shop-card"
+                onClick={() => navigate(`/shop/${shop.id}`)}
+              >
+                <img src={shop.logo} alt={shop.name} className="shop-logo-img" />
+                <p>{shop.name}</p>
+              </div>
+            ))
+          ) : (
+            <p className="no-shops">Do‘konlar yuklanmoqda...</p>
+          )}
         </div>
       </div>
 

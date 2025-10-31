@@ -1,109 +1,106 @@
-/* styles/Profile.css */
+/* === Profil asosiy konteyner === */
 .profile-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #1a1a2e, #16213e);
-  color: white;
+  color: #fff;
   padding: 20px;
-  padding-bottom: 100px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 100px;
 }
 
+/* === Header === */
 .profile-header {
+  width: 100%;
+  max-width: 800px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 25px;
 }
 
 .profile-header h1 {
-  font-size: 24px;
+  font-size: 1.8rem;
   font-weight: 600;
 }
 
 .edit-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #0f3460;
   color: white;
+  border: none;
+  border-radius: 8px;
   padding: 8px 16px;
-  border-radius: 12px;
-  font-size: 14px;
-  backdrop-filter: blur(10px);
-  cursor: pointer;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-
 .edit-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: #1a1a2e;
+  transform: scale(1.05);
 }
 
-.btn-icon {
-  font-size: 16px;
-}
-
+/* === Profil kartasi === */
 .profile-card {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  padding: 24px;
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 25px;
+  max-width: 800px;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
+/* === Avatar === */
 .avatar-section {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 25px;
+  position: relative;
 }
 
 .avatar-wrapper {
   position: relative;
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 16px;
+  display: inline-block;
 }
 
-.avatar-img,
-.avatar-placeholder {
-  width: 100%;
-  height: 100%;
+.avatar-img {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
+  border: 3px solid #00adb5;
   object-fit: cover;
-  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 10px rgba(0,173,181,0.5);
 }
 
 .avatar-placeholder {
-  background: #4e54c8;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #0f3460;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36px;
+  font-size: 3rem;
   font-weight: bold;
-  color: white;
+  color: #fff;
 }
 
 .camera-icon {
   position: absolute;
-  bottom: 0;
-  right: 0;
-  background: #4e54c8;
-  width: 32px;
-  height: 32px;
+  bottom: 5px;
+  right: 5px;
+  background: #00adb5;
+  color: #fff;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
+  padding: 6px;
+  font-size: 1.1rem;
   cursor: pointer;
-  border: 2px solid white;
-  transition: all 0.2s ease;
-  color: white;
+  transition: 0.3s;
 }
-
 .camera-icon:hover {
-  transform: scale(1.1);
-  background: #3f43a8;
+  background: #08c7d3;
 }
 
 .avatar-input {
@@ -111,464 +108,236 @@
 }
 
 .user-name {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 8px 0 4px;
-  word-break: break-word;
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-top: 10px;
 }
 
 .user-role {
-  font-size: 14px;
-  opacity: 0.7;
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-bottom: 10px;
 }
 
-/* Card Section Styles */
-.card-section {
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.card-section h3 {
-  font-size: 18px;
-  margin-bottom: 16px;
-  opacity: 0.9;
-}
-
-.card-container {
-  perspective: 1000px;
-  height: 220px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+.user-balance-badge {
+  background: #00adb5;
+  color: #fff;
+  display: inline-flex;
   align-items: center;
-  margin-bottom: 16px;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 5px;
+}
+.balance-logo {
+  width: 18px;
+  height: 18px;
 }
 
-.card-wrapper {
-  width: 320px;
-  height: 200px;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.6s;
-  cursor: pointer;
+/* === Forma bo‘limi === */
+.profile-form {
+  margin-top: 25px;
 }
 
-.card-wrapper.flipped {
-  transform: rotateY(180deg);
-}
-
-/* Card Generator Styles */
-.card-generator-container {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transform-style: preserve-3d;
-}
-
-.card-side {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  padding: 20px;
-  box-sizing: border-box;
-  font-family: 'Arial', sans-serif;
-  overflow: hidden;
-}
-
-/* Old tomon - Yangi sariq fon */
-.card-front {
-  background: linear-gradient(135deg, #FFC400, #FFB300);
-  color: #000;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.card-background-front {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
-    linear-gradient(45deg, #FFC400 0%, #FFB300 100%);
-  z-index: 1;
-}
-
-.geometric-pattern-front {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 140px;
-  height: 140px;
-  background: linear-gradient(45deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
-  border-radius: 30px;
-  transform: translate(-50%, -50%) rotate(45deg);
-  z-index: 1;
-}
-
-.card-logo {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  font-size: 24px;
-  font-weight: bold;
-  color: #000;
-  z-index: 2;
-}
-
-.card-content {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-}
-
-.card-user-info {
-  text-align: left;
+.input-group {
   margin-bottom: 15px;
-}
-
-.card-login {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #000;
-  margin-top: 20px;
-}
-
-.card-phone {
-  font-size: 14px;
-  color: #000;
-  opacity: 0.8;
-}
-
-.card-number-display {
-  font-size: 18px;
-  font-weight: bold;
-  letter-spacing: 2px;
-  color: #000;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.3);
-  padding: 8px 12px;
-  border-radius: 8px;
-  backdrop-filter: blur(10px);
-}
-
-/* Orqa tomon - Yangi sariq fon */
-.card-back {
-  background: linear-gradient(135deg, #FFC400, #FFB300);
-  color: #000;
-  transform: rotateY(180deg);
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 20px;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.card-background-back {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
-    radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
-    linear-gradient(135deg, #FFC400 0%, #FFB300 100%);
-  z-index: 1;
+.input-group label {
+  font-weight: 500;
+  color: #bbb;
 }
 
-.geometric-pattern-back {
-  position: absolute;
-  top: 20%;
-  left: 10%;
-  width: 120px;
-  height: 120px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
-  border-radius: 25px;
-  transform: rotate(-15deg);
-  z-index: 1;
-}
-
-.card-logo-back {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  font-size: 24px;
-  font-weight: bold;
-  color: #000;
-  z-index: 2;
-}
-
-.qr-section {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  z-index: 2;
-}
-
-.qr-container {
-  background: #FFC400;
-  padding: 5px;
+.input-group input {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
   border-radius: 8px;
-  border: 2px solid #000;
-}
-
-.hamyon-text {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  font-size: 18px;
-  font-weight: bold;
-  color: #000;
-  letter-spacing: 2px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.flip-hint {
-  font-size: 12px;
-  opacity: 0.7;
-  margin-top: 10px;
-  margin-top: 30px;
-}
-
-/* Qolgan CSS qismlari */
-.profile-form .input-group {
-  margin-bottom: 16px;
-}
-
-.profile-form label {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 6px;
-  opacity: 0.8;
-}
-
-.profile-form input {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  padding: 14px 16px;
-  color: white;
-  font-size: 16px;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
-}
-
-.profile-form input:focus {
+  color: #fff;
+  padding: 10px;
+  font-size: 1rem;
   outline: none;
-  border-color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.15);
+  transition: 0.3s;
+}
+.input-group input:focus {
+  border-color: #00adb5;
 }
 
-.profile-form input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.profile-form input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
+/* === Tugmalar === */
 .form-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 20px;
-  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 10px;
 }
 
-.save-btn,
-.cancel-btn {
-  flex: 1;
-  padding: 14px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 16px;
+.save-btn, .cancel-btn, .cards-btn {
   border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 120px;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  gap: 6px;
+  transition: 0.3s;
 }
 
 .save-btn {
-  background: #4e54c8;
+  background: #00adb5;
   color: white;
 }
-
 .save-btn:hover {
-  background: #3f43a8;
+  background: #08c7d3;
 }
 
 .cancel-btn {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #393e46;
+  color: #fff;
 }
-
 .cancel-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: #50555e;
 }
 
+.cards-btn {
+  background: #222831;
+  color: #00adb5;
+  margin-top: 10px;
+  width: 100%;
+  justify-content: center;
+}
+.cards-btn:hover {
+  background: #0f3460;
+}
+
+/* === Statistika === */
 .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin: 24px 0;
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
 .stat-item {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 16px;
+  background: rgba(255,255,255,0.08);
+  flex: 1;
+  min-width: 100px;
+  border-radius: 12px;
+  padding: 15px;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.2s ease;
-}
-
-.stat-item:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
 }
 
 .stat-icon {
-  font-size: 28px;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #4e54c8;
+  font-size: 1.6rem;
+  color: #00adb5;
 }
 
 .stat-value {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 4px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 5px 0;
 }
 
 .stat-label {
-  font-size: 12px;
-  opacity: 0.7;
+  color: #bbb;
+  font-size: 0.9rem;
 }
 
+/* === Tarix bo‘limi === */
+.history-section {
+  margin-top: 30px;
+}
+
+.history-section h3 {
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.05);
+  padding: 10px 14px;
+  border-radius: 10px;
+}
+
+.history-icon .in {
+  color: #00ffae;
+}
+.history-icon .out {
+  color: #ff6b6b;
+}
+
+.history-type {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.history-date {
+  color: #aaa;
+  font-size: 0.8rem;
+}
+.history-amount {
+  font-weight: 700;
+}
+.history-amount.positive {
+  color: #00ffae;
+}
+.history-amount.negative {
+  color: #ff6b6b;
+}
+
+/* === Chiqish tugmasi === */
 .logout-btn {
+  margin-top: 25px;
   width: 100%;
-  background: rgba(220, 20, 60, 0.2);
-  color: #dc143c;
-  border: 1px solid rgba(220, 20, 60, 0.3);
-  padding: 14px;
-  border-radius: 12px;
-  font-weight: 600;
-  margin-top: 24px;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.logout-btn:hover {
-  background: rgba(220, 20, 60, 0.25);
-}
-
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-size: 18px;
+  background: #e94560;
   color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.logout-btn:hover {
+  background: #ff4d6d;
+  transform: scale(1.03);
 }
 
-/* Responsive Design */
+/* === Mobil moslashuv === */
 @media (max-width: 768px) {
-  .card-wrapper {
-    width: 280px;
-    height: 180px;
+  .profile-card {
+    padding: 18px;
   }
-  
-  .card-number-display {
-    font-size: 16px;
+  .profile-header h1 {
+    font-size: 1.4rem;
   }
-  
-  .geometric-pattern-front {
-    width: 120px;
-    height: 120px;
+  .edit-btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
   }
-  
-  .geometric-pattern-back {
-    width: 100px;
-    height: 100px;
+  .stats-grid {
+    flex-direction: column;
+    gap: 10px;
   }
-}
-
-@media (max-width: 480px) {
-  .card-wrapper {
-    width: 260px;
-    height: 160px;
+  .stat-item {
+    width: 100%;
   }
-  
-  .card-number-display {
-    font-size: 14px;
-    padding: 6px 10px;
+  .avatar-img, .avatar-placeholder {
+    width: 90px;
+    height: 90px;
   }
-  
-  .card-login {
-    font-size: 14px;
-  }
-  
-  .card-phone {
-    font-size: 12px;
-  }
-  
-  .qr-container {
-    transform: scale(0.8);
-  }
-  
-  .hamyon-text {
-    font-size: 16px;
-  }
-  
-  .geometric-pattern-front {
-    width: 100px;
-    height: 100px;
-  }
-  
-  .geometric-pattern-back {
-    width: 80px;
-    height: 80px;
-  }
-}
-
-
-
-
-/* Profile.css ga qo'shimcha */
-.user-balance-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 8px 16px;
-  border-radius: 20px;
-  margin-top: 12px;
-  font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.balance-logo {
-  height: 20px;
-  width: auto;
 }
