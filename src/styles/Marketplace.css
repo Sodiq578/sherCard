@@ -241,7 +241,7 @@
 
 .card-preview {
   height: 160px;
-  background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+  /* background: linear-gradient(135deg, var(--gold-light), var(--gold-dark)); */
   padding: 16px;
   color: var(--black);
   position: relative;
@@ -313,6 +313,7 @@
   text-align: center;
   padding: 60px 20px;
   color: rgba(255, 255, 255, 0.7);
+  padding-bottom: 100px;
 }
 
 .empty-icon {

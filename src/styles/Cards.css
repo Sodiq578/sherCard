@@ -16,6 +16,7 @@
   justify-content: center;
   align-items: flex-start;
   padding: 40px 20px;
+  padding-bottom: 100px;
 }
 
 .cards-container {
@@ -559,3 +560,207 @@
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+:root {
+  --blue: #0C73FE;
+  --blue-dark: #084bbf;
+  --black: #000000;
+  --white: #ffffff;
+}
+
+/* ======= BALANS KARTA ======= */
+.total-balance-card {
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  color: var(--white);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  width: 300px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effekti */
+.total-balance-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(12, 115, 254, 0.6);
+}
+
+/* Matnlar */
+.total-balance-card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--white);
+}
+
+.total-balance-card p {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Tugma dizayni (agar bo‘lsa) */
+.total-balance-card button {
+  background-color: var(--white);
+  color: var(--blue);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.total-balance-card button:hover {
+  background-color: var(--blue-dark);
+  color: var(--white);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ======= KARTA ORQA TOMON (YANGI DEKORATIV SHAKLLAR) ======= */
+.card-back {
+  background: radial-gradient(circle at center, #fff7cc 0%, #ffd700 40%, #ffa500 100%);
+  color: var(--black);
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+}
+
+/* Dekorativ to'lqinli shakllar */
+.wave-pattern {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.15;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.8) 3%, transparent 5%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.8) 3%, transparent 5%),
+    radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.6) 2%, transparent 4%),
+    radial-gradient(circle at 60% 60%, rgba(255, 255, 255, 0.6) 2%, transparent 4%);
+}
+
+/* Geometrik shakllar */
+.geometric-shapes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.1;
+}
+
+.geometric-shapes::before,
+.geometric-shapes::after {
+  content: "";
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+
+.geometric-shapes::before {
+  width: 60px;
+  height: 60px;
+  top: 10%;
+  right: 10%;
+  opacity: 0.3;
+}
+
+.geometric-shapes::after {
+  width: 40px;
+  height: 40px;
+  bottom: 15%;
+  left: 15%;
+  opacity: 0.4;
+}
+
+/* Oq rangli dekorativ chiziqlar */
+.decorative-lines {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.2;
+}
+
+.decorative-lines::before,
+.decorative-lines::after {
+  content: "";
+  position: absolute;
+  background: white;
+}
+
+.decorative-lines::before {
+  width: 80%;
+  height: 2px;
+  top: 30%;
+  left: 10%;
+  transform: rotate(-5deg);
+}
+
+.decorative-lines::after {
+  width: 70%;
+  height: 1px;
+  bottom: 40%;
+  left: 15%;
+  transform: rotate(3deg);
+}
+
+/* QR va yozuv joylashuvi */
+.qr-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  position: relative;
+  z-index: 1;
+}
+
+.qr-container {
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(255, 165, 0, 0.5);
+}
+
+.hamyon-text {
+  font-size: 22px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  color: #000;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.7);
+}
+
+

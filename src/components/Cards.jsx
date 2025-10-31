@@ -194,7 +194,7 @@ const getCardNumber = (key) => {
                       <div className="card-number">
                         {cardNumber.replace(/(\d{4})/g, "$1 ").trim()}
                       </div>
-                      <div className="card-expiry">12/28</div>
+                     
                     </div>
                   </div>
 
