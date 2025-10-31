@@ -12,6 +12,8 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
   const [sortBy, setSortBy] = useState('login');
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage] = useState(10);
+  const [activeTab, setActiveTab] = useState('users'); // users yoki market
+  const [notification, setNotification] = useState({ show: false, message: '', type: '' });
 
   useEffect(() => {
     setUsers(allUsers);
@@ -21,6 +23,11 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
   const loadMarketCards = () => {
     const stored = localStorage.getItem('marketCards');
     if (stored) setMarketCards(JSON.parse(stored));
+  };
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ show: true, message, type });
+    setTimeout(() => setNotification({ show: false, message: '', type: '' }), 3000);
   };
 
   // Filtrlangan va saralangan foydalanuvchilar
@@ -45,6 +52,8 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
           return b.balance - a.balance;
         case 'cards':
           return (b.cards?.length || 0) - (a.cards?.length || 0);
+        case 'history':
+          return (b.history?.length || 0) - (a.history?.length || 0);
         default:
           return 0;
       }
@@ -61,7 +70,7 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
 
   const copyTokenAndEnter = (token, userLogin) => {
     navigator.clipboard.writeText(token).then(() => {
-      alert(`Token nusxalandi! @${userLogin} sifatida kirish uchun Ctrl+Alt+E bosing`);
+      showNotification(`Token nusxalandi! @${userLogin} sifatida kirish uchun Ctrl+Alt+E bosing`);
     });
   };
 
@@ -76,14 +85,14 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
   };
 
   const handleSaveUser = () => {
-    if (!selectedUser || (!avatarFile && !editData.balance)) return;
+    if (!selectedUser) return;
 
     if (avatarFile) {
       const reader = new FileReader();
       reader.onload = () => {
         const updated = {
           ...selectedUser,
-          balance: parseInt(editData.balance),
+          balance: parseInt(editData.balance) || 0,
           profile: { 
             ...selectedUser.profile, 
             name: editData.name, 
@@ -95,13 +104,13 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
         updateUser(updated);
         setAvatarFile(null);
         setSelectedUser(null);
-        alert('Foydalanuvchi yangilandi!');
+        showNotification('Foydalanuvchi muvaffaqiyatli yangilandi!');
       };
       reader.readAsDataURL(avatarFile);
     } else {
       const updated = {
         ...selectedUser,
-        balance: parseInt(editData.balance),
+        balance: parseInt(editData.balance) || 0,
         profile: { 
           ...selectedUser.profile, 
           name: editData.name, 
@@ -111,7 +120,7 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
       };
       updateUser(updated);
       setSelectedUser(null);
-      alert('Foydalanuvchi yangilandi!');
+      showNotification('Foydalanuvchi muvaffaqiyatli yangilandi!');
     }
   };
 
@@ -120,6 +129,7 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
       const filtered = marketCards.filter(c => c.id !== id);
       setMarketCards(filtered);
       localStorage.setItem('marketCards', JSON.stringify(filtered));
+      showNotification('Karta muvaffaqiyatli o\'chirildi!', 'warning');
     }
   };
 
@@ -127,7 +137,7 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
     if (window.confirm(`@${user.login} foydalanuvchisining tarixini tozalashni tasdiqlaysizmi?`)) {
       const updated = { ...user, history: [] };
       updateUser(updated);
-      alert('Tarix tozalandi!');
+      showNotification('Tarix muvaffaqiyatli tozalandi!', 'info');
     }
   };
 
@@ -137,162 +147,328 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
     setCurrentPage(1);
   };
 
+  const addBalanceToUser = (user, amount) => {
+    const updated = { ...user, balance: user.balance + amount };
+    updateUser(updated);
+    showNotification(`@${user.login} ga ${amount} ball qo'shildi!`);
+  };
+
+  const removeBalanceFromUser = (user, amount) => {
+    if (user.balance < amount) {
+      showNotification('Foydalanuvchida yetarli ball mavjud emas!', 'error');
+      return;
+    }
+    const updated = { ...user, balance: user.balance - amount };
+    updateUser(updated);
+    showNotification(`@${user.login} dan ${amount} ball olindi!`, 'warning');
+  };
+
+  const exportUsersData = () => {
+    const dataStr = JSON.stringify(users, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'users-data.json';
+    link.click();
+    showNotification('Foydalanuvchilar ma\'lumotlari yuklab olindi!');
+  };
+
   return (
     <div className="admin-panel">
       <div className="admin-container">
+        {/* Notification */}
+        {notification.show && (
+          <div className={`notification ${notification.type}`}>
+            {notification.message}
+          </div>
+        )}
+
         <div className="admin-header">
-          <h1>Admin Panel</h1>
-          <button onClick={onLogout} className="logout-btn">Chiqish</button>
+          <div className="header-content">
+            <h1>Admin Panel</h1>
+            <div className="header-stats">
+              <span>Jami foydalanuvchilar: {users.length}</span>
+              <span>Sotuvdagi kartalar: {marketCards.length}</span>
+            </div>
+          </div>
+          <div className="header-actions">
+            <button onClick={exportUsersData} className="export-btn">Ma'lumotlarni yuklab olish</button>
+            <button onClick={onLogout} className="logout-btn">Chiqish</button>
+          </div>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="admin-tabs">
+          <button 
+            className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
+            onClick={() => setActiveTab('users')}
+          >
+            Foydalanuvchilar
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'market' ? 'active' : ''}`}
+            onClick={() => setActiveTab('market')}
+          >
+            Sotuvdagi Kartalar
+          </button>
         </div>
 
         {/* FOYDALANUVCHILAR */}
-        <div className="admin-section">
-          <div className="section-header">
-            <h2>Foydalanuvchilar ({filteredAndSortedUsers.length})</h2>
-            
-            {/* Filtr va saralash */}
-            <div className="filters-container">
-              <div className="search-box">
-                <input 
-                  type="text" 
-                  placeholder="Foydalanuvchi qidirish..." 
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+        {activeTab === 'users' && (
+          <div className="admin-section">
+            <div className="section-header">
+              <h2>Foydalanuvchilar ({filteredAndSortedUsers.length})</h2>
               
-              <div className="sort-box">
-                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                  <option value="login">Login bo'yicha</option>
-                  <option value="balance">Balans bo'yicha</option>
-                  <option value="cards">Kartalar soni bo'yicha</option>
-                </select>
-              </div>
-              
-              <button onClick={resetFilters} className="reset-btn">Filtrlarni tozalash</button>
-            </div>
-          </div>
-          
-          {/* Sahifalash */}
-          {totalPages > 1 && (
-            <div className="pagination">
-              <button 
-                disabled={currentPage === 1} 
-                onClick={() => setCurrentPage(currentPage - 1)}
-                className="page-btn"
-              >
-                Oldingi
-              </button>
-              
-              <span className="page-info">
-                {currentPage} / {totalPages}
-              </span>
-              
-              <button 
-                disabled={currentPage === totalPages} 
-                onClick={() => setCurrentPage(currentPage + 1)}
-                className="page-btn"
-              >
-                Keyingi
-              </button>
-            </div>
-          )}
-          
-          <div className="users-grid">
-            {currentUsers.length > 0 ? (
-              currentUsers.map(user => (
-                <div key={user.login} className="admin-user-card">
-                  <div className="user-avatar">
-                    {user.profile?.avatar ? 
-                      <img src={user.profile.avatar} alt={`${user.login} avatari`} /> : 
-                      <div className="no-avatar">{user.login[0].toUpperCase()}</div>
-                    }
-                  </div>
-                  <div className="user-info">
-                    <strong>@{user.login}</strong>
-                    <p>{user.balance.toLocaleString()} ball</p>
-                    <p>{user.cards?.length || 0} ta karta</p>
-                    <p>{user.history?.length || 0} ta tarix</p>
-                    <div className="token-row">
-                      <code>{user.token}</code>
-                      <button onClick={() => copyTokenAndEnter(user.token, user.login)} className="copy-btn">Copy</button>
-                    </div>
-                  </div>
-                  <div className="user-actions">
-                    <button onClick={() => handleEditUser(user)} className="action-btn edit">Tahrirlash</button>
-                    <button onClick={() => clearHistory(user)} className="action-btn secondary">Tarix tozalash</button>
-                  </div>
+              {/* Filtr va saralash */}
+              <div className="filters-container">
+                <div className="search-box">
+                  <input 
+                    type="text" 
+                    placeholder="Foydalanuvchi qidirish..." 
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                  />
+                  <span className="search-icon">🔍</span>
                 </div>
-              ))
-            ) : (
-              <div className="no-users">
-                <p>Foydalanuvchilar topilmadi</p>
+                
+                <div className="sort-box">
+                  <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                    <option value="login">Login bo'yicha</option>
+                    <option value="balance">Balans bo'yicha</option>
+                    <option value="cards">Kartalar soni bo'yicha</option>
+                    <option value="history">Tarixlar soni bo'yicha</option>
+                  </select>
+                </div>
+                
+                <button onClick={resetFilters} className="reset-btn">Filtrlarni tozalash</button>
+              </div>
+            </div>
+            
+            {/* Sahifalash */}
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button 
+                  disabled={currentPage === 1} 
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  className="page-btn"
+                >
+                  ◀ Oldingi
+                </button>
+                
+                <span className="page-info">
+                  Sahifa {currentPage} / {totalPages}
+                </span>
+                
+                <button 
+                  disabled={currentPage === totalPages} 
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  className="page-btn"
+                >
+                  Keyingi ▶
+                </button>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* TAHRIRLASH MODALI */}
-        {selectedUser && (
-          <div className="edit-modal">
-            <div className="modal-content">
-              <h3>@{selectedUser.login} ni tahrirlash</h3>
-              <input 
-                type="number" 
-                placeholder="Balans" 
-                value={editData.balance} 
-                onChange={e => setEditData({...editData, balance: e.target.value})} 
-              />
-              <input 
-                type="text" 
-                placeholder="Ism" 
-                value={editData.name} 
-                onChange={e => setEditData({...editData, name: e.target.value})} 
-              />
-              <input 
-                type="tel" 
-                placeholder="Telefon" 
-                value={editData.phone} 
-                onChange={e => setEditData({...editData, phone: e.target.value})} 
-              />
-              <input 
-                type="email" 
-                placeholder="Email" 
-                value={editData.email} 
-                onChange={e => setEditData({...editData, email: e.target.value})} 
-              />
-              <div className="file-input-container">
-                <label>Avatar o'zgartirish:</label>
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  onChange={e => setAvatarFile(e.target.files[0])} 
-                />
-              </div>
-              <div className="modal-actions">
-                <button onClick={handleSaveUser} className="save-btn">Saqlash</button>
-                <button onClick={() => { setSelectedUser(null); setAvatarFile(null); }} className="cancel-btn">Bekor</button>
-              </div>
+            
+            <div className="users-grid">
+              {currentUsers.length > 0 ? (
+                currentUsers.map(user => (
+                  <div key={user.login} className="admin-user-card">
+                    <div className="user-header">
+                      <div className="user-avatar">
+                        {user.profile?.avatar ? 
+                          <img src={user.profile.avatar} alt={`${user.login} avatari`} /> : 
+                          <div className="no-avatar">{user.login[0].toUpperCase()}</div>
+                        }
+                      </div>
+                      <div className="user-basic-info">
+                        <strong className="username">@{user.login}</strong>
+                        {user.profile?.name && <span className="user-name">{user.profile.name}</span>}
+                      </div>
+                    </div>
+                    
+                    <div className="user-stats">
+                      <div className="stat-item">
+                        <span className="stat-label">Balans:</span>
+                        <span className="stat-value balance">{user.balance.toLocaleString()} ball</span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">Kartalar:</span>
+                        <span className="stat-value">{user.cards?.length || 0} ta</span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">Tarix:</span>
+                        <span className="stat-value">{user.history?.length || 0} ta</span>
+                      </div>
+                    </div>
+                    
+                    <div className="token-section">
+                      <div className="token-row">
+                        <code className="token-code">{user.token}</code>
+                        <button 
+                          onClick={() => copyTokenAndEnter(user.token, user.login)} 
+                          className="copy-btn"
+                          title="Tokenni nusxalash"
+                        >
+                          📋
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="balance-actions">
+                      <button 
+                        onClick={() => addBalanceToUser(user, 1000)} 
+                        className="balance-btn add"
+                      >
+                        +1000
+                      </button>
+                      <button 
+                        onClick={() => removeBalanceFromUser(user, 1000)} 
+                        className="balance-btn remove"
+                      >
+                        -1000
+                      </button>
+                    </div>
+                    
+                    <div className="user-actions">
+                      <button onClick={() => handleEditUser(user)} className="action-btn edit">
+                        ✏️ Tahrirlash
+                      </button>
+                      <button onClick={() => clearHistory(user)} className="action-btn secondary">
+                        🗑️ Tarix tozalash
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="no-data">
+                  <div className="no-data-icon">👥</div>
+                  <p>Foydalanuvchilar topilmadi</p>
+                  <button onClick={resetFilters} className="reset-btn">Filtrlarni tozalash</button>
+                </div>
+              )}
             </div>
           </div>
         )}
 
         {/* MARKET KARTALARI */}
-        <div className="admin-section">
-          <h2>Sotuvdagi Kartalar ({marketCards.length})</h2>
-          {marketCards.length > 0 ? (
-            marketCards.map(c => (
-              <div key={c.id} className="market-card-admin">
-                <span>ID: {c.id} - {c.balance} ball → {c.price} ball</span>
-                <button onClick={() => deleteMarketCard(c.id)} className="action-btn danger">O‘chirish</button>
-              </div>
-            ))
-          ) : (
-            <div className="no-cards">
-              <p>Sotuvda kartalar mavjud emas</p>
+        {activeTab === 'market' && (
+          <div className="admin-section">
+            <div className="section-header">
+              <h2>Sotuvdagi Kartalar ({marketCards.length})</h2>
             </div>
-          )}
-        </div>
+            
+            {marketCards.length > 0 ? (
+              <div className="market-cards-grid">
+                {marketCards.map(card => (
+                  <div key={card.id} className="market-card-admin">
+                    <div className="card-info">
+                      <div className="card-id">ID: {card.id}</div>
+                      <div className="card-balance">{card.balance} ball</div>
+                      <div className="card-price">{card.price} ball</div>
+                      <div className="card-profit">
+                        Foyda: {card.price - card.balance} ball
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => deleteMarketCard(card.id)} 
+                      className="action-btn danger"
+                    >
+                      ❌ O'chirish
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="no-data">
+                <div className="no-data-icon">💳</div>
+                <p>Sotuvda kartalar mavjud emas</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAHRIRLASH MODALI */}
+        {selectedUser && (
+          <div className="edit-modal">
+            <div className="modal-overlay" onClick={() => { setSelectedUser(null); setAvatarFile(null); }}></div>
+            <div className="modal-content">
+              <div className="modal-header">
+                <h3>@{selectedUser.login} ni tahrirlash</h3>
+                <button 
+                  className="close-btn"
+                  onClick={() => { setSelectedUser(null); setAvatarFile(null); }}
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Balans</label>
+                  <input 
+                    type="number" 
+                    placeholder="Balans" 
+                    value={editData.balance} 
+                    onChange={e => setEditData({...editData, balance: e.target.value})} 
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Ism</label>
+                  <input 
+                    type="text" 
+                    placeholder="Ism" 
+                    value={editData.name} 
+                    onChange={e => setEditData({...editData, name: e.target.value})} 
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Telefon</label>
+                  <input 
+                    type="tel" 
+                    placeholder="Telefon" 
+                    value={editData.phone} 
+                    onChange={e => setEditData({...editData, phone: e.target.value})} 
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Email</label>
+                  <input 
+                    type="email" 
+                    placeholder="Email" 
+                    value={editData.email} 
+                    onChange={e => setEditData({...editData, email: e.target.value})} 
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Avatar o'zgartirish</label>
+                  <div className="file-input-container">
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={e => setAvatarFile(e.target.files[0])} 
+                    />
+                    {avatarFile && (
+                      <span className="file-name">{avatarFile.name}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="modal-actions">
+                <button onClick={handleSaveUser} className="save-btn">✅ Saqlash</button>
+                <button onClick={() => { setSelectedUser(null); setAvatarFile(null); }} className="cancel-btn">❌ Bekor qilish</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,7 @@
-// src/components/Profile.jsx
 import React, { useState, useEffect } from 'react';
 import {
   FiCamera, FiDollarSign, FiCreditCard, FiClock,
-  FiEdit2, FiSave, FiX, FiLogOut
+  FiEdit2, FiSave, FiX, FiLogOut, FiArrowUpRight, FiArrowDownLeft
 } from 'react-icons/fi';
 import '../styles/Profile.css';
 import Logo from '../assets/images/logo.png';
@@ -27,13 +26,7 @@ function Profile({ user, updateUser, onLogout }) {
   const handleSave = () => {
     const updatedUser = {
       ...user,
-      profile: {
-        ...user.profile,
-        name,
-        phone,
-        email,
-        avatar,
-      },
+      profile: { ...user.profile, name, phone, email, avatar },
     };
     updateUser(updatedUser);
     setIsEditing(false);
@@ -71,6 +64,7 @@ function Profile({ user, updateUser, onLogout }) {
           )}
         </button>
       </div>
+
       <div className="profile-card">
         {/* Avatar */}
         <div className="avatar-section">
@@ -99,8 +93,8 @@ function Profile({ user, updateUser, onLogout }) {
           <h2 className="user-name">{name}</h2>
           <p className="user-role">Foydalanuvchi</p>
           <div className="user-balance-badge">
-            {user.balance?.toLocaleString() || 0} 
-              <img src={Logo} alt="Logo" className="balance-logo" />
+            {user.balance?.toLocaleString() || 0}
+            <img src={Logo} alt="Logo" className="balance-logo" />
           </div>
         </div>
 
@@ -135,6 +129,7 @@ function Profile({ user, updateUser, onLogout }) {
               disabled={!isEditing}
             />
           </div>
+
           {isEditing && (
             <div className="form-actions">
               <button onClick={handleSave} className="save-btn">
@@ -164,6 +159,45 @@ function Profile({ user, updateUser, onLogout }) {
             <div className="stat-value">{user.history?.length || 0}</div>
             <div className="stat-label">Tarix</div>
           </div>
+        </div>
+
+        {/* === OXIRGI TARIX BO‘LIMI === */}
+        <div className="history-section">
+          <h3>Oxirgi amallar</h3>
+          {user.history && user.history.length > 0 ? (
+            <div className="history-list">
+              {user.history
+                .slice(-5)
+                .reverse()
+                .map((item, index) => (
+                  <div key={index} className="history-item">
+                    <div className="history-icon">
+                      {item.type === 'to‘lov' || item.type === 'chiqarish' ? (
+                        <FiArrowUpRight className="out" />
+                      ) : (
+                        <FiArrowDownLeft className="in" />
+                      )}
+                    </div>
+                    <div className="history-info">
+                      <p className="history-type">{item.type}</p>
+                      <p className="history-date">{item.date}</p>
+                    </div>
+                    <div
+                      className={`history-amount ${
+                        item.type === 'to‘lov' || item.type === 'chiqarish'
+                          ? 'negative'
+                          : 'positive'
+                      }`}
+                    >
+                      {item.amount > 0 ? '+' : ''}
+                      {item.amount} UZS
+                    </div>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <p className="no-history">Hozircha hech qanday amal yo‘q.</p>
+          )}
         </div>
 
         {/* Chiqish */}

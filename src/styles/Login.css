@@ -296,3 +296,90 @@
   display: block;
   margin: 0 auto;
 }
+
+
+
+
+
+
+
+
+
+/* ================================================= */
+/* ENG KICHIK EKRANLAR (320px va kichik) UCHUN */
+/* ================================================= */
+@media (max-width: 360px) {
+  .loginx-content {
+    padding: 10px;
+    padding-top: 60px;
+  }
+
+  .loginx-logo {
+    font-size: 26px;
+    text-align: center;
+  }
+
+  .loginx-logo-img {
+    width: 90px;
+    height: auto;
+    margin-bottom: 10px;
+  }
+
+  .loginx-title {
+    font-size: 22px;
+    line-height: 1.3;
+  }
+
+  .loginx-form {
+    padding: 15px 0;
+    gap: 18px;
+    max-width: 100%;
+  }
+
+  .loginx-input {
+    padding: 12px 16px;
+    font-size: 14px;
+    border-radius: 12px;
+  }
+
+  .loginx-inputs {
+    margin-top: 60px;
+    gap: 14px;
+  }
+
+  .loginx-btn-primary {
+    padding: 14px 18px;
+    font-size: 15px;
+    border-radius: 25px;
+  }
+
+  .loginx-btn-toggle {
+    padding: 10px 16px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  .loginx-buttons {
+    margin-top: 60px;
+    gap: 10px;
+  }
+
+  .loginx-footer {
+    font-size: 13px;
+    padding-bottom: 10px;
+  }
+
+  .loginx-background {
+    width: 85%;
+    height: 30%;
+    opacity: 0.4;
+  }
+}
+
+
+
+
+
+
+
+
