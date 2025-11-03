@@ -178,7 +178,8 @@ function MainMenu({ user, updateUser }) {
           </div>
           <div className="balance-amount">
             {(user?.balance || 0).toLocaleString()}
-            <img src={Logo} alt="Logo" className="balance-logo" />
+                      <img src={Logo} alt="Logo" className="topup-logo" />
+
           </div>
         </div>
         <div className="balance-label">Joriy balans</div>

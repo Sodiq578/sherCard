@@ -1,9 +1,12 @@
+/* src/styles/Market.css */
+
+/* Asosiy sahifa */
 .market-page {
   padding-bottom: 90px;
   background: #1a1a1a;
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #ffffff; /* Matn rangini oq qilamiz */
+  color: #ffffff;
 }
 
 .market-container {
@@ -19,13 +22,13 @@
   align-items: center;
   margin-bottom: 24px;
   padding: 12px 0;
-  border-bottom: 1px solid #333; /* Chegara rangini quyuq qilamiz */
+  border-bottom: 1px solid #333;
 }
 
 .market-header h2 {
   font-size: 22px;
   font-weight: 700;
-  color: #ffffff; /* Sarlavha matnini oq qilamiz */
+  color: #ffffff;
   margin: 0;
 }
 
@@ -56,7 +59,7 @@
 .section-header h3 {
   font-size: 18px;
   margin: 0;
-  color: #ffffff; /* Sarlavha matnini oq qilamiz */
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -73,92 +76,10 @@
 }
 
 .view-all-btn:hover {
-  background: rgba(230, 126, 34, 0.1); /* Qora fon uchun yorqinroq hover effekt */
+  background: rgba(230, 126, 34, 0.1);
 }
 
-/* Kartalar */
-.single-card-wrapper {
-  cursor: pointer;
-  margin-bottom: 20px;
-}
-
-.mini-card {
-  background: #e67e22;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(230, 126, 34, 0.25);
-  transition: all 0.2s ease;
-  height: 100px;
-}
-
-.mini-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(230, 126, 34, 0.35);
-}
-
-.mini-card-inner {
-  display: flex;
-  height: 100%;
-  color: white;
-  padding: 10px;
-}
-
-.mini-card-logo {
-  width: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-right: 8px;
-}
-
-.mini-card-logo img {
-  width: 32px;
-  height: 32px;
-  filter: brightness(0) invert(1);
-  object-fit: contain;
-}
-
-.mini-card-info {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-}
-
-.mini-card-details {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.mini-card-name {
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.mini-card-balance {
-  font-weight: 700;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.balance-valyuta-logo {
-  width: 16px;
-  height: 16px;
-  filter: brightness(0) invert(1);
-}
-
-.mini-card-number {
-  font-family: 'Courier New', monospace;
-  letter-spacing: 1.2px;
-  font-size: 11px;
-  opacity: 0.9;
-}
-
-/* Tugmalar bo'limi */
+/* Tugmalar */
 .action-buttons {
   margin: 30px 0;
 }
@@ -181,7 +102,6 @@
   transform: translateY(-5px);
 }
 
-/* Faqat rasmlar va yozuvlar */
 .action-icon {
   width: 160px;
   height: auto;
@@ -197,7 +117,7 @@
 .action-grid p {
   font-weight: 600;
   font-size: 16px;
-  color: #ffffff; /* Matn rangini oq qilamiz */
+  color: #ffffff;
   margin-top: 8px;
 }
 
@@ -213,7 +133,7 @@
 }
 
 .promo-card-small {
-  background: #2d2d2d; /* Qora fon uchun quyuq kulrang */
+  background: #2d2d2d;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -240,7 +160,7 @@
 .promo-info-small h4 {
   font-size: 13px;
   margin: 0 0 4px;
-  color: #ffffff; /* Matn rangini oq qilamiz */
+  color: #ffffff;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -272,7 +192,92 @@
   background: #d35400;
 }
 
-/* 🔹 Responsiv dizayn */
+/* FULL SCREEN MODAL (AliExpress kabi) */
+.full-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.full-modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 95vh;
+  background: #1a1a1a;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  animation: modalSlideUp 0.4s ease-out;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+  background: #e74c3c;
+  transform: scale(1.1);
+}
+
+.modal-body {
+  height: 100%;
+  overflow-y: auto;
+  padding: 0;
+}
+
+/* Scrollbar */
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 3px;
+}
+
+@keyframes modalSlideUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsiv */
 @media (max-width: 768px) {
   .action-icon {
     width: 120px;
@@ -281,6 +286,12 @@
 
   .action-grid p {
     font-size: 14px;
+  }
+
+  .full-modal-content {
+    height: 100vh;
+    border-radius: 0;
+    max-width: 100%;
   }
 }
 
@@ -298,4 +309,3 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
-

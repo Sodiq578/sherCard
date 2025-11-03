@@ -1,119 +1,197 @@
 // src/components/ChatDetail.jsx
-import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { FiArrowLeft, FiSend } from "react-icons/fi";
+import React, { useState, useRef } from "react";
+import {
+  FaPaperPlane,
+  FaMicrophone,
+  FaMoon,
+  FaSun,
+  FaPaperclip,
+  FaImage,
+  FaVideo,
+} from "react-icons/fa";
 import "../styles/ChatDetail.css";
 
 function ChatDetail() {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const [theme, setTheme] = useState("light");
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [recipient, setRecipient] = useState(null);
-  const messagesEndRef = useRef(null);
+  const [inputValue, setInputValue] = useState("");
+  const [recording, setRecording] = useState(false);
+  const [audioLevel, setAudioLevel] = useState(0);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+  const animationFrameRef = useRef(null);
 
-  useEffect(() => {
-    const currentUser = JSON.parse(localStorage.getItem("userData"));
-    const allUsers = JSON.parse(localStorage.getItem("allUsers") || "[]");
-    const user = allUsers.find(u => u.login === id);
-    setRecipient(user);
+  // Tema almashtirish
+  const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
 
-    const chatMsgs = (currentUser.messages || []).filter(
-      m => (m.from === currentUser.login && m.to === id) || (m.from === id && m.to === currentUser.login)
-    );
-    setMessages(chatMsgs);
-
-    // O'qilgan deb belgilash
-    const updatedMessages = currentUser.messages.map(m =>
-      m.to === currentUser.login && m.from === id ? { ...m, read: true } : m
-    );
-    const updatedUser = { ...currentUser, messages: updatedMessages };
-    localStorage.setItem("userData", JSON.stringify(updatedUser));
-
-    // allUsers ni yangilash
-    const updatedAll = allUsers.map(u =>
-      u.login === currentUser.login ? updatedUser : u
-    );
-    localStorage.setItem("allUsers", JSON.stringify(updatedAll));
-  }, [id]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
+  // Xabar yuborish
   const sendMessage = () => {
-    if (!newMessage.trim()) return;
-
-    const currentUser = JSON.parse(localStorage.getItem("userData"));
-    const msg = {
-      text: newMessage,
-      from: currentUser.login,
-      to: id,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      read: false,
+    if (inputValue.trim() === "") return;
+    const newMsg = {
+      type: "text",
+      content: inputValue,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
+    setMessages([...messages, newMsg]);
+    setInputValue("");
+  };
 
-    // Joriy foydalanuvchi
-    const updatedCurrent = {
-      ...currentUser,
-      messages: [...(currentUser.messages || []), msg],
+  // Rasm yoki video yuborish
+  const sendMedia = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const fileUrl = URL.createObjectURL(file);
+    const fileType = file.type.startsWith("video") ? "video" : "image";
+
+    const newMsg = {
+      type: fileType,
+      content: fileUrl,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
-    localStorage.setItem("userData", JSON.stringify(updatedCurrent));
+    setMessages((prev) => [...prev, newMsg]);
+  };
 
-    // Qabul qiluvchi
-    const allUsers = JSON.parse(localStorage.getItem("allUsers") || "[]");
-    const updatedAll = allUsers.map(u =>
-      u.login === id
-        ? { ...u, messages: [...(u.messages || []), { ...msg, read: false }] }
-        : u
-    );
-    localStorage.setItem("allUsers", JSON.stringify(updatedAll));
+  // Ovoz yozishni boshlash
+  const startRecording = async () => {
+    setRecording(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+      mediaRecorderRef.current.ondataavailable = (e) => {
+        audioChunksRef.current.push(e.data);
+      };
 
-    setMessages(prev => [...prev, msg]);
-    setNewMessage("");
+      // Soundwave uchun audio context
+      audioContextRef.current = new AudioContext();
+      const source = audioContextRef.current.createMediaStreamSource(stream);
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      source.connect(analyserRef.current);
+      const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+
+      const animateWave = () => {
+        analyserRef.current.getByteFrequencyData(dataArray);
+        const avg =
+          dataArray.reduce((a, b) => a + b, 0) / dataArray.length / 2;
+        setAudioLevel(avg);
+        animationFrameRef.current = requestAnimationFrame(animateWave);
+      };
+      animateWave();
+
+      mediaRecorderRef.current.onstop = () => {
+        cancelAnimationFrame(animationFrameRef.current);
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/mp3" });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const newMsg = {
+          type: "audio",
+          content: audioUrl,
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        };
+        setMessages((prev) => [...prev, newMsg]);
+      };
+
+      mediaRecorderRef.current.start();
+    } catch (err) {
+      alert("Mikrofonga ruxsat berilmagan!");
+      setRecording(false);
+    }
+  };
+
+  // Ovoz yozishni to‘xtatish
+  const stopRecording = () => {
+    setRecording(false);
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+    }
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+    }
   };
 
   return (
-    <div className="chat-detail-container">
+    <div className={`chat-detail-container ${theme}`}>
       <div className="chat-detail-header">
-        <button onClick={() => navigate(-1)} className="back-btn">
-          <FiArrowLeft />
-        </button>
         <img
-          src={recipient?.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}
-          alt=""
+          src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png"
+          alt="User"
           className="chat-detail-avatar"
         />
-        <div>
-          <p className="chat-detail-username">@{recipient?.profile?.username}</p>
-          <p className="chat-detail-name">{recipient?.profile?.name}</p>
-        </div>
+        <h3 className="chat-user-name">Sodiqjon</h3>
+        <button className="theme-toggle" onClick={toggleTheme}>
+          {theme === "light" ? <FaMoon /> : <FaSun />}
+        </button>
       </div>
 
       <div className="chat-messages">
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`message ${m.from === JSON.parse(localStorage.getItem("userData")).login ? "sent" : "received"}`}
-          >
-            <p>{m.text}</p>
-            <span className="message-time">{m.time}</span>
+        {messages.map((msg, i) => (
+          <div key={i} className={`message sent`}>
+            {msg.type === "text" && <p>{msg.content}</p>}
+            {msg.type === "audio" && <audio controls src={msg.content}></audio>}
+            {msg.type === "image" && <img src={msg.content} alt="sent" className="msg-img" />}
+            {msg.type === "video" && (
+              <video controls src={msg.content} className="msg-video"></video>
+            )}
+            <span className="message-time">{msg.time}</span>
           </div>
         ))}
-        <div ref={messagesEndRef} />
       </div>
 
       <div className="chat-input-area">
+        <label htmlFor="media-upload" className="file-btn">
+          <FaPaperclip />
+        </label>
         <input
-          type="text"
-          placeholder="Xabar yozing..."
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+          type="file"
+          id="media-upload"
+          accept="image/*,video/*"
+          onChange={sendMedia}
+          style={{ display: "none" }}
         />
-        <button onClick={sendMessage}>
-          <FiSend />
-        </button>
+
+        {recording ? (
+          <div className="recording-bar">
+            <div className="wave">
+              <div
+                className="wave-bar"
+                style={{ height: `${Math.min(audioLevel, 60)}px` }}
+              ></div>
+              <div
+                className="wave-bar"
+                style={{ height: `${Math.min(audioLevel / 1.5, 50)}px` }}
+              ></div>
+              <div
+                className="wave-bar"
+                style={{ height: `${Math.min(audioLevel / 2, 40)}px` }}
+              ></div>
+            </div>
+            <span>Ovoz yozilmoqda...</span>
+          </div>
+        ) : (
+          <input
+            type="text"
+            placeholder="Xabar yozing..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+          />
+        )}
+
+        {inputValue ? (
+          <button onClick={sendMessage}>
+            <FaPaperPlane />
+          </button>
+        ) : (
+          <button
+            onMouseDown={startRecording}
+            onMouseUp={stopRecording}
+            className={`mic-btn ${recording ? "recording" : ""}`}
+          >
+            <FaMicrophone />
+          </button>
+        )}
       </div>
     </div>
   );

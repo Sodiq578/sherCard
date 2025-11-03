@@ -1,109 +1,228 @@
 // src/data/shops.js
+
+let shops = [
+  {
+    id: 1,
+    name: "Burger King",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/2/21/Burger_King_2020.svg",
+    description: "Tez tayyorlanadigan burgerlar",
+    menu: [
+      {
+        id: 1,
+        name: "Whopper",
+        price: 45000,
+        image: "https://static.wikia.nocookie.net/burgerking/images/7/7c/Whopper.png",
+      },
+      {
+        id: 2,
+        name: "Cheeseburger",
+        price: 35000,
+        image: "https://static.wikia.nocookie.net/burgerking/images/2/28/Cheeseburger.png",
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: "KFC",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/b/bf/KFC_logo.svg",
+    description: "Mazali tovuq go‘shtli taomlar",
+    menu: [
+      {
+        id: 3,
+        name: "Zinger",
+        price: 48000,
+        image: "https://static.wikia.nocookie.net/kfc/images/9/9e/Zinger.png",
+      },
+      {
+        id: 4,
+        name: "BoxMaster",
+        price: 52000,
+        image: "https://static.wikia.nocookie.net/kfc/images/a/a0/Boxmaster.png",
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: "Domino's Pizza",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/7/74/Dominos_pizza_logo.svg",
+    description: "Issiq va yangi pitsa turlari",
+    menu: [
+      {
+        id: 5,
+        name: "Pepperoni",
+        price: 68000,
+        image: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Supreme_pizza.jpg",
+      },
+      {
+        id: 6,
+        name: "Cheese Lava",
+        price: 72000,
+        image: "https://upload.wikimedia.org/wikipedia/commons/9/9b/Cheese_pizza.jpg",
+      },
+    ],
+  },
+  {
+    id: 4,
+    name: "Coca-Cola",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/1/1b/Coca-Cola_logo.svg",
+    description: "Dunyo bo‘ylab mashhur ichimlik",
+    menu: [
+      {
+        id: 7,
+        name: "Coca-Cola 1L",
+        price: 12000,
+        image: "https://upload.wikimedia.org/wikipedia/commons/1/16/Coca-Cola_bottle_1L.jpg",
+      },
+      {
+        id: 8,
+        name: "Coca-Cola 0.5L",
+        price: 8000,
+        image: "https://upload.wikimedia.org/wikipedia/commons/2/27/Coca-Cola_0.5L.jpg",
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: "Starbucks",
+    logo: "https://upload.wikimedia.org/wikipedia/sco/4/45/Starbucks_Coffee_Logo.svg",
+    description: "Kofe va shirinliklar",
+    menu: [
+      {
+        id: 9,
+        name: "Latte",
+        price: 40000,
+        image: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Caff%C3%A8_Latte_at_Sightglass_Coffee.jpg",
+      },
+      {
+        id: 10,
+        name: "Cappuccino",
+        price: 42000,
+        image: "https://upload.wikimedia.org/wikipedia/commons/4/45/Cappuccino_Chiang_Mai.jpg",
+      },
+    ],
+  },
+  {
+    id: 6,
+    name: "Subway",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/5/5c/Subway_2016_logo.svg",
+    description: "Yangi sabzavotli sendvichlar",
+    menu: [
+      {
+        id: 11,
+        name: "Chicken Teriyaki",
+        price: 46000,
+        image: "https://upload.wikimedia.org/wikipedia/commons/2/2a/Subway_Teriyaki_Chicken_Sandwich.jpg",
+      },
+      {
+        id: 12,
+        name: "Tuna",
+        price: 42000,
+        image: "https://upload.wikimedia.org/wikipedia/commons/a/a8/Subway_tuna_sandwich.jpg",
+      },
+    ],
+  },
+  {
+    id: 7,
+    name: "Local Pizza",
+    logo: "https://picsum.photos/seed/pizza/200/300",
+    description: "Mahalliy ta’mli pitsa",
+    menu: [
+      {
+        id: 13,
+        name: "Margherita",
+        price: 60000,
+        image: "https://picsum.photos/seed/margherita/400/300",
+      },
+      {
+        id: 14,
+        name: "Four Cheese",
+        price: 68000,
+        image: "https://picsum.photos/seed/fourcheese/400/300",
+      },
+    ],
+  },
+  {
+    id: 8,
+    name: "Fast Food Point",
+    logo: "https://picsum.photos/seed/fastfood/200/300",
+    description: "Turli xil fast-food taomlar",
+    menu: [
+      {
+        id: 15,
+        name: "Hotdog",
+        price: 25000,
+        image: "https://picsum.photos/seed/hotdog/400/300",
+      },
+      {
+        id: 16,
+        name: "French Fries",
+        price: 15000,
+        image: "https://picsum.photos/seed/fries/400/300",
+      },
+    ],
+  },
+  {
+    id: 9,
+    name: "Juice Bar",
+    logo: "https://picsum.photos/seed/juice/200/300",
+    description: "Tabiiy sharbatlar va smuzilar",
+    menu: [
+      {
+        id: 17,
+        name: "Orange Juice",
+        price: 18000,
+        image: "https://picsum.photos/seed/orange/400/300",
+      },
+      {
+        id: 18,
+        name: "Strawberry Smoothie",
+        price: 22000,
+        image: "https://picsum.photos/seed/strawberry/400/300",
+      },
+    ],
+  },
+];
+
+// === DO‘KONLARNI OLISH ===
 export const getShops = () => {
-  try {
-    const stored = localStorage.getItem('shops');
-    if (stored) {
+  const stored = localStorage.getItem("shopsData");
+  if (stored) {
+    try {
       const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
-      }
+      return Array.isArray(parsed) ? parsed : shops;
+    } catch (e) {
+      console.error("shopsData o‘qishda xato:", e);
     }
-  } catch (error) {
-    console.error("shops o'qishda xato:", error);
   }
-
-  const defaultShops = [
-    {
-      id: 1,
-      name: "Evos",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/6/6b/Evos_logo.png",
-      menu: [
-        { id: 101, name: "Lavash", price: 25000, image: "https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg?auto=compress&cs=tinysrgb&w=600" },
-        { id: 102, name: "Burger", price: 30000, image: "https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg?auto=compress&cs=tinysrgb&w=600" },
-        { id: 103, name: "Cola", price: 8000, image: "https://images.pexels.com/photos/1322188/pexels-photo-1322188.jpeg?auto=compress&cs=tinysrgb&w=600" },
-      ],
-    },
-    {
-      id: 2,
-      name: "Bellissimo",
-      logo: "https://bellissimo.uz/images/logo_new.svg",
-      menu: [
-        { id: 201, name: "Pizza Margherita", price: 45000, image: "https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=600" },
-        { id: 202, name: "Pasta", price: 35000, image: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=600" },
-        { id: 203, name: "Tiramisu", price: 20000, image: "https://images.pexels.com/photos/1126359/pexels-photo-1126359.jpeg?auto=compress&cs=tinysrgb&w=600" },
-      ],
-    },
-    {
-      id: 3,
-      name: "KFC",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/b/bf/KFC_logo.svg",
-      menu: [
-        { id: 301, name: "Zinger Burger", price: 38000, image: "https://images.pexels.com/photos/2983101/pexels-photo-2983101.jpeg?auto=compress&cs=tinysrgb&w=600" },
-        { id: 302, name: "6 dona Hot Wings", price: 42000, image: "https://images.pexels.com/photos/60616/fried-chicken-chicken-fried-60616.jpeg?auto=compress&cs=tinysrgb&w=600" },
-        { id: 303, name: "Fries", price: 15000, image: "https://images.pexels.com/photos/1583884/pexels-photo-1583884.jpeg?auto=compress&cs=tinysrgb&w=600" },
-      ],
-    },
-    {
-      id: 4,
-      name: "McDonald's",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/4/4c/McDonald%27s_logo.svg",
-      menu: [
-        { id: 401, name: "Big Mac", price: 40000, image: "https://images.pexels.com/photos/2983098/pexels-photo-2983098.jpeg?auto=compress&cs=tinysrgb&w=600" },
-        { id: 402, name: "McChicken", price: 32000, image: "https://images.pexels.com/photos/2282528/pexels-photo-2282528.jpeg?auto=compress&cs=tinysrgb&w=600" },
-        { id: 403, name: "McFlurry", price: 18000, image: "https://images.pexels.com/photos/1352270/pexels-photo-1352270.jpeg?auto=compress&cs=tinysrgb&w=600" },
-      ],
-    },
-    {
-      id: 5,
-      name: "Korzinka",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/aa/Korzinka_logo.svg",
-      menu: [
-        { id: 501, name: "Non (1 dona)", price: 3000, image: "https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=600" },
-        { id: 502, name: "Sut (1L)", price: 12000, image: "https://images.pexels.com/photos/264547/pexels-photo-264547.jpeg?auto=compress&cs=tinysrgb&w=600" },
-        { id: 503, name: "Tuxum (10 ta)", price: 15000, image: "https://images.pexels.com/photos/162712/egg-eggshell-protein-food-162712.jpeg?auto=compress&cs=tinysrgb&w=600" },
-      ],
-    },
-    {
-      id: 6,
-      name: "Chopar Pizza",
-      logo: "https://static.tildacdn.com/tild3864-3935-4665-b837-343230396133/choparlogo.svg",
-      menu: [
-        { id: 601, name: "Chopar Special", price: 55000, image: "https://images.pexels.com/photos/1653877/pexels-photo-1653877.jpeg?auto=compress&cs=tinysrgb&w=600" },
-        { id: 602, name: "Pepperoni", price: 48000, image: "https://images.pexels.com/photos/280252/pexels-photo-280252.jpeg?auto=compress&cs=tinysrgb&w=600" },
-      ],
-    },
-    {
-      id: 7,
-      name: "FeedUp",
-      logo: "https://feedup.uz/_nuxt/img/logo.2e4ff10.svg",
-      menu: [
-        { id: 701, name: "Doner", price: 28000, image: "https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg?auto=compress&cs=tinysrgb&w=600" },
-        { id: 702, name: "Shaurma", price: 25000, image: "https://images.pexels.com/photos/461326/pexels-photo-461326.jpeg?auto=compress&cs=tinysrgb&w=600" },
-      ],
-    },
-    {
-      id: 8,
-      name: "Lavash House",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/7/7a/Lavash_House_logo.png",
-      menu: [
-        { id: 801, name: "Tandir Lavash", price: 22000, image: "https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=600" },
-        { id: 802, name: "Guruchli Lavash", price: 30000, image: "https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg?auto=compress&cs=tinysrgb&w=600" },
-      ],
-    },
-  ];
-
-  try {
-    localStorage.setItem('shops', JSON.stringify(defaultShops));
-  } catch (e) {
-    console.warn("localStorage ga yozib bo‘lmadi:", e);
-  }
-  return defaultShops;
+  return shops;
 };
 
-export const saveShops = (shops) => {
-  try {
-    localStorage.setItem('shops', JSON.stringify(shops));
-  } catch (e) {
-    console.error("shops saqlashda xato:", e);
+// === DO‘KONLARNI SAQLASH ===
+export const saveShops = (updatedShops) => {
+  if (!Array.isArray(updatedShops)) {
+    console.error("saveShops: Ma'lumotlar array bo‘lishi kerak!");
+    return;
   }
+
+  const sanitized = updatedShops.map((shop) => ({
+    ...shop,
+    id: shop.id || Date.now(),
+    name: shop.name?.trim() || "Noma'lum",
+    logo: shop.logo?.trim() || "https://picsum.photos/seed/default/200/300",
+    description: shop.description?.trim() || "",
+    menu: Array.isArray(shop.menu)
+      ? shop.menu.map((item) => ({
+          ...item,
+          id: item.id || Date.now(),
+          name: item.name?.trim() || "Noma'lum",
+          price: parseInt(item.price) || 0,
+          image:
+            item.image?.trim() ||
+            "https://picsum.photos/seed/defaultmenu/400/300",
+        }))
+      : [],
+  }));
+
+  localStorage.setItem("shopsData", JSON.stringify(sanitized));
+  console.log("Do‘konlar saqlandi:", sanitized);
 };

@@ -1,4 +1,4 @@
-// src/App.js
+// src/App.js (YANGI TO‘LIQ VERSIYA)
 import React, { useState, useEffect } from "react";
 import {
   BrowserRouter,
@@ -22,23 +22,22 @@ import Cards from "./components/Cards";
 import AdminPanel from "./components/AdminPanel";
 import ShopDetail from "./components/ShopDetail";
 import Market from "./components/Market";
+import AllShops from "./components/AllShops"; // 🟢 YANGI
 import BottomNav from "./components/BottomNav";
 
-// CHAT
 import ChatList from "./components/ChatList";
 import ChatDetail from "./components/ChatDetail";
 
 import "./styles/App.css";
 
 // ==================== BOTTOM NAV WRAPPER ====================
-// BottomNav faqat quyidagi sahifalarda ko‘rinsin
 const BottomNavWrapper = ({ isAuthenticated, isAdmin }) => {
   const location = useLocation();
 
   const allowedPaths = [
     "/main",
     "/market",
-    "/marketplace",
+    "/all-shops",        // 🟢 YANGI
     "/buy-card",
     "/cards",
     "/profile",
@@ -98,7 +97,7 @@ function App() {
 
   // ==================== LOGIN ====================
   const handleLogin = (data) => {
-    // 1. Token orqali
+    // Token orqali kirish
     if (data.token) {
       const found = allUsers.find((u) => u.token === data.token);
       if (found) {
@@ -113,7 +112,7 @@ function App() {
       }
     }
 
-    // 2. Admin
+    // Admin
     if (data.login === "sodiqjon" && data.password === "sodiqjon123") {
       const admin = {
         login: "sodiqjon",
@@ -139,7 +138,7 @@ function App() {
       return "/admin";
     }
 
-    // 3. Yangi foydalanuvchi
+    // Yangi foydalanuvchi
     const username = generateUsername(data.profile.name);
     const newUser = {
       login: data.login,
@@ -257,7 +256,9 @@ function App() {
         {/* HELLO */}
         <Route
           path="/hello"
-          element={isAuthenticated && !isAdmin ? <Hello /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? <Hello /> : <Navigate to="/" />
+          }
         />
 
         {/* MAIN MENU */}
@@ -275,66 +276,125 @@ function App() {
         {/* CHAT LIST */}
         <Route
           path="/chat"
-          element={isAuthenticated && !isAdmin ? <ChatList /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? <ChatList user={user} /> : <Navigate to="/" />
+          }
         />
 
         {/* CHAT DETAIL */}
         <Route
           path="/chat/:id"
-          element={isAuthenticated && !isAdmin ? <ChatDetail /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? <ChatDetail user={user} /> : <Navigate to="/" />
+          }
         />
 
         {/* MARKET */}
         <Route
           path="/market"
-          element={isAuthenticated && !isAdmin ? <Market user={user} updateUser={updateUser} /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? (
+              <Market user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
 
         {/* SHOP DETAIL */}
         <Route
           path="/shop/:id"
-          element={isAuthenticated && !isAdmin ? <ShopDetail user={user} updateUser={updateUser} /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? (
+              <ShopDetail user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
 
         {/* BUY CARD */}
         <Route
           path="/buy-card"
-          element={isAuthenticated && !isAdmin ? <BuyCard user={user} updateUser={updateUser} /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? (
+              <BuyCard user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        {/* 🟢 ALL SHOPS (YANGI) */}
+        <Route
+          path="/all-shops"
+          element={
+            isAuthenticated && !isAdmin ? (
+              <AllShops user={user} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
 
         {/* MARKETPLACE */}
         <Route
           path="/marketplace"
-          element={isAuthenticated && !isAdmin ? <Marketplace user={user} updateUser={updateUser} /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? (
+              <Marketplace user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
 
         {/* HISTORY */}
         <Route
           path="/history"
-          element={isAuthenticated && !isAdmin ? <History user={user} /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? (
+              <History user={user} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
 
         {/* TRANSFER */}
         <Route
           path="/transfer"
-          element={isAuthenticated && !isAdmin ? <Transfer user={user} updateUser={updateUser} /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? (
+              <Transfer user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
 
         {/* BANNER TRANSFER */}
         <Route
           path="/banner-transfer"
-          element={isAuthenticated && !isAdmin ? <BannerTransfer user={user} updateUser={updateUser} /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? (
+              <BannerTransfer user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
 
-
-<Route
-  path="/cards"
-  element={isAuthenticated && !isAdmin ? <Cards user={user} updateUser={updateUser} /> : <Navigate to="/" />}
-/>
         {/* CARDS */}
         <Route
           path="/cards"
-          element={isAuthenticated && !isAdmin ? <Cards user={user} /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? (
+              <Cards user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
 
         {/* PROFILE */}
@@ -353,7 +413,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
 
-      {/* BOTTOM NAV – faqat kerakli sahifalarda */}
+      {/* BOTTOM NAV */}
       <BottomNavWrapper isAuthenticated={isAuthenticated} isAdmin={isAdmin} />
     </div>
   );
