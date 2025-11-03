@@ -1,0 +1,301 @@
+.market-page {
+  padding-bottom: 90px;
+  background: #1a1a1a;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #ffffff; /* Matn rangini oq qilamiz */
+}
+
+.market-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Header */
+.market-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 12px 0;
+  border-bottom: 1px solid #333; /* Chegara rangini quyuq qilamiz */
+}
+
+.market-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff; /* Sarlavha matnini oq qilamiz */
+  margin: 0;
+}
+
+.balance-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #e67e22;
+  font-size: 16px;
+}
+
+.balance-logo-small {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) invert(1);
+  object-fit: contain;
+}
+
+/* Bo'lim sarlavhalari */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.section-header h3 {
+  font-size: 18px;
+  margin: 0;
+  color: #ffffff; /* Sarlavha matnini oq qilamiz */
+  font-weight: 600;
+}
+
+.view-all-btn {
+  background: none;
+  border: none;
+  color: #e67e22;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.view-all-btn:hover {
+  background: rgba(230, 126, 34, 0.1); /* Qora fon uchun yorqinroq hover effekt */
+}
+
+/* Kartalar */
+.single-card-wrapper {
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.mini-card {
+  background: #e67e22;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(230, 126, 34, 0.25);
+  transition: all 0.2s ease;
+  height: 100px;
+}
+
+.mini-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(230, 126, 34, 0.35);
+}
+
+.mini-card-inner {
+  display: flex;
+  height: 100%;
+  color: white;
+  padding: 10px;
+}
+
+.mini-card-logo {
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: 8px;
+}
+
+.mini-card-logo img {
+  width: 32px;
+  height: 32px;
+  filter: brightness(0) invert(1);
+  object-fit: contain;
+}
+
+.mini-card-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.mini-card-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.mini-card-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.mini-card-balance {
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.balance-valyuta-logo {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) invert(1);
+}
+
+.mini-card-number {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1.2px;
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+/* Tugmalar bo'limi */
+.action-buttons {
+  margin: 30px 0;
+}
+
+.action-grid {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  text-align: center;
+}
+
+.action-item {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.action-item:hover {
+  transform: translateY(-5px);
+}
+
+/* Faqat rasmlar va yozuvlar */
+.action-icon {
+  width: 160px;
+  height: auto;
+  max-height: 130px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.action-item:hover .action-icon {
+  transform: scale(1.08);
+}
+
+.action-grid p {
+  font-weight: 600;
+  font-size: 16px;
+  color: #ffffff; /* Matn rangini oq qilamiz */
+  margin-top: 8px;
+}
+
+/* Chegirmadagi mahsulotlar */
+.promotions-section {
+  margin-top: 20px;
+}
+
+.promotions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 14px;
+}
+
+.promo-card-small {
+  background: #2d2d2d; /* Qora fon uchun quyuq kulrang */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.promo-card-small:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+}
+
+.promo-img-small {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+}
+
+.promo-info-small {
+  padding: 10px;
+  text-align: center;
+}
+
+.promo-info-small h4 {
+  font-size: 13px;
+  margin: 0 0 4px;
+  color: #ffffff; /* Matn rangini oq qilamiz */
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.price-small {
+  font-weight: 700;
+  color: #e74c3c;
+  margin: 2px 0;
+  font-size: 13px;
+}
+
+.buy-btn-small {
+  background: #e67e22;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 6px;
+  transition: background 0.2s;
+}
+
+.buy-btn-small:hover {
+  background: #d35400;
+}
+
+/* 🔹 Responsiv dizayn */
+@media (max-width: 768px) {
+  .action-icon {
+    width: 120px;
+    max-height: 100px;
+  }
+
+  .action-grid p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .market-container {
+    padding: 12px;
+  }
+  
+  .action-icon {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .promotions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
