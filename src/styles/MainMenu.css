@@ -65,6 +65,7 @@
   text-align: center;
   margin-bottom: 30px;
   box-shadow: 0 4px 12px rgba(12, 115, 254, 0.4);
+    z-index: -1;
 }
 
 .balance-top {
