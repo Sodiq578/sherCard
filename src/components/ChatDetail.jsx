@@ -13,7 +13,13 @@ import "../styles/ChatDetail.css";
 
 function ChatDetail() {
   const [theme, setTheme] = useState("light");
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+      type: "received",
+      content: "Salom! Qalaysiz?",
+      time: "10:00",
+    }
+  ]);
   const [inputValue, setInputValue] = useState("");
   const [recording, setRecording] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
@@ -30,7 +36,7 @@ function ChatDetail() {
   const sendMessage = () => {
     if (inputValue.trim() === "") return;
     const newMsg = {
-      type: "text",
+      type: "sent",
       content: inputValue,
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
@@ -47,7 +53,8 @@ function ChatDetail() {
     const fileType = file.type.startsWith("video") ? "video" : "image";
 
     const newMsg = {
-      type: fileType,
+      type: "sent",
+      mediaType: fileType,
       content: fileUrl,
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
@@ -86,7 +93,8 @@ function ChatDetail() {
         const audioBlob = new Blob(audioChunksRef.current, { type: "audio/mp3" });
         const audioUrl = URL.createObjectURL(audioBlob);
         const newMsg = {
-          type: "audio",
+          type: "sent",
+          mediaType: "audio",
           content: audioUrl,
           time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         };
@@ -100,7 +108,7 @@ function ChatDetail() {
     }
   };
 
-  // Ovoz yozishni to‘xtatish
+  // Ovoz yozishni to'xtatish
   const stopRecording = () => {
     setRecording(false);
     if (mediaRecorderRef.current) {
@@ -127,12 +135,15 @@ function ChatDetail() {
 
       <div className="chat-messages">
         {messages.map((msg, i) => (
-          <div key={i} className={`message sent`}>
-            {msg.type === "text" && <p>{msg.content}</p>}
-            {msg.type === "audio" && <audio controls src={msg.content}></audio>}
-            {msg.type === "image" && <img src={msg.content} alt="sent" className="msg-img" />}
-            {msg.type === "video" && (
+          <div key={i} className={`message ${msg.type}`}>
+            {msg.mediaType === "audio" ? (
+              <audio controls src={msg.content} className="msg-audio"></audio>
+            ) : msg.mediaType === "image" ? (
+              <img src={msg.content} alt="sent" className="msg-img" />
+            ) : msg.mediaType === "video" ? (
               <video controls src={msg.content} className="msg-video"></video>
+            ) : (
+              <p>{msg.content}</p>
             )}
             <span className="message-time">{msg.time}</span>
           </div>
@@ -166,8 +177,16 @@ function ChatDetail() {
                 className="wave-bar"
                 style={{ height: `${Math.min(audioLevel / 2, 40)}px` }}
               ></div>
+              <div
+                className="wave-bar"
+                style={{ height: `${Math.min(audioLevel / 2.5, 30)}px` }}
+              ></div>
+              <div
+                className="wave-bar"
+                style={{ height: `${Math.min(audioLevel / 3, 20)}px` }}
+              ></div>
             </div>
-            <span>Ovoz yozilmoqda...</span>
+            <span className="recording-text">Ovoz yozilmoqda...</span>
           </div>
         ) : (
           <input
@@ -180,13 +199,15 @@ function ChatDetail() {
         )}
 
         {inputValue ? (
-          <button onClick={sendMessage}>
+          <button onClick={sendMessage} className="send-btn">
             <FaPaperPlane />
           </button>
         ) : (
           <button
             onMouseDown={startRecording}
             onMouseUp={stopRecording}
+            onTouchStart={startRecording}
+            onTouchEnd={stopRecording}
             className={`mic-btn ${recording ? "recording" : ""}`}
           >
             <FaMicrophone />
