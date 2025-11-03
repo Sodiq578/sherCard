@@ -1,7 +1,6 @@
-// src/components/ChatList.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiArrowLeft, FiSearch } from "react-icons/fi";
+import { FiSearch, FiArrowLeft } from "react-icons/fi";
 import "../styles/ChatList.css";
 
 function ChatList() {

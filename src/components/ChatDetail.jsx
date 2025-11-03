@@ -1,4 +1,3 @@
-// src/components/ChatDetail.jsx
 import React, { useState, useRef } from "react";
 import {
   FaPaperPlane,
@@ -6,33 +5,27 @@ import {
   FaMoon,
   FaSun,
   FaPaperclip,
-  FaImage,
-  FaVideo,
+  FaArrowLeft,
 } from "react-icons/fa";
 import "../styles/ChatDetail.css";
 
 function ChatDetail() {
   const [theme, setTheme] = useState("light");
   const [messages, setMessages] = useState([
-    {
-      type: "received",
-      content: "Salom! Qalaysiz?",
-      time: "10:00",
-    }
+    { type: "received", content: "Salom! Qalaysiz?", time: "10:00" }
   ]);
   const [inputValue, setInputValue] = useState("");
   const [recording, setRecording] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
+
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
   const animationFrameRef = useRef(null);
 
-  // Tema almashtirish
   const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
 
-  // Xabar yuborish
   const sendMessage = () => {
     if (inputValue.trim() === "") return;
     const newMsg = {
@@ -44,7 +37,6 @@ function ChatDetail() {
     setInputValue("");
   };
 
-  // Rasm yoki video yuborish
   const sendMedia = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -61,18 +53,14 @@ function ChatDetail() {
     setMessages((prev) => [...prev, newMsg]);
   };
 
-  // Ovoz yozishni boshlash
   const startRecording = async () => {
     setRecording(true);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream);
       audioChunksRef.current = [];
-      mediaRecorderRef.current.ondataavailable = (e) => {
-        audioChunksRef.current.push(e.data);
-      };
+      mediaRecorderRef.current.ondataavailable = (e) => audioChunksRef.current.push(e.data);
 
-      // Soundwave uchun audio context
       audioContextRef.current = new AudioContext();
       const source = audioContextRef.current.createMediaStreamSource(stream);
       analyserRef.current = audioContextRef.current.createAnalyser();
@@ -81,8 +69,7 @@ function ChatDetail() {
 
       const animateWave = () => {
         analyserRef.current.getByteFrequencyData(dataArray);
-        const avg =
-          dataArray.reduce((a, b) => a + b, 0) / dataArray.length / 2;
+        const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length / 2;
         setAudioLevel(avg);
         animationFrameRef.current = requestAnimationFrame(animateWave);
       };
@@ -108,20 +95,18 @@ function ChatDetail() {
     }
   };
 
-  // Ovoz yozishni to'xtatish
   const stopRecording = () => {
     setRecording(false);
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-    }
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-    }
+    if (mediaRecorderRef.current) mediaRecorderRef.current.stop();
+    if (audioContextRef.current) audioContextRef.current.close();
   };
 
   return (
     <div className={`chat-detail-container ${theme}`}>
       <div className="chat-detail-header">
+        <button className="back-btn" onClick={() => window.history.back()}>
+          <FaArrowLeft />
+        </button>
         <img
           src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png"
           alt="User"
@@ -137,11 +122,11 @@ function ChatDetail() {
         {messages.map((msg, i) => (
           <div key={i} className={`message ${msg.type}`}>
             {msg.mediaType === "audio" ? (
-              <audio controls src={msg.content} className="msg-audio"></audio>
+              <audio controls src={msg.content} className="msg-audio" />
             ) : msg.mediaType === "image" ? (
               <img src={msg.content} alt="sent" className="msg-img" />
             ) : msg.mediaType === "video" ? (
-              <video controls src={msg.content} className="msg-video"></video>
+              <video controls src={msg.content} className="msg-video" />
             ) : (
               <p>{msg.content}</p>
             )}
@@ -165,26 +150,13 @@ function ChatDetail() {
         {recording ? (
           <div className="recording-bar">
             <div className="wave">
-              <div
-                className="wave-bar"
-                style={{ height: `${Math.min(audioLevel, 60)}px` }}
-              ></div>
-              <div
-                className="wave-bar"
-                style={{ height: `${Math.min(audioLevel / 1.5, 50)}px` }}
-              ></div>
-              <div
-                className="wave-bar"
-                style={{ height: `${Math.min(audioLevel / 2, 40)}px` }}
-              ></div>
-              <div
-                className="wave-bar"
-                style={{ height: `${Math.min(audioLevel / 2.5, 30)}px` }}
-              ></div>
-              <div
-                className="wave-bar"
-                style={{ height: `${Math.min(audioLevel / 3, 20)}px` }}
-              ></div>
+              {[...Array(5)].map((_, idx) => (
+                <div
+                  key={idx}
+                  className="wave-bar"
+                  style={{ height: `${Math.max(2, audioLevel / (idx + 1))}px` }}
+                />
+              ))}
             </div>
             <span className="recording-text">Ovoz yozilmoqda...</span>
           </div>

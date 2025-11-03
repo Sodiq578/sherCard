@@ -311,3 +311,25 @@
     max-width: 220px;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+.back-btn {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  margin-right: 10px;
+  cursor: pointer;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
