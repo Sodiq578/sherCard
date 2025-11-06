@@ -204,28 +204,7 @@ function MainMenu({ user, updateUser }) {
         </div>
       </div>
 
-      {/* === DO‘KONLAR === */}
-      <div className="shops-section">
-        <h3>
-          <FiShoppingBag /> Tokenlar bilan yegulik olsa bo‘ladigan joylar
-        </h3>
-        <div className="shops-grid">
-          {Array.isArray(shops) && shops.length > 0 ? (
-            shops.map((shop) => (
-              <div
-                key={shop.id}
-                className="shop-card"
-                onClick={() => navigate(`/shop/${shop.id}`)}
-              >
-                <img src={shop.logo} alt={shop.name} className="shop-logo-img" />
-                <p>{shop.name}</p>
-              </div>
-            ))
-          ) : (
-            <p className="no-shops">Do‘konlar yuklanmoqda...</p>
-          )}
-        </div>
-      </div>
+      
 
       {/* === CHAT KIRISH === */}
       <div className="chat-entry" onClick={() => navigate("/chat")}>
