@@ -1,80 +1,87 @@
 // src/components/BottomNav.jsx
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   HiHome,
   HiOutlineHome,
+  HiShoppingCart,
+  HiOutlineShoppingCart,
   HiShoppingBag,
   HiOutlineShoppingBag,
-  HiShoppingCart,     // YANGI
-  HiOutlineShoppingCart, // YANGI
-  HiDocumentText,
-  HiOutlineDocumentText,
-  HiUser,
-  HiOutlineUser,
 } from 'react-icons/hi';
 import '../styles/BottomNav.css';
 
+const menuItems = [
+  { to: '/main', label: 'Asosiy', icon: HiOutlineHome, activeIcon: HiHome },
+  { to: '/market', label: 'Market', icon: HiOutlineShoppingCart, activeIcon: HiShoppingCart },
+  { to: '/marketplace', label: 'Sotuv', icon: HiOutlineShoppingBag, activeIcon: HiShoppingBag },
+];
+
 function BottomNav() {
   const location = useLocation();
-  const isActive = (path) => location.pathname === path;
+  const indicatorRef = useRef(null);
+  const menuRef = useRef(null);
+
+  const updateIndicator = () => {
+    const items = menuRef.current?.querySelectorAll('.nav-item');
+    if (!items || items.length === 0) return;
+
+    const activeIndex = Array.from(items).findIndex(
+      (item) => item.getAttribute('href') === location.pathname
+    );
+
+    if (activeIndex === -1) return;
+
+    const firstItem = items[0];
+    const activeItem = items[activeIndex];
+
+    const gap =
+      activeIndex > 0
+        ? items[1].getBoundingClientRect().left - items[0].getBoundingClientRect().right
+        : 0;
+
+    const itemWidth = activeItem.offsetWidth;
+    const leftOffset = firstItem.getBoundingClientRect().left;
+
+    const indicator = indicatorRef.current;
+    if (indicator) {
+      indicator.style.setProperty('--item', activeIndex);
+      indicator.style.setProperty('--gap', `${gap}px`);
+      indicator.style.setProperty('--item-width', `${itemWidth}px`);
+    }
+  };
+
+  useEffect(() => {
+    updateIndicator();
+    const handleResize = () => updateIndicator();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [location]);
 
   return (
     <nav className="bottom-nav">
-      {/* 1. Asosiy */}
-      <Link to="/main" className={`nav-item ${isActive('/main') ? 'active' : ''}`}>
-        <div className="nav-content">
-          <div className="nav-icon">
-            {isActive('/main') ? <HiHome size={24} /> : <HiOutlineHome size={24} />}
-          </div>
-          <span className="nav-text">Asosiy</span>
-        </div>
-        {isActive('/main') && <div className="active-bg" />}
-      </Link>
+      <div className="indicator" ref={indicatorRef}></div>
+      <ul className="menu bottom-nav-menu" ref={menuRef}>
+        {menuItems.map((item) => {
+          const isActive = location.pathname === item.to;
+          const Icon = isActive ? item.activeIcon : item.icon;
 
-      {/* 2. Market (YANGI) */}
-      <Link to="/market" className={`nav-item ${isActive('/market') ? 'active' : ''}`}>
-        <div className="nav-content">
-          <div className="nav-icon">
-            {isActive('/market') ? <HiShoppingCart size={24} /> : <HiOutlineShoppingCart size={24} />}
-          </div>
-          <span className="nav-text">Market</span>
-        </div>
-        {isActive('/market') && <div className="active-bg" />}
-      </Link>
-
-      {/* 3. Sotuv (Marketplace) */}
-      <Link to="/marketplace" className={`nav-item ${isActive('/marketplace') ? 'active' : ''}`}>
-        <div className="nav-content">
-          <div className="nav-icon">
-            {isActive('/marketplace') ? <HiShoppingBag size={24} /> : <HiOutlineShoppingBag size={24} />}
-          </div>
-          <span className="nav-text">Sotuv</span>
-        </div>
-        {isActive('/marketplace') && <div className="active-bg" />}
-      </Link>
-
-      {/* 4. Kartalar */}
-      <Link to="/cards" className={`nav-item ${isActive('/cards') ? 'active' : ''}`}>
-        <div className="nav-content">
-          <div className="nav-icon">
-            {isActive('/cards') ? <HiDocumentText size={24} /> : <HiOutlineDocumentText size={24} />}
-          </div>
-          <span className="nav-text">Kartalar</span>
-        </div>
-        {isActive('/cards') && <div className="active-bg" />}
-      </Link>
-
-      {/* 5. Profil */}
-      <Link to="/profile" className={`nav-item ${isActive('/profile') ? 'active' : ''}`}>
-        <div className="nav-content">
-          <div className="nav-icon">
-            {isActive('/profile') ? <HiUser size={24} /> : <HiOutlineUser size={24} />}
-          </div>
-          <span className="nav-text">Profil</span>
-        </div>
-        {isActive('/profile') && <div className="active-bg" />}
-      </Link>
+          return (
+            <li key={item.to}>
+              <Link
+                to={item.to}
+                className={`nav-item ${isActive ? 'active' : ''}`}
+                href={item.to} // for JS calculation
+              >
+                <span className="icon">
+                  <Icon size={24} />
+                </span>
+                <span className="text">{item.label}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </nav>
   );
 }

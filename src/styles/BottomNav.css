@@ -1,91 +1,145 @@
 /* src/styles/BottomNav.css */
+@import url('https://fonts.googleapis.com/css?family=Quicksand|Montserrat');
+
+:root {
+  --background-color: rgb(10, 10, 11);
+  --indicator-clr: rgb(0, 255, 170);
+  --menu-clr: white;
+  --items-icons-clr: black;
+  --items-text-clr: black;
+  --menu-padding-left: 1.6rem;
+  --menu-padding-right: 1.6rem;
+  --menu-padding-top: 1rem;
+  --menu-padding-bottom: 0;
+  --item-width: 4rem;
+}
+
+*,
+*::before,
+*::after {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
 .bottom-nav {
   position: fixed;
-  left: 0;
-  right: 0;
   bottom: 0;
-  height: 90px;
-  padding-bottom: env(safe-area-inset-bottom);
-background: linear-gradient(to right, #595858, #2c2c2c);
-
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 500px;
+  width: 100%;
+  background-color: var(--menu-clr);
+  border-radius: 20px 20px 0 0;
+  isolation: isolate;
+  user-select: none;
   z-index: 1000;
-  padding: 0 10px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
 
-  border-radius: 24px;
+.menu {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--menu-padding-top) var(--menu-padding-left) var(--menu-padding-bottom) var(--menu-padding-right);
+  list-style: none;
+  position: relative;
 }
 
 .nav-item {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 72px;
-  height: 70px;
-  text-decoration: none;
-  transition: transform 0.2s ease;
-}
-
-.nav-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  z-index: 2;
-  transition: all 0.2s ease;
+  justify-content: center;
+  width: var(--item-width);
+  padding: 1em 0;
+  color: var(--items-icons-clr);
+  text-decoration: none;
+  position: relative;
+  transition: all 300ms ease;
 }
 
-.nav-icon {
+.nav-item .icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.4em;
+margin-top: -10px;
+  transition: transform 300ms ease;
+  color: var(--items-icons-clr);
 }
 
-.nav-item svg {
-  transition: all 0.2s ease;
-  color: rgba(255, 255, 255, 0.5);
+.nav-item.active .icon {
+  transform: translateY(calc(-50% - var(--menu-padding-top)));
 }
 
-.nav-text {
-  font-size: 10px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
-  transition: color 0.2s ease;
-}
-
-/* FAOL HOLAT */
-.nav-item.active .nav-content svg,
-.nav-item.active .nav-content .nav-text {
-  color: #ffffff;
-}
-
-.nav-item.active svg {
-  transform: scale(1.15);
-}
-
-/* ORQA FON – yumaloq to'rtburchak */
-.active-bg {
+.nav-item .text {
   position: absolute;
-  top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: 56px;
-  height: 56px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 1;
-  transition: all 0.3s ease;
+  transform: translateX(-50%);
+  top: 100%;
+  opacity: 0;
+  font-size: 0.7em;
+  color: var(--items-text-clr);
+  font-family: 'Quicksand', sans-serif;
+  transition: opacity 300ms, transform 300ms ease;
+  transition-delay: 40ms;
+  white-space: nowrap;
 }
 
-/* Hover / Press */
-.nav-item:active {
-  transform: scale(0.94);
+.nav-item.active .text {
+  opacity: 1;
+  transform: translateY(calc(-50% - var(--menu-padding-top))) translateX(-50%);
+}
+
+/* Indicator */
+.indicator {
+  --indicator-brdr-size: 0.25rem;
+  position: absolute;
+  height: 100%;
+  aspect-ratio: 1;
+  background-color: var(--indicator-clr);
+  border: var(--indicator-brdr-size) solid var(--background-color);
+  border-radius: 50%;
+  left: var(--menu-padding-left);
+  top: -50%;
+  transform: translateX(
+    calc(
+      ((var(--item-width) - 100%) / 2) + (var(--gap, 1rem) + var(--item-width)) * var(--item, 0)
+    )
+  );
+  transition: transform 300ms ease;
+  pointer-events: none;
+}
+
+.indicator::before,
+.indicator::after {
+  --size: 1rem;
+  --shadow-y: calc(var(--size) / 2 * -1);
+  content: '';
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  top: 50%;
+  background-color: transparent;
+  box-shadow: 0 var(--shadow-y) 0 var(--background-color);
+  z-index: -1;
+}
+
+.indicator::before {
+  right: 100%;
+  border-top-right-radius: 100%;
+}
+
+.indicator::after {
+  left: 100%;
+  border-top-left-radius: 100%;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  :root {
+    --menu-padding-left: 1rem;
+    --menu-padding-right: 1rem;
+    --item-width: 3.5rem;
+  }
 }

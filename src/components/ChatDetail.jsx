@@ -1,191 +1,270 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
-  FaPaperPlane,
-  FaMicrophone,
+  FaArrowLeft,
+  FaCoins,
+  FaStar,
+  FaUser,
   FaMoon,
   FaSun,
-  FaPaperclip,
-  FaArrowLeft,
+  FaTimes,
+  FaCreditCard,
+  FaPhone,
+  FaHistory,
 } from "react-icons/fa";
 import "../styles/ChatDetail.css";
 
 function ChatDetail() {
-  const [theme, setTheme] = useState("light");
-  const [messages, setMessages] = useState([
-    { type: "received", content: "Salom! Qalaysiz?", time: "10:00" }
-  ]);
-  const [inputValue, setInputValue] = useState("");
-  const [recording, setRecording] = useState(false);
-  const [audioLevel, setAudioLevel] = useState(0);
+  const { userId } = useParams();
+  const navigate = useNavigate();
+  const [theme, setTheme] = useState("dark");
+  const [chatUser, setChatUser] = useState(null);
+  const [transferAmount, setTransferAmount] = useState("");
+  const [showCustomAmount, setShowCustomAmount] = useState(false);
+  const [showUserInfo, setShowUserInfo] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const messagesEndRef = useRef(null);
 
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
-  const audioContextRef = useRef(null);
-  const analyserRef = useRef(null);
-  const animationFrameRef = useRef(null);
+  const presetAmounts = [1000, 5000, 10000, 25000, 50000, 100000];
+
+  useEffect(() => {
+    const allUsers = JSON.parse(localStorage.getItem("allUsers") || "[]");
+    const user = allUsers.find((u) => u.login === userId);
+    setChatUser(user);
+  }, [userId]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
 
-  const sendMessage = () => {
-    if (inputValue.trim() === "") return;
-    const newMsg = {
-      type: "sent",
-      content: inputValue,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-    setMessages([...messages, newMsg]);
-    setInputValue("");
-  };
+  const handleSendToken = (amount) => {
+    const currentUser = JSON.parse(localStorage.getItem("userData"));
+    const finalAmount = amount || parseInt(transferAmount);
 
-  const sendMedia = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const fileUrl = URL.createObjectURL(file);
-    const fileType = file.type.startsWith("video") ? "video" : "image";
-
-    const newMsg = {
-      type: "sent",
-      mediaType: fileType,
-      content: fileUrl,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-    setMessages((prev) => [...prev, newMsg]);
-  };
-
-  const startRecording = async () => {
-    setRecording(true);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      audioChunksRef.current = [];
-      mediaRecorderRef.current.ondataavailable = (e) => audioChunksRef.current.push(e.data);
-
-      audioContextRef.current = new AudioContext();
-      const source = audioContextRef.current.createMediaStreamSource(stream);
-      analyserRef.current = audioContextRef.current.createAnalyser();
-      source.connect(analyserRef.current);
-      const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-
-      const animateWave = () => {
-        analyserRef.current.getByteFrequencyData(dataArray);
-        const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length / 2;
-        setAudioLevel(avg);
-        animationFrameRef.current = requestAnimationFrame(animateWave);
-      };
-      animateWave();
-
-      mediaRecorderRef.current.onstop = () => {
-        cancelAnimationFrame(animationFrameRef.current);
-        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/mp3" });
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const newMsg = {
-          type: "sent",
-          mediaType: "audio",
-          content: audioUrl,
-          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        };
-        setMessages((prev) => [...prev, newMsg]);
-      };
-
-      mediaRecorderRef.current.start();
-    } catch (err) {
-      alert("Mikrofonga ruxsat berilmagan!");
-      setRecording(false);
+    if (!finalAmount || finalAmount < 100) {
+      alert("Iltimos, 100 UZS dan kam bo‘lmagan summa kiriting!");
+      return;
     }
+
+    if (currentUser.balance < finalAmount) {
+      alert("Balansingizda yetarli mablag‘ yo‘q!");
+      return;
+    }
+
+    // Pul o‘tkazish jarayoni
+    const updatedCurrentUser = {
+      ...currentUser,
+      balance: currentUser.balance - finalAmount,
+      history: [
+        ...(currentUser.history || []),
+        {
+          time: new Date().toLocaleString("uz-UZ"),
+          action: `Pul o'tkazildi: @${chatUser.profile?.username}`,
+          amount: `-${finalAmount.toLocaleString()} UZS`,
+        },
+      ],
+    };
+
+    const allUsers = JSON.parse(localStorage.getItem("allUsers") || "[]");
+    const updatedUsers = allUsers.map((u) => {
+      if (u.login === userId) {
+        return {
+          ...u,
+          balance: (u.balance || 0) + finalAmount,
+          history: [
+            ...(u.history || []),
+            {
+              time: new Date().toLocaleString("uz-UZ"),
+              action: `Pul qabul qilindi: @${currentUser.profile?.username}`,
+              amount: `+${finalAmount.toLocaleString()} UZS`,
+            },
+          ],
+        };
+      }
+      return u;
+    });
+
+    localStorage.setItem("userData", JSON.stringify(updatedCurrentUser));
+    localStorage.setItem("allUsers", JSON.stringify(updatedUsers));
+
+    const transferMsg = {
+      type: "info",
+      content: `${finalAmount.toLocaleString()} UZS muvaffaqiyatli o'tkazildi`,
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+
+    setMessages((prev) => [...prev, transferMsg]);
+    setShowCustomAmount(false);
+    setTransferAmount("");
   };
 
-  const stopRecording = () => {
-    setRecording(false);
-    if (mediaRecorderRef.current) mediaRecorderRef.current.stop();
-    if (audioContextRef.current) audioContextRef.current.close();
-  };
+  if (!chatUser)
+    return (
+      <div className="chat-detail-container">
+        <p>Foydalanuvchi topilmadi...</p>
+      </div>
+    );
 
   return (
     <div className={`chat-detail-container ${theme}`}>
+      {/* HEADER */}
       <div className="chat-detail-header">
-        <button className="back-btn" onClick={() => window.history.back()}>
+        <button className="back-btn" onClick={() => navigate(-1)}>
           <FaArrowLeft />
         </button>
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png"
-          alt="User"
-          className="chat-detail-avatar"
-        />
-        <h3 className="chat-user-name">Sodiqjon</h3>
-        <button className="theme-toggle" onClick={toggleTheme}>
-          {theme === "light" ? <FaMoon /> : <FaSun />}
-        </button>
+
+        <div
+          className="chat-user-info"
+          onClick={() => setShowUserInfo(true)}
+          style={{ cursor: "pointer" }}
+        >
+          <div className="chat-avatar-container">
+            <img
+              src={
+                chatUser?.profile?.avatar ||
+                "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+              }
+              alt="User"
+              className="chat-detail-avatar"
+            />
+            {chatUser?.isPremium && (
+              <div className="chat-premium-indicator">
+                <FaStar size={12} />
+              </div>
+            )}
+          </div>
+          <div className="chat-user-details">
+            <h3 className="chat-user-name">
+              {chatUser?.profile?.name || chatUser?.profile?.username}
+            </h3>
+            <p className="chat-user-status">
+              {chatUser?.isPremium ? "⭐ Premium" : "🟢 Online"}
+            </p>
+          </div>
+        </div>
+
+        <div className="chat-header-actions">
+          <button
+            className="token-transfer-btn"
+            onClick={() => setShowUserInfo(true)}
+            title="Pul o'tkazish"
+          >
+            💸 Pul o‘tkazish
+          </button>
+          <button className="theme-toggle" onClick={toggleTheme}>
+            {theme === "light" ? <FaMoon /> : <FaSun />}
+          </button>
+        </div>
       </div>
 
+      {/* CHAT HUDUDI */}
       <div className="chat-messages">
         {messages.map((msg, i) => (
           <div key={i} className={`message ${msg.type}`}>
-            {msg.mediaType === "audio" ? (
-              <audio controls src={msg.content} className="msg-audio" />
-            ) : msg.mediaType === "image" ? (
-              <img src={msg.content} alt="sent" className="msg-img" />
-            ) : msg.mediaType === "video" ? (
-              <video controls src={msg.content} className="msg-video" />
-            ) : (
-              <p>{msg.content}</p>
-            )}
+            <p>{msg.content}</p>
             <span className="message-time">{msg.time}</span>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
-      <div className="chat-input-area">
-        <label htmlFor="media-upload" className="file-btn">
-          <FaPaperclip />
-        </label>
-        <input
-          type="file"
-          id="media-upload"
-          accept="image/*,video/*"
-          onChange={sendMedia}
-          style={{ display: "none" }}
-        />
-
-        {recording ? (
-          <div className="recording-bar">
-            <div className="wave">
-              {[...Array(5)].map((_, idx) => (
-                <div
-                  key={idx}
-                  className="wave-bar"
-                  style={{ height: `${Math.max(2, audioLevel / (idx + 1))}px` }}
-                />
-              ))}
-            </div>
-            <span className="recording-text">Ovoz yozilmoqda...</span>
-          </div>
-        ) : (
-          <input
-            type="text"
-            placeholder="Xabar yozing..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-          />
-        )}
-
-        {inputValue ? (
-          <button onClick={sendMessage} className="send-btn">
-            <FaPaperPlane />
-          </button>
-        ) : (
-          <button
-            onMouseDown={startRecording}
-            onMouseUp={stopRecording}
-            onTouchStart={startRecording}
-            onTouchEnd={stopRecording}
-            className={`mic-btn ${recording ? "recording" : ""}`}
+      {/* FOYDALANUVCHI MA’LUMOTLARI MODALI */}
+      {showUserInfo && (
+        <div
+          className="chat-user-modal-overlay"
+          onClick={() => setShowUserInfo(false)}
+        >
+          <div
+            className="chat-user-modal-content"
+            onClick={(e) => e.stopPropagation()}
           >
-            <FaMicrophone />
-          </button>
-        )}
-      </div>
+            <div className="chat-user-modal-header">
+              <h3>Pul o'tkazish</h3>
+              <button
+                className="chat-close-modal-btn"
+                onClick={() => setShowUserInfo(false)}
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            <div className="chat-user-profile-section">
+              <img
+                src={
+                  chatUser.profile?.avatar ||
+                  "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                }
+                alt=""
+                className="chat-user-avatar-large"
+              />
+              <h4>{chatUser.profile?.name || "Foydalanuvchi"}</h4>
+              <p>@{chatUser.profile?.username}</p>
+            </div>
+
+            <div className="chat-token-section">
+              {!showCustomAmount ? (
+                <>
+                  <h4>Tayyor summalar:</h4>
+                  <div className="chat-token-buttons-grid">
+                    {presetAmounts.map((amount) => (
+                      <button
+                        key={amount}
+                        className="chat-token-btn"
+                        onClick={() => handleSendToken(amount)}
+                      >
+                        {amount.toLocaleString()} UZS
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    className="custom-amount-btn"
+                    onClick={() => setShowCustomAmount(true)}
+                  >
+                    Boshqa summa
+                  </button>
+                </>
+              ) : (
+                <div className="custom-amount-section">
+                  <input
+                    type="number"
+                    placeholder="Summani kiriting"
+                    value={transferAmount}
+                    onChange={(e) => setTransferAmount(e.target.value)}
+                    className="custom-amount-input"
+                    min="100"
+                  />
+                  <div className="custom-amount-actions">
+                    <button
+                      className="cancel-btn"
+                      onClick={() => {
+                        setShowCustomAmount(false);
+                        setTransferAmount("");
+                      }}
+                    >
+                      Bekor qilish
+                    </button>
+                    <button
+                      className="confirm-btn"
+                      onClick={() => handleSendToken()}
+                    >
+                      O‘tkazish
+                    </button>
+                  </div>
+                </div>
+              )}
+              <div className="transfer-info">
+                <FaHistory className="info-icon" />
+                <span>O‘tkazmalar tarixini ko‘rish uchun profilga o‘ting</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

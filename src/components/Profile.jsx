@@ -1,253 +1,288 @@
 // src/components/Profile.jsx
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  FiCamera, FiDollarSign, FiCreditCard, FiClock,
-  FiEdit2, FiSave, FiX, FiLogOut, FiArrowUpRight, FiArrowDownLeft,
-  FiUser, FiMail, FiPhone, FiChevronRight
-} from 'react-icons/fi';
-import '../styles/Profile.css';
-import Logo from '../assets/images/logo.png';
+  FiArrowLeft,
+  FiCamera,
+  FiDollarSign,
+  FiCreditCard,
+  FiClock,
+  FiEdit2,
+  FiSave,
+  FiX,
+  FiLogOut,
+  FiArrowUpRight,
+  FiArrowDownLeft,
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiChevronRight,
+} from "react-icons/fi";
+import "../styles/Profile.css";
+import Logo from "../assets/images/logo.png";
 
 function Profile({ user, updateUser, onLogout }) {
   const navigate = useNavigate();
 
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [avatar, setAvatar] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const [cardsCount, setCardsCount] = useState(0);
-  const [showHistory, setShowHistory] = useState(false);
+  const [ism, setIsm] = useState("");
+  const [telefon, setTelefon] = useState("");
+  const [email, setEmail] = useState("");
+  const [rasm, setRasm] = useState("");
+  const [tahrirlash, setTahrirlash] = useState(false);
+  const [kartalarSoni, setKartalarSoni] = useState(0);
+  const [tarixKorsat, setTarixKorsat] = useState(false);
 
-  // Profilni yuklash
   useEffect(() => {
     if (user?.profile) {
-      setName(user.profile.name || user.login);
-      setPhone(user.profile.phone || '');
-      setEmail(user.profile.email || '');
-      setAvatar(user.profile.avatar || '');
+      setIsm(user.profile.name || user.login);
+      setTelefon(user.profile.phone || "");
+      setEmail(user.profile.email || "");
+      setRasm(user.profile.avatar || "");
     }
-    
-    setCardsCount((user?.cards?.length || 0) + 1); // +1 virtual karta uchun
+    setKartalarSoni(user?.cards?.length || 0);
   }, [user]);
 
-  const handleSave = () => {
-    if (!name.trim() || !phone.trim()) {
+  const saqlash = () => {
+    if (!ism.trim() || !telefon.trim()) {
       alert("Ism va telefon to'ldirilishi shart!");
       return;
     }
 
-    const updatedUser = {
+    const yangilanganFoydalanuvchi = {
       ...user,
-      profile: { ...user.profile, name, phone, email, avatar },
+      profile: {
+        ...user.profile,
+        name: ism,
+        phone: telefon,
+        email,
+        avatar: rasm,
+      },
     };
-    updateUser(updatedUser);
-    setIsEditing(false);
-    alert('Profil muvaffaqiyatli yangilandi!');
+
+    updateUser(yangilanganFoydalanuvchi);
+    setTahrirlash(false);
+    alert("Profil muvaffaqiyatli yangilandi!");
   };
 
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
+  const rasmOzgartirish = (e) => {
+    const fayl = e.target.files[0];
+    if (fayl) {
+      if (fayl.size > 2 * 1024 * 1024) {
         alert("Rasm hajmi 2MB dan oshmasin!");
         return;
       }
       const reader = new FileReader();
-      reader.onload = (ev) => setAvatar(ev.target.result);
-      reader.readAsDataURL(file);
+      reader.onload = (ev) => setRasm(ev.target.result);
+      reader.readAsDataURL(fayl);
     }
   };
 
-  const handleLogout = () => {
-    if (window.confirm('Haqiqatan ham chiqmoqchimisiz?')) {
+  const chiqish = () => {
+    if (window.confirm("Haqiqatan ham chiqmoqchimisiz?")) {
       onLogout();
-      navigate('/');
+      navigate("/");
     }
   };
 
-  const toggleHistory = () => {
-    setShowHistory(prev => !prev);
-  };
+  const tarixniOchish = () => setTarixKorsat((prev) => !prev);
 
-  if (!user) return (
-    <div className="loading">
-      <div className="spinner"></div>
-      <p>Yuklanmoqda...</p>
-    </div>
-  );
+  if (!user)
+    return (
+      <div className="yuklanmoqda">
+        <div className="aylanuvchi"></div>
+        <p>Yuklanmoqda...</p>
+      </div>
+    );
 
   return (
-    <div className="profile-container">
-      <div className="profile-header">
+    <div className="profil-sahifa">
+      {/* === SARLAVHA === */}
+      <div className="profil-sarlavha">
+        <button onClick={() => navigate(-1)} className="orqaga-tugma">
+          <FiArrowLeft size={24} />
+        </button>
         <h1>Profil</h1>
-        <button onClick={() => setIsEditing(!isEditing)} className="edit-btn">
-          {isEditing ? (
-            <>Bekor qilish</>
-          ) : (
-            <>Tahrirlash</>
-          )}
+        <button
+          onClick={() => setTahrirlash(!tahrirlash)}
+          className="tahrirlash-tugma"
+        >
+          {tahrirlash ? <FiX /> : <FiEdit2 />}
         </button>
       </div>
 
-      <div className="profile-card">
+      {/* === PROFIL KARTASI === */}
+      <div className="profil-kartasi">
         {/* === AVATAR === */}
-        <div className="avatar-section">
-          <div className="avatar-wrapper">
-            {avatar ? (
-              <img src={avatar} alt="Avatar" className="avatar-img" />
+        <div className="rasm-bolimi">
+          <div className="rasm-quti">
+            {rasm ? (
+              <img src={rasm} alt="Avatar" className="foydalanuvchi-rasmi" />
             ) : (
-              <div className="avatar-placeholder">
-                {name.charAt(0).toUpperCase()}
-              </div>
+              <div className="rasm-orniga">{ism.charAt(0).toUpperCase()}</div>
             )}
-            {isEditing && (
-              <label htmlFor="avatar-upload" className="camera-icon">
-                <FiCamera />
+            {tahrirlash && (
+              <label htmlFor="rasm-yuklash" className="kamera-belgisi">
+                <FiCamera size={18} />
               </label>
             )}
           </div>
           <input
-            id="avatar-upload"
+            id="rasm-yuklash"
             type="file"
             accept="image/*"
-            onChange={handleAvatarChange}
-            className="avatar-input"
+            onChange={rasmOzgartirish}
+            className="rasm-kirish"
           />
-          <h2 className="user-name">{name}</h2>
-          <p className="user-username">@{user.profile?.username || 'username'}</p>
-          <div className="user-balance-badge">
-            {user.balance?.toLocaleString() || 0} UZS
-            <img src={Logo} alt="Logo" className="balance-logo" />
+          <h2 className="foydalanuvchi-ism">{ism}</h2>
+          <p className="foydalanuvchi-nik">
+            @{user.profile?.username || "username"}
+          </p>
+          <div className="balans-belgisi">
+            <span>{(user.balance || 0).toLocaleString()} UZS</span>
+            <img src={Logo} alt="Logo" className="balans-logosi" />
           </div>
         </div>
 
         {/* === FORMA === */}
-        <div className="profile-form">
-          <div className="input-group">
-            <label><FiUser /> To'liq ism</label>
+        <div className="profil-forma">
+          <div className="kirish-guruh">
+            <label>
+              <FiUser /> To'liq ism
+            </label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={!isEditing}
+              value={ism}
+              onChange={(e) => setIsm(e.target.value)}
+              disabled={!tahrirlash}
               placeholder="Ism Familiya"
             />
           </div>
 
-          <div className="input-group">
-            <label><FiPhone /> Telefon</label>
+          <div className="kirish-guruh">
+            <label>
+              <FiPhone /> Telefon
+            </label>
             <input
               type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              disabled={!isEditing}
+              value={telefon}
+              onChange={(e) => setTelefon(e.target.value)}
+              disabled={!tahrirlash}
               placeholder="+998 ** *** ** **"
             />
           </div>
 
-          <div className="input-group">
-            <label><FiMail /> Email</label>
+          <div className="kirish-guruh">
+            <label>
+              <FiMail /> Email
+            </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={!isEditing}
+              disabled={!tahrirlash}
               placeholder="email@example.com"
             />
           </div>
 
-          {isEditing && (
-            <div className="form-actions">
-              <button onClick={handleSave} className="save-btn">
-                Saqlash
+          {tahrirlash && (
+            <div className="forma-harakatlar">
+              <button onClick={saqlash} className="saqlash-tugma">
+                <FiSave /> Saqlash
               </button>
-              <button onClick={() => setIsEditing(false)} className="cancel-btn">
-                Bekor qilish
+              <button
+                onClick={() => setTahrirlash(false)}
+                className="bekor-qilish-tugma"
+              >
+                <FiX /> Bekor qilish
               </button>
             </div>
           )}
         </div>
 
         {/* === STATISTIKA === */}
-        <div className="stats-grid">
-          <div className="stat-item">
-            <FiDollarSign className="stat-icon" />
-            <div className="stat-value">{user.balance?.toLocaleString() || 0}</div>
-            <div className="stat-label">Balans</div>
+        <div className="statistika-setka">
+          <div className="stat-element">
+            <FiDollarSign className="stat-belgi" />
+            <div className="stat-qiymat">
+              {(user.balance || 0).toLocaleString()}
+            </div>
+            <div className="stat-izoh">Balans</div>
           </div>
-          <div className="stat-item">
-            <FiCreditCard className="stat-icon" />
-            <div className="stat-value">{cardsCount}</div>
-            <div className="stat-label">Kartalar</div>
+          <div className="stat-element" onClick={() => navigate("/cards")}>
+            <FiCreditCard className="stat-belgi" />
+            <div className="stat-qiymat">{kartalarSoni}</div>
+            <div className="stat-izoh">Kartalar</div>
+            <FiChevronRight className="ong-belgi" />
           </div>
-          <div className="stat-item" onClick={toggleHistory} style={{ cursor: 'pointer' }}>
-            <FiClock className="stat-icon" />
-            <div className="stat-value">{user.history?.length || 0}</div>
-            <div className="stat-label">Tarix</div>
-            <FiChevronRight className="chevron-icon" />
+          <div
+            className="stat-element"
+            onClick={tarixniOchish}
+            style={{ cursor: "pointer" }}
+          >
+            <FiClock className="stat-belgi" />
+            <div className="stat-qiymat">{user.history?.length || 0}</div>
+            <div className="stat-izoh">Tarix</div>
+            <FiChevronRight
+              className={`ong-belgi ${tarixKorsat ? "aylantirilgan" : ""}`}
+            />
           </div>
         </div>
 
-        {/* === KARTALAR TUGMASI === */}
-        <button onClick={() => navigate('/cards')} className="cards-btn">
-          Kartalarimni ko'rish
-        </button>
-
-        {/* === TARIX (OCHILADIGAN) === */}
-        <div className={`history-section ${showHistory ? 'expanded' : ''}`}>
-          <div className="history-header" onClick={toggleHistory}>
-            <h3>Oxirgi amallar</h3>
-            <FiChevronRight className={`chevron ${showHistory ? 'rotated' : ''}`} />
-          </div>
-
-          {showHistory && (
-            <div className="history-content">
-              {user.history && user.history.length > 0 ? (
-                <div className="history-list">
-                  {user.history
-                    .slice()
-                    .reverse()
-                    .map((item, i) => {
-                      const isPositive = item.amount?.toString().startsWith('+') || 
-                                       item.action?.includes('to‘ldirildi') || 
-                                       item.action?.includes('keldi');
-                      return (
-                        <div key={i} className="history-item">
-                          <div className="history-icon">
-                            {isPositive ? (
-                              <FiArrowDownLeft className="in" />
-                            ) : (
-                              <FiArrowUpRight className="out" />
-                            )}
-                          </div>
-                          <div className="history-info">
-                            <p className="history-type">
-                              {item.action || item.type || 'Amal'}
-                            </p>
-                            <p className="history-date">
-                              {item.time || item.date || new Date().toLocaleString()}
-                            </p>
-                          </div>
-                          <div className={`history-amount ${isPositive ? 'positive' : 'negative'}`}>
-                            {isPositive ? '+' : ''}
-                            {Math.abs(parseInt(item.amount) || 0).toLocaleString()} UZS
-                          </div>
+        {/* === TARIX === */}
+        <div
+          className={`tarix-bolimi ${tarixKorsat ? "kengaytirilgan" : ""}`}
+        >
+          <div className="tarix-mazmuni">
+            {user.history && user.history.length > 0 ? (
+              <div className="tarix-royxati">
+                {user.history
+                  .slice()
+                  .reverse()
+                  .map((item, i) => {
+                    const kirim =
+                      item.amount?.toString().startsWith("+") ||
+                      item.action?.includes("to‘ldirildi") ||
+                      item.action?.includes("keldi");
+                    return (
+                      <div key={i} className="tarix-band">
+                        <div className="tarix-belgisi">
+                          {kirim ? (
+                            <FiArrowDownLeft className="kirim" />
+                          ) : (
+                            <FiArrowUpRight className="chiqim" />
+                          )}
                         </div>
-                      );
-                    })}
-                </div>
-              ) : (
-                <p className="no-history">Hozircha hech qanday amal yo'q.</p>
-              )}
-            </div>
-          )}
+                        <div className="tarix-malumot">
+                          <p className="amal-turi">
+                            {item.action || item.type || "Amal"}
+                          </p>
+                          <p className="amal-sana">
+                            {item.time ||
+                              new Date().toLocaleString("uz-UZ")}
+                          </p>
+                        </div>
+                        <div
+                          className={`amal-miqdor ${
+                            kirim ? "musbat" : "manfiy"
+                          }`}
+                        >
+                          {kirim ? "+" : ""}
+                          {Math.abs(parseInt(item.amount) || 0).toLocaleString()}{" "}
+                          UZS
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            ) : (
+              <p className="tarix-yoq">Hozircha hech qanday amal yo'q.</p>
+            )}
+          </div>
         </div>
 
         {/* === CHIQISH === */}
-        <button onClick={handleLogout} className="logout-btn">
-          Chiqish
+        <button onClick={chiqish} className="chiqish-tugma">
+          <FiLogOut /> Chiqish
         </button>
       </div>
     </div>

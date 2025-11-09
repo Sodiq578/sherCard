@@ -1,571 +1,406 @@
 /* src/styles/Profile.css */
-.profile-container {
+.profil-sahifa {
   min-height: 100vh;
-  background: #000000; /* Qora fon */
-  color: #ffffff;
+  background: #f8f9fa;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   padding-bottom: 100px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  position: relative;
-  overflow-x: hidden;
 }
 
-/* Orqa fon gradient effekt (engil) */
-.profile-container::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(12, 115, 254, 0.08), transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Barcha elementlar z-index orqali oldinga */
-.profile-header,
-.profile-card,
-* {
-  position: relative;
-  z-index: 1;
-}
-
-/* === HEADER === */
-.profile-header {
-  width: 100%;
-  max-width: 800px;
+.profil-sarlavha {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 24px;
+  color: #000;
+ 
+
 }
 
-.profile-header h1 {
-  font-size: 1.9rem;
-  font-weight: 700;
-  background: linear-gradient(90deg, #0C73FE, #4A9EFF);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 8px rgba(12, 115, 254, 0.3);
-}
-
-.edit-btn {
-  background: rgba(12, 115, 254, 0.15);
-  color: #0C73FE;
-  border: 1.5px solid #0C73FE;
-  border-radius: 12px;
-  padding: 9px 18px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(6px);
-  box-shadow: 0 2px 8px rgba(12, 115, 254, 0.2);
-}
-.edit-btn:hover {
-  background: #0C73FE;
-  color: white;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(12, 115, 254, 0.4);
-}
-
-/* === KARTA === */
-.profile-card {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(14px);
-  border-radius: 24px;
-  padding: 30px;
-  max-width: 800px;
-  width: 100%;
-  box-shadow: 
-    0 12px 40px rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(12, 115, 254, 0.15);
-  border: 1px solid rgba(12, 115, 254, 0.2);
-}
-
-/* === AVATAR === */
-.avatar-section {
-  text-align: center;
-  margin-bottom: 30px;
-}
-.avatar-wrapper {
-  position: relative;
-  display: inline-block;
-}
-.avatar-img, .avatar-placeholder {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  border: 5px solid transparent;
-  background: 
-    linear-gradient(#000, #000) padding-box,
-    linear-gradient(45deg, #0C73FE, #4A9EFF) border-box;
-  object-fit: cover;
-  box-shadow: 
-    0 0 30px rgba(12, 115, 254, 0.4),
-    inset 0 0 20px rgba(0, 0, 0, 0.3);
-}
-.avatar-placeholder {
-  background: linear-gradient(135deg, #111, #222);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3.8rem;
-  font-weight: bold;
-  color: #0C73FE;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.5);
-}
-.camera-icon {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background: linear-gradient(45deg, #0C73FE, #4A9EFF);
-  color: white;
-  border-radius: 50%;
-  padding: 12px;
-  font-size: 1.4rem;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(12, 115, 254, 0.5);
-  transition: all 0.25s ease;
-}
-.camera-icon:hover {
-  transform: scale(1.15);
-  box-shadow: 0 6px 18px rgba(12, 115, 254, 0.6);
-}
-.avatar-input { display: none; }
-
-.user-name {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin: 16px 0 6px;
-  background: linear-gradient(90deg, #ffffff, #e0e0e0);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.user-username {
-  color: #4A9EFF;
-  font-size: 1.05rem;
-  margin-bottom: 12px;
-  font-weight: 500;
-}
-.user-balance-badge {
-  background: linear-gradient(45deg, #0C73FE, #4A9EFF);
-  color: white;
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 24px;
-  border-radius: 30px;
-  font-weight: 700;
-  font-size: 1.25rem;
-  box-shadow: 0 6px 20px rgba(12, 115, 254, 0.35);
-  border: 1px solid rgba(255,255,255,0.2);
-}
-.balance-logo {
-  width: 24px;
-  height: 24px;
-  filter: brightness(0) invert(1);
-}
-
-/* === FORMA === */
-.profile-form {
-  margin-top: 30px;
-}
-.input-group {
-  margin-bottom: 22px;
-}
-.input-group label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  color: #bbbbbb;
-  margin-bottom: 8px;
-  font-size: 0.95rem;
-}
-.input-group input {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1.5px solid rgba(12, 115, 254, 0.3);
-  border-radius: 14px;
-  color: #fff;
-  padding: 15px 18px;
-  font-size: 1rem;
-  width: 100%;
-  outline: none;
-  transition: all 0.3s ease;
-}
-.input-group input::placeholder {
-  color: #777;
-}
-.input-group input:focus {
-  border-color: #0C73FE;
-  background: rgba(12, 115, 254, 0.12);
-  box-shadow: 
-    0 0 0 4px rgba(12, 115, 254, 0.2),
-    0 0 20px rgba(12, 115, 254, 0.15);
-}
-.input-group input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(12, 115, 254, 0.2);
-}
-
-/* === TUGMALAR === */
-.form-actions {
-  display: flex;
-  gap: 16px;
-  justify-content: flex-end;
-  margin-top: 20px;
-}
-.save-btn, .cancel-btn, .cards-btn, .logout-btn {
+.orqaga-tugma {
+  background: none;
   border: none;
-  border-radius: 14px;
-  padding: 14px 24px;
-  font-weight: 600;
+  font-size: 24px;
   cursor: pointer;
-  transition: all 0.35s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 1.02rem;
-}
-.save-btn {
-  background: linear-gradient(45deg, #0C73FE, #4A9EFF);
-  color: white;
-  flex: 1;
-  box-shadow: 0 4px 15px rgba(12, 115, 254, 0.3);
-}
-.save-btn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 22px rgba(12, 115, 254, 0.45);
-}
-.cancel-btn {
-  background: rgba(80, 85, 94, 0.6);
-  color: #ccc;
-  flex: 1;
-  border: 1px solid rgba(12, 115, 254, 0.2);
-}
-.cancel-btn:hover {
-  background: rgba(12, 115, 254, 0.2);
-  color: white;
-}
-.cards-btn {
-  background: linear-gradient(45deg, #111, #222);
   color: #0C73FE;
-  width: 100%;
-  margin-top: 28px;
-  font-size: 1.15rem;
-  padding: 18px;
-  border: 1.5px solid rgba(12, 115, 254, 0.3);
-}
-.cards-btn:hover {
-  background: linear-gradient(45deg, #0C73FE, #4A9EFF);
-  color: white;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(12, 115, 254, 0.4);
+  padding: 8px;
+  border-radius:  50%;
+  transition: background 0.2s;
 }
 
-/* === STATISTIKA === */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin: 35px 0;
-}
-.stat-item {
-  background: rgba(255, 255, 255, 0.07);
-  border-radius: 20px;
-  padding: 22px;
-  text-align: center;
-  border: 1.5px solid rgba(12, 115, 254, 0.25);
-  transition: all 0.35s ease;
-  position: relative;
-  overflow: hidden;
-}
-.stat-item::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, rgba(12,115,254,0.15), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.stat-item:hover::before {
-  opacity: 1;
-}
-.stat-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(12, 115, 254, 0.25);
-  border-color: #0C73FE;
-}
-.stat-icon {
-  font-size: 2rem;
-  color: #0C73FE;
-  margin-bottom: 12px;
-  filter: drop-shadow(0 2px 6px rgba(12, 115, 254, 0.3));
-}
-.stat-value {
-  font-size: 1.6rem;
-  font-weight: 700;
-  background: linear-gradient(90deg, #ffffff, #cccccc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.stat-label {
-  color: #888;
-  font-size: 0.92rem;
-  margin-top: 6px;
-}
-.chevron-icon {
-  position: absolute;
-  top: 50%;
-  right: 14px;
-  transform: translateY(-50%);
-  color: #0C73FE;
-  font-size: 1.3rem;
-  transition: transform 0.3s ease;
-}
-
-/* === TARIX (OCHILADIGAN) === */
-.history-section {
-  margin-top: 35px;
-  border-radius: 20px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1.5px solid rgba(12, 115, 254, 0.2);
-  transition: all 0.4s ease;
-}
-.history-section.expanded {
-  background: rgba(12, 115, 254, 0.08);
-  box-shadow: 0 8px 25px rgba(12, 115, 254, 0.15);
-}
-.history-header {
-  padding: 18px 22px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-.history-header:hover {
+.orqaga-tugma:hover {
   background: rgba(12, 115, 254, 0.1);
 }
-.history-header h3 {
-  font-size: 1.35rem;
-  margin: 0;
-  color: #0C73FE;
+
+.profil-sarlavha h1 {
+  font-size: 22px;
   font-weight: 600;
+  margin: 0;
 }
-.chevron {
-  font-size: 1.5rem;
+
+.tahrirlash-tugma {
+  background: transparent;
+  border: 1.5px solid #0C73FE;
   color: #0C73FE;
-  transition: transform 0.35s ease;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.chevron.rotated {
+
+.tahrirlash-tugma:hover {
+  background: #0C73FE;
+  color: white;
+}
+
+.profil-kartasi {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.rasm-bo‘limi {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.rasm-quti {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.foydalanuvchi-rasmi,
+.rasm-o‘rniga {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #e3e3e3;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: bold;
+  color: #0C73FE;
+}
+
+.kamera-belgisi {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: #0C73FE;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(12, 115, 254, 0.3);
+}
+
+.rasm-kirish {
+  display: none;
+}
+
+.foydalanuvchi-ism {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 8px 0 4px;
+  color: #000;
+}
+
+.foydalanuvchi-nik {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.balans-belgisi {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #0C73FE;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+.balans-logosi {
+  width: 20px;
+  height: 20px;
+}
+
+.profil-forma {
+  margin-bottom: 24px;
+}
+
+.kirish-guruh {
+  margin-bottom: 16px;
+}
+
+.kirish-guruh label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.kirish-guruh input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 12px;
+  font-size: 15px;
+  transition: border 0.2s;
+}
+
+.kirish-guruh input:focus {
+  outline: none;
+  border-color: #0C73FE;
+}
+
+.kirish-guruh input:disabled {
+  background: #f9f9f9;
+  color: #666;
+}
+
+.forma-harakatlar {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.saqlash-tugma,
+.bekor-qilish-tugma {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.saqlash-tugma {
+  background: #0C73FE;
+  color: white;
+  border: none;
+}
+
+.saqlash-tugma:hover {
+  background: #0a5dd8;
+}
+
+.bekor-qilish-tugma {
+  background: #f1f1f1;
+  color: #666;
+  border: 1.5px solid #ddd;
+}
+
+.bekor-qilish-tugma:hover {
+  background: #e0e0e0;
+}
+
+.statistika-setka {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.stat-element {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 16px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.stat-element:hover {
+  transform: translateY(-2px);
+}
+
+.stat-belgi {
+  color: #0C73FE;
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.stat-qiymat {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+}
+
+.stat-izoh {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.o‘ng-belgi {
+  margin-left: auto;
+  color: #aaa;
+  transition: transform 0.2s;
+}
+
+.o‘ng-belgi.aylantirilgan {
   transform: rotate(90deg);
 }
 
-.history-content {
-  padding: 0 22px 22px;
-  max-height: 600px;
-  overflow-y: auto;
-  animation: slideDown 0.45s ease;
-}
-@keyframes slideDown {
-  from { opacity: 0; max-height: 0; }
-  to { opacity: 1; max-height: 600px; }
+.tarix-bo‘limi {
+  margin-top: 20px;
+  border-top: 1.5px solid #eee;
+  padding-top: 16px;
 }
 
-.history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.tarix-mazmuni {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.tarix-bo‘limi.kengaytirilgan .tarix-mazmuni {
+  max-height: 500px;
+}
+
+.tarix-ro‘yxati {
   margin-top: 12px;
 }
 
-/* === HISTORY ITEM – BALANDLIK O‘CHIRILDI, CHIROYLIGINA === */
-.history-item {
+.tarix-band {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: rgba(255, 255, 255, 0.06);
-  padding: 18px 20px;
-  border-radius: 18px;
-  border-left: 5px solid transparent;
-  transition: all 0.35s ease;
-  position: relative;
-  overflow: hidden;
-  /* height: 100px; ← BU O‘CHIRILDI! */
-  min-height: 72px; /* Juda kichik bo‘lmasin */
   gap: 12px;
-}
-.history-item::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 5px;
-  background: linear-gradient(180deg, #0C73FE, #4A9EFF);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.history-item:hover::before {
-  opacity: 1;
-}
-.history-item:hover {
-  transform: translateX(4px);
-  background: rgba(12, 115, 254, 0.12);
-  box-shadow: 0 4px 15px rgba(12, 115, 254, 0.2);
-}
-.history-item:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.04);
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-/* Ikonka */
-.history-icon {
-  width: 44px;
-  height: 44px;
+.tarix-band:last-child {
+  border-bottom: none;
+}
+
+.tarix-belgisi {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  flex-shrink: 0;
-}
-.history-icon .in {
-  background: linear-gradient(45deg, rgba(12, 115, 254, 0.2), rgba(74, 158, 255, 0.2));
-  color: #0C73FE;
-}
-.history-icon .out {
-  background: linear-gradient(45deg, rgba(255, 107, 107, 0.2), rgba(255, 150, 150, 0.2));
-  color: #ff6b6b;
+  font-size: 16px;
 }
 
-/* Ma'lumotlar */
-.history-info {
+.tarix-belgisi.kirim {
+  background: rgba(12, 115, 254, 0.1);
+  color: #0C73FE;
+}
+
+.tarix-belgisi.chiqim {
+  background: rgba(255, 0, 0, 0.1);
+  color: #e74c3c;
+}
+
+.tarix-malumot {
   flex: 1;
-  margin-left: 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0; /* Text overflow uchun */
 }
-.history-type {
-  font-weight: 600;
-  font-size: 1.02rem;
+
+.amal-turi {
+  font-weight: 500;
+  color: #000;
   margin: 0;
-  color: #eee;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.history-date {
-  color: #999;
-  font-size: 0.88rem;
-  margin: 4px 0 0;
-  white-space: nowrap;
 }
 
-/* Summa */
-.history-amount {
-  font-weight: 700;
-  font-size: 1.15rem;
-  white-space: nowrap;
-  flex-shrink: 0;
+.amal-sana {
+  font-size: 12px;
+  color: #888;
+  margin: 2px 0 0;
 }
-.history-amount.positive {
+
+.amal-miqdor {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.amal-miqdor.musbat {
   color: #0C73FE;
-  text-shadow: 0 1px 3px rgba(12, 115, 254, 0.3);
-}
-.history-amount.negative {
-  color: #ff6b6b;
 }
 
-/* === YO‘Q TARIX === */
-.no-history {
+.amal-miqdor.manfiy {
+  color: #e74c3c;
+}
+
+.tarix-yo‘q {
   text-align: center;
-  color: #666;
+  color: #999;
   font-style: italic;
-  padding: 30px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 16px;
-  margin: 12px 0;
-  border: 1px dashed rgba(12, 115, 254, 0.2);
+  padding: 20px 0;
 }
 
-/* === CHIQISH === */
-.logout-btn {
-  margin-top: 40px;
+.chiqish-tugma {
+  margin-top: 24px;
   width: 100%;
-  background: linear-gradient(45deg, #e94560, #ff6b6b);
+  padding: 14px;
+  background: #ff3b30;
   color: white;
-  font-size: 1.2rem;
-  padding: 18px;
-  border-radius: 18px;
-  box-shadow: 0 6px 20px rgba(233, 69, 96, 0.3);
-}
-.logout-btn:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(233, 69, 96, 0.45);
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.2s;
 }
 
-/* === LOADING === */
-.loading {
+.chiqish-tugma:hover {
+  background: #e32d22;
+}
+
+.yuklanmoqda {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
-  color: #0C73FE;
-  background: #000;
+  color: #666;
 }
-.spinner {
-  width: 70px;
-  height: 70px;
-  border: 7px solid rgba(12, 115, 254, 0.2);
-  border-top: 7px solid #0C73FE;
+
+.aylanuvchi {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #0C73FE;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
+
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
-
-/* === MOBIL === */
-@media (max-width: 768px) {
-  .profile-header h1 { font-size: 1.6rem; }
-  .profile-card { padding: 22px; border-radius: 20px; }
-  .stats-grid { grid-template-columns: 1fr; gap: 14px; }
-  .avatar-img, .avatar-placeholder { width: 110px; height: 110px; }
-  .user-name { font-size: 1.5rem; }
-  .user-balance-badge { font-size: 1.1rem; padding: 10px 18px; }
-  .form-actions { flex-direction: column; }
-  .save-btn, .cancel-btn { width: 100%; }
-  
-  /* Mobil uchun history-item */
-  .history-item {
-    padding: 14px 16px;
-    gap: 10px;
-    min-height: 64px;
-  }
-  .history-icon {
-    width: 38px;
-    height: 38px;
-    font-size: 1.1rem;
-  }
-  .history-type {
-    font-size: 0.95rem;
-  }
-  .history-date {
-    font-size: 0.8rem;
-  }
-  .history-amount {
-    font-size: 1.05rem;
-  }
-}
-
-
-

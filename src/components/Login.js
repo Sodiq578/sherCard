@@ -71,6 +71,7 @@ const Login = ({ onLogin }) => {
       cards: [],
       history: [],
       messages: [],
+      isPremium: true,
     };
     onLogin(admin);
     navigate("/admin");
@@ -85,7 +86,7 @@ const Login = ({ onLogin }) => {
 
     // === VALIDATION ===
     if (isRegister && (!login || !password || !fullName || !phone)) {
-      alert("Barcha maydonlarni to‘ldiring!");
+      alert("Barcha maydonlarni to'ldiring!");
       return;
     }
     if (!isRegister && (!login || !password)) {
@@ -94,10 +95,9 @@ const Login = ({ onLogin }) => {
     }
 
     if (isRegister) {
-      // === YANGI FOYDALANUVCHI ===
+      // === YANGI FOYDALANUVCHI RO'YXATDAN O'TISH ===
       const username = generateUsername(fullName);
       const cardNumber = generateCardNumber();
-
       const newUser = {
         login,
         password,
@@ -108,31 +108,54 @@ const Login = ({ onLogin }) => {
           avatar: "",
           username,
         },
-        balance: 10000,
+        balance: 10000, // Ro'yxatdan o'tganda 10,000 UZS
         cards: [],
         history: [],
         messages: [],
+        isPremium: false,
       };
 
-      // === localStorage ===
+      // localStorage ga saqlash
       localStorage.setItem(`cardNumber_${login}`, cardNumber);
       localStorage.setItem("userData", JSON.stringify(newUser));
 
-      // === allUsers ga qo'shish ===
+      // allUsers ga qo'shish
       const allUsers = JSON.parse(localStorage.getItem("allUsers") || "[]");
       if (!allUsers.find(u => u.login === login)) {
         allUsers.push(newUser);
         localStorage.setItem("allUsers", JSON.stringify(allUsers));
       }
 
-      alert(`Tabriklaymiz, ${fullName}!\nSizning nikneymingiz: @${username}\nKarta: ${cardNumber}`);
+      // Kirish bonusi belgisi
+      localStorage.setItem(`login_bonus_${login}`, "true");
+
+      alert(`Tabriklaymiz, ${fullName}!\nSizning nikneymingiz: @${username}\nKarta: ${cardNumber}\n+1,000 UZS bonus oldingiz!`);
       onLogin(newUser);
       navigate("/hello");
     } else {
       // === KIRISH ===
       const savedUser = JSON.parse(localStorage.getItem("userData"));
       if (savedUser && savedUser.login === login && savedUser.password === password) {
-        onLogin(savedUser);
+        let updatedUser = { ...savedUser };
+
+        // === BIR MARTALIK KIRISH BONUSI: +1000 UZS ===
+        const hasReceivedBonus = localStorage.getItem(`login_bonus_${login}`);
+        if (!hasReceivedBonus) {
+          updatedUser.balance = (updatedUser.balance || 0) + 1000;
+          updatedUser.history = [
+            ...(updatedUser.history || []),
+            {
+              time: new Date().toLocaleString("uz-UZ"),
+              action: "Kirish bonusi",
+              amount: "+1,000 UZS",
+            },
+          ];
+          localStorage.setItem(`login_bonus_${login}`, "true");
+          localStorage.setItem("userData", JSON.stringify(updatedUser));
+          alert("Tabriklaymiz! Kirish uchun +1,000 UZS bonus oldingiz!");
+        }
+
+        onLogin(updatedUser);
         navigate("/hello");
       } else {
         alert("Login yoki parol xato!");
@@ -145,15 +168,12 @@ const Login = ({ onLogin }) => {
       <div className="loginx-background">
         <img src={Backround} alt="Background" className="loginx-bg-image" />
       </div>
-
       <div className="loginx-content">
         <div className="loginx-logo-container">
           <img src={Logo} alt="Hamyon Logo" className="loginx-logo-img" />
         </div>
-
         <div className="loginx-form">
-          <h2 className="loginx-title">{isRegister ? "Ro‘yxatdan o‘tish" : "Kirish"}</h2>
-
+          <h2 className="loginx-title">{isRegister ? "Ro'yxatdan o'tish" : "Kirish"}</h2>
           <form onSubmit={handleSubmit} className="loginx-inputs">
             <input
               type="text"
@@ -171,7 +191,6 @@ const Login = ({ onLogin }) => {
               className="loginx-input"
               required
             />
-
             {isRegister && (
               <>
                 <input
@@ -192,25 +211,22 @@ const Login = ({ onLogin }) => {
                 />
               </>
             )}
-
             <div className="loginx-buttons">
               <button type="submit" className="loginx-btn-primary">
-                {isRegister ? "Ro‘yxatdan o‘tish" : "Kirish"}
+                {isRegister ? "Ro'yxatdan o'tish" : "Kirish"}
               </button>
               <button
                 type="button"
                 className="loginx-btn-toggle"
                 onClick={() => setIsRegister(!isRegister)}
               >
-                {isRegister ? "Kirish" : "Ro‘yxatdan o‘tish"}
+                {isRegister ? "Kirish" : "Ro'yxatdan o'tish"}
               </button>
             </div>
           </form>
         </div>
-
         <p className="loginx-footer">© 2025 Sodiqov</p>
       </div>
-
       <AdminModal
         isOpen={isAdminModalOpen}
         onClose={handleAdminClose}

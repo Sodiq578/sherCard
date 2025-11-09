@@ -1,11 +1,11 @@
-// src/App.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   BrowserRouter,
   Routes,
   Route,
   Navigate,
   useLocation,
+  useParams,
 } from "react-router-dom";
 
 // ==================== KOMPONENTLAR ====================
@@ -25,11 +25,18 @@ import Market from "./components/Market";
 import AllShops from "./components/AllShops";
 import BottomNav from "./components/BottomNav";
 
-// 🔹 Chat komponentlari
+// Chat komponentlari
 import ChatList from "./components/ChatList";
+import ViewProfile from "./components/ViewProfile";
 import ChatDetail from "./components/ChatDetail";
 
 import "./styles/App.css";
+
+// ==================== YO'NALTIRUVCHI KOMPONENT ====================
+const RedirectChatToProfile = () => {
+  const { id } = useParams();
+  return <Navigate to={`/profile/${id}`} replace />;
+};
 
 // ==================== BOTTOM NAV WRAPPER ====================
 const BottomNavWrapper = ({ isAuthenticated, isAdmin }) => {
@@ -46,10 +53,12 @@ const BottomNavWrapper = ({ isAuthenticated, isAdmin }) => {
     "/transfer",
     "/banner-transfer",
     "/history",
+    "/chat",
   ];
 
   const isShopPage = /^\/shop\/\d+$/.test(location.pathname);
-  const isAllowedPage = allowedPaths.includes(location.pathname);
+  const isChatDetailPage = /^\/chat\/[^/]+$/.test(location.pathname);
+  const isAllowedPage = allowedPaths.includes(location.pathname) || isChatDetailPage;
 
   const shouldShow = isAuthenticated && !isAdmin && (isAllowedPage || isShopPage);
 
@@ -78,7 +87,7 @@ function App() {
         setIsAdmin(storedUser.login === "sodiqjon");
       }
     } catch (err) {
-      console.error("localStorage o‘qishda xato:", err);
+      console.error("localStorage o'qishda xato:", err);
     } finally {
       setIsLoading(false);
     }
@@ -98,74 +107,77 @@ function App() {
   };
 
   // ==================== LOGIN ====================
-  const handleLogin = (data) => {
-    if (data.token) {
-      const found = allUsers.find((u) => u.token === data.token);
-      if (found) {
-        localStorage.setItem("userData", JSON.stringify(found));
-        setUser(found);
-        setIsAuthenticated(true);
-        setIsAdmin(false);
-        return "/main";
-      } else {
-        alert("Noto‘g‘ri token!");
-        return null;
+  const handleLogin = useCallback(
+    (data) => {
+      if (data.token) {
+        const found = allUsers.find((u) => u.token === data.token);
+        if (found) {
+          localStorage.setItem("userData", JSON.stringify(found));
+          setUser(found);
+          setIsAuthenticated(true);
+          setIsAdmin(false);
+          return "/main";
+        } else {
+          alert("Noto'g'ri token!");
+          return null;
+        }
       }
-    }
 
-    if (data.login === "sodiqjon" && data.password === "sodiqjon123") {
-      const admin = {
-        login: "sodiqjon",
-        password: "sodiqjon123",
-        balance: 999999,
+      if (data.login === "sodiqjon" && data.password === "sodiqjon123") {
+        const admin = {
+          login: "sodiqjon",
+          password: "sodiqjon123",
+          balance: 999999,
+          cards: [],
+          history: [],
+          messages: [],
+          profile: {
+            name: "Admin",
+            phone: "",
+            email: "admin@system.com",
+            avatar: "",
+            username: "admin_master",
+          },
+          token: "admin_token_999",
+        };
+
+        localStorage.setItem("userData", JSON.stringify(admin));
+        setUser(admin);
+        setIsAuthenticated(true);
+        setIsAdmin(true);
+        return "/admin";
+      }
+
+      const username = generateUsername(data.profile.name);
+      const newUser = {
+        login: data.login,
+        password: data.password || "",
+        balance: 10000,
         cards: [],
         history: [],
         messages: [],
+        token: generateToken(),
         profile: {
-          name: "Admin",
-          phone: "",
-          email: "admin@system.com",
-          avatar: "",
-          username: "admin_master",
+          ...data.profile,
+          username,
         },
-        token: "admin_token_999",
       };
 
-      localStorage.setItem("userData", JSON.stringify(admin));
-      setUser(admin);
+      const updatedAll = [
+        ...allUsers.filter((u) => u.login !== data.login),
+        newUser,
+      ];
+
+      localStorage.setItem("allUsers", JSON.stringify(updatedAll));
+      localStorage.setItem("userData", JSON.stringify(newUser));
+      setAllUsers(updatedAll);
+      setUser(newUser);
       setIsAuthenticated(true);
-      setIsAdmin(true);
-      return "/admin";
-    }
-
-    const username = generateUsername(data.profile.name);
-    const newUser = {
-      login: data.login,
-      password: data.password || "",
-      balance: 10000,
-      cards: [],
-      history: [],
-      messages: [],
-      token: generateToken(),
-      profile: {
-        ...data.profile,
-        username,
-      },
-    };
-
-    const updatedAll = [
-      ...allUsers.filter((u) => u.login !== data.login),
-      newUser,
-    ];
-
-    localStorage.setItem("allUsers", JSON.stringify(updatedAll));
-    localStorage.setItem("userData", JSON.stringify(newUser));
-    setAllUsers(updatedAll);
-    setUser(newUser);
-    setIsAuthenticated(true);
-    setIsAdmin(false);
-    return "/hello";
-  };
+      setIsAdmin(false);
+      return "/hello";
+    },
+    [allUsers]
+  );
 
   // ==================== LOGOUT ====================
   const handleLogout = () => {
@@ -202,16 +214,16 @@ function App() {
                 window.location.href = redirect;
               }
             } else {
-              alert("Noto‘g‘ri token!");
+              alert("Noto'g'ri token!");
             }
           })
-          .catch(() => alert("Tokenni o‘qib bo‘lmadi!"));
+          .catch(() => alert("Tokenni o'qib bo'lmadi!"));
       }
     };
 
     window.addEventListener("keydown", handleTokenPaste);
     return () => window.removeEventListener("keydown", handleTokenPaste);
-  }, [allUsers]);
+  }, [handleLogin]);
 
   // ==================== LOADING ====================
   if (isLoading) {
@@ -255,59 +267,167 @@ function App() {
         {/* USER PAGES */}
         <Route
           path="/hello"
-          element={isAuthenticated && !isAdmin ? <Hello /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? <Hello /> : <Navigate to="/" />
+          }
         />
+
         <Route
           path="/main"
-          element={isAuthenticated && !isAdmin ? <MainMenu user={user} updateUser={updateUser} /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? (
+              <MainMenu user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
+
+        {/* CHAT RO'YXATI */}
         <Route
           path="/chat"
-          element={isAuthenticated && !isAdmin ? <ChatList user={user} /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? <ChatList /> : <Navigate to="/" />
+          }
         />
+
+        {/* CHAT DETAIL */}
         <Route
-          path="/chat/:id"
-          element={isAuthenticated && !isAdmin ? <ChatDetail user={user} /> : <Navigate to="/" />}
+          path="/chat/:userId"
+          element={
+            isAuthenticated && !isAdmin ? (
+              <ChatDetail />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
+
+        {/* BOSHQA FOYDALANUVCHI PROFILI */}
         <Route
-          path="/market"
-          element={isAuthenticated && !isAdmin ? <Market user={user} updateUser={updateUser} /> : <Navigate to="/" />}
+          path="/profile/:login"
+          element={
+            isAuthenticated && !isAdmin ? (
+              <ViewProfile />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
-        <Route
-          path="/marketplace"
-          element={isAuthenticated && !isAdmin ? <Marketplace user={user} updateUser={updateUser} /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/shop/:id"
-          element={isAuthenticated && !isAdmin ? <ShopDetail user={user} updateUser={updateUser} /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/all-shops"
-          element={isAuthenticated && !isAdmin ? <AllShops user={user} /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/buy-card"
-          element={isAuthenticated && !isAdmin ? <BuyCard user={user} updateUser={updateUser} /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/history"
-          element={isAuthenticated && !isAdmin ? <History user={user} /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/transfer"
-          element={isAuthenticated && !isAdmin ? <Transfer user={user} updateUser={updateUser} /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/banner-transfer"
-          element={isAuthenticated && !isAdmin ? <BannerTransfer user={user} updateUser={updateUser} /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/cards"
-          element={isAuthenticated && !isAdmin ? <Cards user={user} updateUser={updateUser} /> : <Navigate to="/" />}
-        />
+
+        {/* O'Z PROFILI */}
         <Route
           path="/profile"
-          element={isAuthenticated && !isAdmin ? <Profile user={user} updateUser={updateUser} onLogout={handleLogout} /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && !isAdmin ? (
+              <Profile
+                user={user}
+                updateUser={updateUser}
+                onLogout={handleLogout}
+              />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        <Route
+          path="/market"
+          element={
+            isAuthenticated && !isAdmin ? (
+              <Market user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        <Route
+          path="/marketplace"
+          element={
+            isAuthenticated && !isAdmin ? (
+              <Marketplace user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        <Route
+          path="/shop/:id"
+          element={
+            isAuthenticated && !isAdmin ? (
+              <ShopDetail user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        <Route
+          path="/all-shops"
+          element={
+            isAuthenticated && !isAdmin ? (
+              <AllShops user={user} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        <Route
+          path="/buy-card"
+          element={
+            isAuthenticated && !isAdmin ? (
+              <BuyCard user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        <Route
+          path="/history"
+          element={
+            isAuthenticated && !isAdmin ? (
+              <History user={user} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        <Route
+          path="/transfer"
+          element={
+            isAuthenticated && !isAdmin ? (
+              <Transfer user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        <Route
+          path="/banner-transfer"
+          element={
+            isAuthenticated && !isAdmin ? (
+              <BannerTransfer user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        <Route
+          path="/cards"
+          element={
+            isAuthenticated && !isAdmin ? (
+              <Cards user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
 
         {/* 404 */}
