@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ValyutaLogo from "../assets/images/logo.png";
-import CardIcon from "../assets/images/card.png";
+import CardIcon from "../assets/images/cardorg.png";
 import MarketIcon from "../assets/images/market.png";
 import Cards from "./Cards";
 import "../styles/Market.css";

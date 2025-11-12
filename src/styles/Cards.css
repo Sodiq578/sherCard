@@ -298,6 +298,7 @@ body {
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  top: -20px;
 }
 
 .card-number-back {
@@ -1480,3 +1481,491 @@ body {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==== MODAL OVERLAY ==== */
+.buycard-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s ease;
+  z-index: 999;
+}
+
+.buycard-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ==== MODAL BOX ==== */
+.buycard-modal {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ==== TITLE ==== */
+.buycard-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 20px;
+}
+
+/* ==== CARD TYPE SELECT ==== */
+.card-type-select {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.type-btn {
+  flex: 1;
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+
+.type-btn:hover {
+  background: #eaeaea;
+}
+
+.type-btn.active {
+  background: linear-gradient(135deg, #0c73fe, #0047ab);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 3px 8px rgba(12, 115, 254, 0.4);
+}
+
+/* ==== BALANCE ==== */
+.buycard-balance {
+  text-align: center;
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 18px;
+}
+
+/* ==== CARD PREVIEW WRAPPER ==== */
+.buycard-preview-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ==== CARD PREVIEW ==== */
+.buycard-preview {
+  width: 100%;
+  max-width: 320px;
+  height: 190px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease;
+}
+
+.buycard-preview:hover {
+  transform: scale(1.03);
+}
+
+.buycard-overlay-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7));
+}
+
+/* ==== CARD HEADER ==== */
+.buycard-header {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+}
+
+.buycard-header img {
+  width: 60px;
+}
+
+/* ==== CARD BODY ==== */
+.buycard-body {
+  position: absolute;
+  bottom: 40px;
+  left: 16px;
+  color: #fff;
+}
+
+.buycard-username {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.buycard-number {
+  font-size: 18px;
+  letter-spacing: 2px;
+  font-family: monospace;
+}
+
+/* ==== CARD PRICE ==== */
+.buycard-price {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0c73fe;
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* ==== ACTION BUTTONS ==== */
+.buycard-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.buycard-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.buycard-btn.cancel {
+  background: #f1f1f1;
+  color: #333;
+}
+
+.buycard-btn.cancel:hover {
+  background: #ddd;
+}
+
+.buycard-btn.confirm {
+  background: linear-gradient(135deg, #0c73fe, #0047ab);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(12, 115, 254, 0.4);
+}
+
+.buycard-btn.confirm:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.buycard-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ==== RESPONSIVE DESIGN ==== */
+@media (max-width: 480px) {
+  .buycard-modal {
+    padding: 18px;
+  }
+
+  .buycard-title {
+    font-size: 20px;
+  }
+
+  .buycard-preview {
+    height: 170px;
+  }
+
+  .buycard-username {
+    font-size: 15px;
+  }
+
+  .buycard-number {
+    font-size: 16px;
+  }
+
+  .buycard-btn {
+    font-size: 14px;
+  }
+}
+
+
+
+
+
+
+
+
+.card-type{
+  position: absolute;
+  top: -100px;
+  right: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.alert-box {
+  background: #fff;
+  padding: 25px 35px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  animation: pop 0.3s ease;
+  max-width: 300px;
+}
+
+.alert-box p {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: #222;
+  white-space: pre-line;
+}
+
+.alert-box button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.alert-box button:hover {
+  background: #0056b3;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==== VERTICAL LAYOUT: CHEVRON + TITLE + BUTTON (Mobil) ==== */
+.cards-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16px;
+  gap: 12px;
+  
+  
+  top: 0;
+  z-index: 100;
+  min-height: 80px;
+}
+
+/* Back va Title bir qatorda — header-box */
+.header-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.back-chevron-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000000;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+
+  background-color: #ffffff;
+}
+
+.back-chevron-btn:hover,
+.back-chevron-btn:active {
+  color: #007bff;
+  background: rgba(0, 123, 255, 0.1);
+}
+
+/* h2 — header-box ichida */
+.header-box h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #ffffff;
+  flex: 1;
+  text-align: center;
+}
+
+/* + Yangi karta tugmasi — o'ng pastda */
+.add-card-btn {
+  align-self: flex-end;
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+  min-width: 100px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+}
+
+.add-card-btn:hover,
+.add-card-btn:active {
+  background: #0056b3;
+}
+
+/* Mobil uchun optimizatsiya */
+@media (max-width: 480px) {
+  .cards-header {
+    padding: 12px;
+    gap: 10px;
+    min-height: 72px;
+  }
+
+  .back-chevron-btn {
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+  }
+
+  .back-chevron-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .header-box h2 {
+    font-size: 16px;
+  }
+
+  .add-card-btn {
+    padding: 7px 14px;
+    font-size: 13px;
+    min-width: 90px;
+    height: 32px;
+  }
+}

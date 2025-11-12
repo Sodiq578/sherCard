@@ -332,18 +332,29 @@
 }
 
 .menu-premium-balance-badge {
-  background: rgba(12, 115, 254, 0.2);
-  color: #0C73FE;
-  padding: 6px 12px;
+  background: linear-gradient(135deg, #FFD700, #FFC107, #FFB300);
+  color: #fff;
+  padding: 6px 14px;
   border-radius: 12px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   margin-top: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  border: 1px solid rgba(12, 115, 254, 0.3);
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  box-shadow: 0 2px 6px rgba(255, 215, 0, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.menu-premium-balance-badge:hover {
+  background: linear-gradient(135deg, #FFB300, #FFD700);
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.6);
 }
 
 /* === TO'LDIRISH === */
@@ -1224,4 +1235,142 @@
   .menu-premium-features-list {
     max-height: 200px; /* Past ekranlarda kamroq balandlik */
   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* KARTANI TANLASH MODAL - YANGI NOMLAR */
+.card-picker-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-picker-backdrop {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.card-picker-panel {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.card-picker-title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.card-picker-title-bar h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.card-picker-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.card-picker-amount-info {
+  padding: 16px 20px;
+  text-align: center;
+  font-size: 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.card-picker-items {
+  padding: 8px 0;
+}
+
+.card-picker-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.card-picker-option:hover {
+  background: #f5f5f5;
+}
+
+.card-picker-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-mini-preview {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  min-width: 140px;
+}
+
+.card-mini-number {
+  font-family: monospace;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.card-mini-balance {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.card-mini-type {
+  font-size: 12px;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.card-picker-add-icon {
+  color: #4CAF50;
+}
+
+.card-picker-footer-note {
+  padding: 12px 20px;
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  border-top: 1px solid #eee;
+}
+
+.premium-badge-text {
+  color: #FFD700;
+  font-weight: 600;
 }

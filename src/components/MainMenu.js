@@ -13,10 +13,10 @@ import {
   FiX,
   FiCheck,
   FiAlertCircle,
+  FiInfo,
   FiShield,
   FiAward,
   FiTrendingUp,
-  FiInfo,
   FiDollarSign
 } from "react-icons/fi";
 import Logo from "../assets/images/logo.png";
@@ -33,6 +33,10 @@ function MainMenu({ user, updateUser }) {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success");
+
+  // === KARTANI TANLASH MODAL ===
+  const [showCardSelectModal, setShowCardSelectModal] = useState(false);
+  const [pendingTopUpAmount, setPendingTopUpAmount] = useState(null);
 
   useEffect(() => {
     const loadUsers = () => {
@@ -85,41 +89,113 @@ function MainMenu({ user, updateUser }) {
     }, 3000);
   };
 
-  const handleTopUp = (amount) => {
-    if (!user || amount <= 0) return;
-    
+  // === VIRTUAL KARTA RAQAMI ===
+  const getVirtualCardNumber = () => {
+    const key = `virtual_${user.login}`;
+    const saved = localStorage.getItem(key);
+    if (saved && saved.length === 12) return saved;
+    const newNum = generateNormalCardNumber();
+    localStorage.setItem(key, newNum);
+    return newNum;
+  };
+
+  const generateNormalCardNumber = () => {
+    let num = "";
+    for (let i = 0; i < 12; i++) num += Math.floor(Math.random() * 10);
+    return num;
+  };
+
+  // === BARCHA KARTALAR ===
+  const virtualCard = {
+    id: "virtual",
+    number: getVirtualCardNumber(),
+    balance: user.balance || 0,
+    type: "virtual",
+  };
+
+  const allCards = [
+    virtualCard,
+    ...(user.cards?.filter((c) => !c.deleted) || []),
+  ];
+
+  // === KARTANI TANLASH MODAL OCHISH ===
+  const openCardSelectModal = (amount) => {
     if (amount < 100) {
       showAlertMessage("Minimal to'ldirish summasi: 100 UZS", "error");
       return;
     }
+    setPendingTopUpAmount(amount);
+    setShowCardSelectModal(true);
+  };
 
-    const updatedUser = {
-      ...user,
-      balance: (user.balance || 0) + amount,
-      history: [
+  // === KARTAGA PUL QO'SHISH ===
+  const handleTopUpToCard = (cardId) => {
+    if (!pendingTopUpAmount || pendingTopUpAmount < 100) return;
+
+    const targetCard = allCards.find(c => c.id === cardId);
+    if (!targetCard) {
+      showAlertMessage("Karta topilmadi!", "error");
+      return;
+    }
+
+    let updatedUser = { ...user };
+
+    if (cardId === "virtual") {
+      // Virtual kartaga — balansdan olamiz
+      if (user.balance < pendingTopUpAmount) {
+        showAlertMessage("Balansda yetarli mablag' yo'q!", "error");
+        return;
+      }
+
+      updatedUser.balance = user.balance - pendingTopUpAmount;
+      updatedUser.history = [
         ...(user.history || []),
         {
           time: new Date().toLocaleString("uz-UZ"),
-          action: "Balans to'ldirildi",
-          amount: `+${amount.toLocaleString()} UZS`,
+          action: "Virtual kartaga o'tkazma",
+          amount: `-${pendingTopUpAmount.toLocaleString()} UZS`,
         },
-      ],
-    };
+      ];
+      showAlertMessage(`${pendingTopUpAmount.toLocaleString()} UZS virtual kartaga o'tkazildi!`, "success");
+    } else {
+      // Fizik yoki Gold kartaga
+      updatedUser.cards = user.cards.map(c =>
+        c.id === cardId
+          ? { ...c, balance: (c.balance || 0) + pendingTopUpAmount }
+          : c
+      );
+      updatedUser.history = [
+        ...(user.history || []),
+        {
+          time: new Date().toLocaleString("uz-UZ"),
+          action: `Kartaga to'ldirish (#${targetCard.number.slice(-4)})`,
+          amount: `+${pendingTopUpAmount.toLocaleString()} UZS`,
+        },
+      ];
+      showAlertMessage(`${pendingTopUpAmount.toLocaleString()} UZS kartaga qo'shildi!`, "success");
+    }
+
     localStorage.setItem("userData", JSON.stringify(updatedUser));
     updateUser(updatedUser);
-    showAlertMessage(`${amount.toLocaleString()} UZS muvaffaqiyatli qo'shildi!`, "success");
-    setShowCustomAmountModal(false);
+
+    setShowCardSelectModal(false);
+    setPendingTopUpAmount(null);
+  };
+
+  // === BALANS TO'LDIRISH ===
+  const handleTopUp = (amount) => {
+    openCardSelectModal(amount);
   };
 
   const handleBuyPremium = () => {
     if (!user) return;
     const premiumPrice = 10000;
-    
+
     if (user.balance < premiumPrice) {
       showAlertMessage(`Premium sotib olish uchun balansingizda kamida ${premiumPrice.toLocaleString()} UZS bo'lishi kerak!`, "error");
       return;
     }
-    
+
     if (user.isPremium) {
       showAlertMessage("Sizda allaqachon Premium obuna aktiv!", "info");
       return;
@@ -142,38 +218,29 @@ function MainMenu({ user, updateUser }) {
     localStorage.setItem("userData", JSON.stringify(updatedUser));
     updateUser(updatedUser);
     setShowPremiumModal(false);
-    showAlertMessage("Tabriklaymiz! Siz Premium obunaga ega bo'ldingiz! 🎉", "success");
+    showAlertMessage("Tabriklaymiz! Siz Premium obunaga ega bo'ldingiz!", "success");
   };
 
-  // Foydalanuvchini chatga o'tkazish
   const handleUserClick = (targetUser) => {
     if (!targetUser || !targetUser.login) {
       showAlertMessage("Foydalanuvchi topilmadi!", "error");
       return;
     }
-    
-    // O'zim bilan chat qilishni oldini olish
     if (targetUser.login === user?.login) {
       showAlertMessage("O'zingiz bilan chat qila olmaysiz!", "info");
       return;
     }
-    
-    console.log("Chatga o'tilmoqda:", targetUser.login);
     setSearchQuery("");
     setFilteredUsers([]);
-    
-    // ChatDetail sahifasiga o'tish
     navigate(`/chat/${targetUser.login}`);
   };
 
-  // Foydalanuvchi profiliga o'tish
   const handleViewProfile = (targetUser, e) => {
-    e.stopPropagation(); // Chatga o'tishni oldini olish
+    e.stopPropagation();
     if (!targetUser || !targetUser.login) {
       showAlertMessage("Foydalanuvchi topilmadi!", "error");
       return;
     }
-    
     setSearchQuery("");
     setFilteredUsers([]);
     navigate(`/profile/${targetUser.login}`);
@@ -190,7 +257,8 @@ function MainMenu({ user, updateUser }) {
       showAlertMessage("Iltimos, 100 UZS dan kam bo'lmagan summa kiriting", "error");
       return;
     }
-    handleTopUp(amount);
+    setShowCustomAmountModal(false);
+    openCardSelectModal(amount);
   };
 
   const displayName = user?.profile?.name || user?.profile?.username || "Foydalanuvchi";
@@ -211,7 +279,7 @@ function MainMenu({ user, updateUser }) {
 
       {/* === SALOMLASHUV === */}
       <div className="menu-welcome-section">
-        <div 
+        <div
           className="menu-avatar-circle"
           onClick={() => navigate("/profile")}
           style={{ cursor: "pointer" }}
@@ -231,7 +299,6 @@ function MainMenu({ user, updateUser }) {
             </div>
           )}
         </div>
-
         <div className="menu-welcome-texts">
           <span className="menu-welcome-text">Salom,</span>
           <span className="menu-username">
@@ -239,9 +306,8 @@ function MainMenu({ user, updateUser }) {
             {user?.isPremium && <span className="menu-premium-tag">PREMIUM</span>}
           </span>
         </div>
-
         {!user?.isPremium && (
-          <button 
+          <button
             className="menu-premium-button"
             onClick={() => setShowPremiumModal(true)}
           >
@@ -263,7 +329,6 @@ function MainMenu({ user, updateUser }) {
             className="menu-search-input"
           />
         </div>
-
         {filteredUsers.length > 0 && (
           <div className="menu-search-results">
             {filteredUsers.map((u) => (
@@ -324,7 +389,6 @@ function MainMenu({ user, updateUser }) {
         <h3 className="menu-topup-title">
           <FiPlusCircle /> Balansni to'ldirish
         </h3>
-
         <div className="menu-topup-modern">
           <div className="menu-topup-presets">
             {[5000, 10000, 25000].map((amount) => (
@@ -343,7 +407,6 @@ function MainMenu({ user, updateUser }) {
               Boshqa summa
             </button>
           </div>
-
           <p className="menu-topup-hint">
             Minimal to'ldirish: <strong>100 UZS</strong>
           </p>
@@ -385,22 +448,66 @@ function MainMenu({ user, updateUser }) {
         </div>
       )}
 
-      {/* === PASTKI NAVIGATSIYA === */}
-      <div className="menu-bottom-nav">
-        <button className="menu-nav-item menu-nav-item-active">
-          <FiHome size={20} /> <span>Bosh sahifa</span>
-        </button>
-        <button className="menu-nav-item" onClick={() => navigate("/marketplace")}>
-          <FiCreditCard size={20} /> <span>To'lovlar</span>
-        </button>
-        <button className="menu-nav-item" onClick={() => navigate("/history")}>
-          <FiClock size={20} /> <span>Tarix</span>
-        </button>
-        <button className="menu-nav-item" onClick={() => navigate("/profile")}>
-          <FiUser size={20} /> <span>Profil</span>
+{/* === KARTANI TANLASH MODAL - YANGI NOMLAR === */}
+{showCardSelectModal && (
+  <div className="card-picker-modal">
+    <div 
+      className="card-picker-backdrop" 
+      onClick={() => {
+        setShowCardSelectModal(false);
+        setPendingTopUpAmount(null);
+      }}
+    ></div>
+    <div className="card-picker-panel">
+      <div className="card-picker-title-bar">
+        <h3>Kartani tanlang</h3>
+        <button
+          className="card-picker-close-btn"
+          onClick={() => {
+            setShowCardSelectModal(false);
+            setPendingTopUpAmount(null);
+          }}
+        >
+          <FiX size={20} />
         </button>
       </div>
-
+      <div className="card-picker-amount-info">
+        To'ldirish summasi: <strong>{pendingTopUpAmount?.toLocaleString()} UZS</strong>
+      </div>
+      <div className="card-picker-items">
+        {allCards.map((card) => (
+          <div
+            key={card.id}
+            className="card-picker-option"
+            onClick={() => handleTopUpToCard(card.id)}
+          >
+            <div className="card-picker-preview">
+              <div className="card-mini-preview">
+                <div className="card-mini-number">
+                  {card.number.replace(/(\d{4})/g, "$1 ").trim()}
+                </div>
+                <div className="card-mini-balance">
+                  {card.balance.toLocaleString()} UZS
+                </div>
+              </div>
+              <div className="card-mini-type">
+                {card.type === "gold" ? "Gold" : card.type === "virtual" ? "Virtual" : "Plastik"}
+              </div>
+            </div>
+            <FiPlusCircle size={20} className="card-picker-add-icon" />
+          </div>
+        ))}
+      </div>
+      <div className="card-picker-footer-note">
+        {pendingTopUpAmount >= 10000 && user?.isPremium ? (
+          <span className="premium-badge-text">Premium: o'tkazma bepul!</span>
+        ) : (
+          <span>Virtual kartadan boshqa kartaga o'tkazma — 1% foiz</span>
+        )}
+      </div>
+    </div>
+  </div>
+)}
       {/* === BOSHQA SUMMA MODAL === */}
       {showCustomAmountModal && (
         <div className="menu-custom-amount-modal">
@@ -408,14 +515,13 @@ function MainMenu({ user, updateUser }) {
           <div className="menu-custom-amount-content">
             <div className="menu-custom-amount-header">
               <h3>Boshqa summa kiriting</h3>
-              <button 
+              <button
                 className="menu-close-custom-amount"
                 onClick={() => setShowCustomAmountModal(false)}
               >
                 <FiX size={20} />
               </button>
             </div>
-            
             <div className="menu-custom-amount-input-group">
               <input
                 type="number"
@@ -437,7 +543,6 @@ function MainMenu({ user, updateUser }) {
                 ))}
               </div>
             </div>
-
             <button
               onClick={handleCustomTopUp}
               className="menu-custom-amount-submit"
@@ -446,7 +551,6 @@ function MainMenu({ user, updateUser }) {
               <FiPlusCircle size={18} />
               {tempCustomAmount ? `${parseInt(tempCustomAmount).toLocaleString()} UZS to'ldirish` : "Summa kiriting"}
             </button>
-
             <p className="menu-custom-amount-hint">
               Minimal to'ldirish: 100 UZS
             </p>
@@ -462,14 +566,13 @@ function MainMenu({ user, updateUser }) {
             <div className="menu-premium-modal-header">
               <FiStar className="menu-premium-star-icon" />
               <h2>Premium Obuna</h2>
-              <button 
+              <button
                 className="menu-close-premium-modal"
                 onClick={() => setShowPremiumModal(false)}
               >
                 <FiX size={20} />
               </button>
             </div>
-            
             <div className="menu-premium-features-list">
               <h3 className="menu-premium-title">Premium afzalliklar:</h3>
               <div className="menu-premium-feature-item">
@@ -489,7 +592,6 @@ function MainMenu({ user, updateUser }) {
                 <span>Qidiruv natijalarida birinchi o'rinda ko'rinish</span>
               </div>
             </div>
-
             <div className="menu-premium-price-section">
               <div className="menu-premium-price">
                 Narxi: <strong>10,000 UZS</strong>
@@ -498,8 +600,7 @@ function MainMenu({ user, updateUser }) {
                 Joriy balans: <strong>{(user?.balance || 0).toLocaleString()} UZS</strong>
               </div>
             </div>
-
-            <button 
+            <button
               className={`menu-buy-premium-btn ${(!user || user.balance < 10000) ? 'menu-buy-premium-disabled' : ''}`}
               onClick={handleBuyPremium}
               disabled={!user || user.balance < 10000}
@@ -512,13 +613,11 @@ function MainMenu({ user, updateUser }) {
                 "Balans yetarli emas"
               )}
             </button>
-
             {user?.balance < 10000 && (
               <div className="menu-insufficient-balance">
                 Premium sotib olish uchun balansingizni to'ldiring
               </div>
             )}
-
             <div className="menu-premium-note">
               Premium obuna 1 yil muddatga amal qiladi
             </div>

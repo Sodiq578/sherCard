@@ -19,6 +19,15 @@ function Marketplace({ user, updateUser }) {
   const [isSelling, setIsSelling] = useState(false);
   const [isBuying, setIsBuying] = useState({});
 
+  // === Alert Modal holati ===
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
+  const showAlertModal = (msg) => {
+    setAlertMessage(msg);
+    setShowAlert(true);
+  };
+
   // localStorage dan yuklash
   useEffect(() => {
     const stored = localStorage.getItem('marketCards');
@@ -37,17 +46,15 @@ function Marketplace({ user, updateUser }) {
     const price = parseInt(sellPrice);
 
     if (!card) {
-      alert('Karta topilmadi!');
+      showAlertModal('Karta topilmadi!');
       return;
     }
     if (!price || price <= 0) {
-      alert('Iltimos, to\'g\'ri narx kiriting!');
+      showAlertModal("Iltimos, to'g'ri narx kiriting!");
       return;
     }
 
     setIsSelling(true);
-
-    // Simulyatsiya
     await new Promise(resolve => setTimeout(resolve, 1200));
 
     const marketCard = {
@@ -68,7 +75,7 @@ function Marketplace({ user, updateUser }) {
         ...(user.history || []),
         {
           time: new Date().toLocaleString('uz-UZ'),
-          action: 'Karta sotuvga qo\'yildi',
+          action: "Karta sotuvga qo'yildi",
           amount: price,
           details: `Karta: ${sellCardId}`,
           type: 'sell'
@@ -81,18 +88,16 @@ function Marketplace({ user, updateUser }) {
     setSellPrice('');
     setIsSelling(false);
 
-    alert(`Karta ${sellCardId} ${price} ballga sotuvga qo'yildi!`);
+    showAlertModal(`Karta ${sellCardId} ${price} ballga sotuvga qo'yildi!`);
   };
 
   const handleBuy = async (marketCard) => {
     if (user.balance < marketCard.price) {
-      alert('Yetarli balans yo\'q!');
+      showAlertModal("Yetarli balans yo'q!");
       return;
     }
 
     setIsBuying(prev => ({ ...prev, [marketCard.id]: true }));
-
-    // Simulyatsiya
     await new Promise(resolve => setTimeout(resolve, 1200));
 
     const newCard = {
@@ -125,7 +130,7 @@ function Marketplace({ user, updateUser }) {
     setMarketCards(newMarketCards);
     setIsBuying(prev => ({ ...prev, [marketCard.id]: false }));
 
-    alert(`Karta muvaffaqiyatli sotib olindi!\nSotuvchi: @${marketCard.seller}\nNarx: ${marketCard.price} ball`);
+    showAlertModal(`Karta muvaffaqiyatli sotib olindi!\nSotuvchi: @${marketCard.seller}\nNarx: ${marketCard.price} ball`);
   };
 
   const selectedCard = user.cards?.find(c => c.id === sellCardId);
@@ -306,6 +311,18 @@ function Marketplace({ user, updateUser }) {
           )}
         </div>
       </div>
+
+      {/* === Alert Modal (ichida) === */}
+     {showAlert && (
+  <div className="alert-overlay" onClick={() => setShowAlert(false)}>
+    <div className="alert-box" onClick={(e) => e.stopPropagation()}>
+      <p>  {alertMessage}</p>
+     
+      <button onClick={() => setShowAlert(false)}>OK</button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

@@ -1,158 +1,223 @@
-/* src/styles/AllShops.css */
-
-/* ASOSIY SAHIFA */
+/* === ALLSHOPS PAGE – SARIQSIZ, KO‘K PREMIUM DIZAYN === */
 .allshops-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
-  color: #fff;
-  padding: 20px;
-  padding-bottom: 130px;
+  background: linear-gradient(135deg, #000000 0%, #0a0a0a 100%);
+  color: #ffffff;
+  padding: 24px 16px;
+  padding-bottom: 110px;
+  box-sizing: border-box;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  position: relative;
 }
 
 .allshops-container {
-  max-width: 1100px;
+  max-width: 540px;
   margin: 0 auto;
 }
 
-/* HEADER */
+/* === HEADER === */
 .allshops-header {
   text-align: center;
   margin-bottom: 32px;
+  animation: slideDown 0.6s ease-out;
 }
 
 .allshops-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #0C73FE;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin: 0 0 8px 0;
+  font-size: 26px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.5px;
 }
 
 .title-icon {
-  font-size: 32px;
   color: #0C73FE;
+  font-size: 30px;
+  filter: drop-shadow(0 0 8px rgba(12, 115, 254, 0.4));
 }
 
 .allshops-subtitle {
-  font-size: 16px;
-  color: #aaa;
+  font-size: 15px;
+  color: #bbbbbb;
   margin: 0;
   font-weight: 500;
+  background: rgba(12, 115, 254, 0.12);
+  padding: 5px 14px;
+  border-radius: 18px;
+  display: inline-block;
+  border: 1px solid rgba(12, 115, 254, 0.25);
 }
 
-/* GRID */
+/* === GRID – HAR QANDAY EKRANDA 2 TA KARTA === */
 .allshops-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 22px;
-  margin-top: 10px;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  animation: fadeInUp 0.6s ease-out;
 }
 
-/* KARTA */
+/* === KARTA === */
 .allshops-card {
-  background: #1e1e1e;
-  border-radius: 20px;
+  background: rgba(26, 26, 26, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 22px;
   overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
-  border: 1px solid #333;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
-  display: flex;
-  flex-direction: column;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+  animation: cardRise 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
 }
+
+/* Animatsiya kechikishi */
+.allshops-card:nth-child(1) { animation-delay: 0.1s; }
+.allshops-card:nth-child(2) { animation-delay: 0.2s; }
+.allshops-card:nth-child(3) { animation-delay: 0.3s; }
+.allshops-card:nth-child(4) { animation-delay: 0.4s; }
+.allshops-card:nth-child(5) { animation-delay: 0.5s; }
+.allshops-card:nth-child(6) { animation-delay: 0.6s; }
 
 .allshops-card:hover {
-  transform: translateY(-10px) scale(1.03);
-  box-shadow: 0 20px 40px rgba(12, 115, 254, 0.3);
+  transform: translateY(-8px) scale(1.04);
+  box-shadow: 0 16px 40px rgba(12, 115, 254, 0.3);
   border-color: #0C73FE;
-  z-index: 10;
 }
 
-/* LOGO - KATTA VA CHIROYLILI */
+.allshops-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0C73FE, #00c3ff, #0C73FE);
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  animation: shimmer 2s infinite;
+}
+
+.allshops-card:hover::before {
+  opacity: 1;
+}
+
+/* === LOGO === */
 .allshops-logo-wrapper {
   position: relative;
-  height: 130px;
-  background: #2a2a2a;
+  height: 110px;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
 }
 
 .allshops-logo {
-  width: 90%;
-  height: 90%;
-  object-fit: contain;
-  padding: 12px;
-  border-radius: 12px;
-  background: transparent;
-  transition: transform 0.3s ease;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
 }
 
 .allshops-card:hover .allshops-logo {
-  transform: scale(1.08);
+  transform: scale(1.15);
 }
 
-/* RATING */
-.allshops-rating {
+/* === MENU COUNT BADGE – KO‘K PREMIUM (SARIQ YO‘Q!) === */
+.allshops-menu-count {
   position: absolute;
   top: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.75);
-  color: #0C73FE;
-  font-size: 13px;
-  font-weight: 600;
+  left: 10px;
+  background: linear-gradient(135deg, #0C73FE, #0056d6);
+  color: #ffffff;
   padding: 5px 10px;
-  border-radius: 20px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  box-shadow: 0 3px 10px rgba(12, 115, 254, 0.4);
+  z-index: 3;
   display: flex;
   align-items: center;
   gap: 4px;
-  backdrop-filter: blur(4px);
+  border: 1.8px solid rgba(255, 255, 255, 0.15);
+  text-transform: uppercase;
+}
+
+ 
+
+/* === RATING – KO‘K YULDUZ (SARIQ YO‘Q!) === */
+.allshops-rating {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  color: #0C73FE;
+  padding: 5px 10px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1.5px solid rgba(12, 115, 254, 0.4);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
 }
 
 .rating-star {
-  font-size: 14px;
+  font-size: 13px;
+  color: #0C73FE;
+  filter: drop-shadow(0 0 3px rgba(12, 115, 254, 0.5));
 }
 
-/* INFO */
+/* === INFO === */
 .allshops-info {
-  padding: 16px;
-  flex-grow: 1;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
 .allshops-name {
-  font-size: 16px;
-  font-weight: 700;
   margin: 0;
-  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .allshops-category {
-  font-size: 13px;
-  color: #0C73FE;
-  font-weight: 500;
   margin: 0;
+  font-size: 11px;
+  color: #0C73FE;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(12, 115, 254, 0.15);
+  padding: 2px 7px;
+  border-radius: 7px;
+  display: inline-block;
+  align-self: flex-start;
+  border: 1px dashed rgba(12, 115, 254, 0.4);
 }
 
-/* FOOTER */
+/* === FOOTER === */
 .allshops-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 8px;
-  font-size: 12px;
-  color: #ccc;
+  font-size: 11px;
+  color: #cccccc;
+  font-weight: 600;
 }
 
 .allshops-time,
@@ -163,59 +228,112 @@
 }
 
 .footer-icon {
-  font-size: 14px;
   color: #0C73FE;
+  font-size: 13px;
 }
 
-/* MENU SONI */
-.allshops-menu-count {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  background: #0C73FE;
-  color: white;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 9px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(12, 115, 254, 0.3);
+/* === ANIMATSİYALAR === */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .allshops-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
-  }
-
-  .allshops-logo-wrapper {
-    height: 110px;
-  }
-
-  .allshops-name {
-    font-size: 15px;
-  }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes cardRise {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* === RESPONSIVE – HAR QANDAY EKRANDA 2 TA KARTA === */
 @media (max-width: 480px) {
   .allshops-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 14px;
+  }
+
+  .allshops-page {
+    padding: 20px 12px;
+    padding-bottom: 100px;
+  }
+
+  .allshops-title {
+    font-size: 24px;
+    gap: 10px;
+  }
+
+  .title-icon {
+    font-size: 28px;
+  }
+
+  .allshops-subtitle {
+    font-size: 14px;
+    padding: 4px 12px;
   }
 
   .allshops-logo-wrapper {
     height: 100px;
   }
 
-  .allshops-title {
-    font-size: 24px;
+  .allshops-info {
+    padding: 12px;
   }
 
   .allshops-name {
     font-size: 14px;
   }
 
-  .allshops-info {
-    padding: 12px;
+  .allshops-category {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  .allshops-footer {
+    font-size: 10px;
+  }
+
+  .allshops-menu-count {
+    font-size: 10px;
+    padding: 4px 8px;
+    top: 8px;
+    left: 8px;
+  }
+
+  .allshops-rating {
+    font-size: 11px;
+    padding: 4px 8px;
+    bottom: 6px;
+    right: 6px;
+  }
+}
+
+@media (max-width: 360px) {
+  .allshops-grid {
+    gap: 12px;
+  }
+
+  .allshops-title {
+    font-size: 22px;
+  }
+
+  .allshops-name {
+    font-size: 13px;
+  }
+
+  .allshops-footer {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .allshops-logo-wrapper {
+    height: 90px;
   }
 }

@@ -1,4 +1,3 @@
-// src/components/BottomNav.jsx
 import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -29,25 +28,16 @@ function BottomNav() {
     const activeIndex = Array.from(items).findIndex(
       (item) => item.getAttribute('href') === location.pathname
     );
-
     if (activeIndex === -1) return;
 
-    const firstItem = items[0];
     const activeItem = items[activeIndex];
-
-    const gap =
-      activeIndex > 0
-        ? items[1].getBoundingClientRect().left - items[0].getBoundingClientRect().right
-        : 0;
-
-    const itemWidth = activeItem.offsetWidth;
-    const leftOffset = firstItem.getBoundingClientRect().left;
-
     const indicator = indicatorRef.current;
-    if (indicator) {
-      indicator.style.setProperty('--item', activeIndex);
-      indicator.style.setProperty('--gap', `${gap}px`);
-      indicator.style.setProperty('--item-width', `${itemWidth}px`);
+    if (indicator && activeItem) {
+      const itemRect = activeItem.getBoundingClientRect();
+      const menuRect = menuRef.current.getBoundingClientRect();
+      const left = itemRect.left - menuRect.left;
+      indicator.style.left = `${left}px`;
+      indicator.style.width = `${itemRect.width}px`;
     }
   };
 
@@ -60,8 +50,8 @@ function BottomNav() {
 
   return (
     <nav className="bottom-nav">
-      <div className="indicator" ref={indicatorRef}></div>
       <ul className="menu bottom-nav-menu" ref={menuRef}>
+        <div className="indicator" ref={indicatorRef}></div>
         {menuItems.map((item) => {
           const isActive = location.pathname === item.to;
           const Icon = isActive ? item.activeIcon : item.icon;
@@ -71,10 +61,10 @@ function BottomNav() {
               <Link
                 to={item.to}
                 className={`nav-item ${isActive ? 'active' : ''}`}
-                href={item.to} // for JS calculation
+                href={item.to}
               >
                 <span className="icon">
-                  <Icon size={24} />
+                  <Icon size={26} />
                 </span>
                 <span className="text">{item.label}</span>
               </Link>

@@ -1,104 +1,107 @@
-/* src/styles/Profile.css */
+/* === PROFIL SAHIFASI ASOSIY === */
 .profil-sahifa {
   min-height: 100vh;
-  background: #f8f9fa;
+  background-color: #000000;
+  color: #ffffff;
   padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   padding-bottom: 100px;
+  box-sizing: border-box;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  position: relative;
 }
 
+/* === SARLAVHA === */
 .profil-sarlavha {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
-  color: #000;
- 
-
-}
-
-.orqaga-tugma {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #0C73FE;
-  padding: 8px;
-  border-radius:  50%;
-  transition: background 0.2s;
-}
-
-.orqaga-tugma:hover {
-  background: rgba(12, 115, 254, 0.1);
+  margin-bottom: 30px;
+  padding: 0 8px;
 }
 
 .profil-sarlavha h1 {
   font-size: 22px;
   font-weight: 600;
   margin: 0;
+  color: #ffffff;
 }
 
+.orqaga-tugma,
 .tahrirlash-tugma {
-  background: transparent;
-  border: 1.5px solid #0C73FE;
-  color: #0C73FE;
-  padding: 8px 16px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
+  background: rgba(26, 26, 26, 0.8);
+  border: 1px solid #333333;
+  color: #cccccc;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
+.orqaga-tugma:hover,
 .tahrirlash-tugma:hover {
   background: #0C73FE;
-  color: white;
+  color: #ffffff;
+  border-color: #0C73FE;
+  transform: scale(1.05);
 }
 
+/* === PROFIL KARTASI === */
 .profil-kartasi {
-  background: white;
+  background: #1a1a1a;
   border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333333;
 }
 
-.rasm-bo‘limi {
+/* === AVATAR BO'LIMI === */
+.rasm-bolimi {
+  
+  padding: 30px 20px;
   text-align: center;
-  margin-bottom: 20px;
+  position: relative;
 }
 
 .rasm-quti {
-  position: relative;
-  display: inline-block;
-  margin-bottom: 12px;
-}
-
-.foydalanuvchi-rasmi,
-.rasm-o‘rniga {
   width: 100px;
   height: 100px;
   border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 16px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  box-shadow: 0 0 20px rgba(12, 115, 254, 0.4);
+}
+
+.foydalanuvchi-rasmi {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border: 4px solid #e3e3e3;
-  background: #f0f0f0;
+}
+
+.rasm-orniga {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 36px;
-  font-weight: bold;
-  color: #0C73FE;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 .kamera-belgisi {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
+  bottom: 0;
+  right: 0;
   background: #0C73FE;
-  color: white;
+  color: #ffffff;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -106,7 +109,14 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(12, 115, 254, 0.3);
+  border: 3px solid #000000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.kamera-belgisi:hover {
+  background: #0056d6;
+  transform: scale(1.1);
 }
 
 .rasm-kirish {
@@ -114,44 +124,47 @@
 }
 
 .foydalanuvchi-ism {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
-  margin: 8px 0 4px;
-  color: #000;
+  margin: 0 0 6px 0;
+  color: #ffffff;
 }
 
 .foydalanuvchi-nik {
-  color: #666;
   font-size: 14px;
-  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 12px 0;
 }
 
 .balans-belgisi {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  background: #0C73FE;
-  color: white;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.15);
   padding: 8px 16px;
   border-radius: 12px;
+  font-size: 16px;
   font-weight: 600;
-  font-size: 15px;
-  margin: 0 auto;
-  width: fit-content;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .balans-logosi {
   width: 20px;
   height: 20px;
+  border-radius: 50%;
 }
 
+/* === FORMA === */
 .profil-forma {
-  margin-bottom: 24px;
+  padding: 24px 20px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #333333;
 }
 
 .kirish-guruh {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .kirish-guruh label {
@@ -159,30 +172,38 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: #444;
-  margin-bottom: 6px;
+  color: #cccccc;
+  margin-bottom: 8px;
   font-weight: 500;
 }
 
 .kirish-guruh input {
   width: 100%;
-  padding: 12px 14px;
-  border: 1.5px solid #ddd;
+  background: #000000;
+  border: 1.5px solid #333333;
   border-radius: 12px;
+  padding: 14px 16px;
+  color: #ffffff;
   font-size: 15px;
-  transition: border 0.2s;
+  outline: none;
+  transition: all 0.3s ease;
 }
 
 .kirish-guruh input:focus {
-  outline: none;
   border-color: #0C73FE;
+  box-shadow: 0 0 0 3px rgba(12, 115, 254, 0.2);
 }
 
 .kirish-guruh input:disabled {
-  background: #f9f9f9;
-  color: #666;
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
+.kirish-guruh input::placeholder {
+  color: #888888;
+}
+
+/* === FORMA HARAKATLARI === */
 .forma-harakatlar {
   display: flex;
   gap: 12px;
@@ -192,208 +213,248 @@
 .saqlash-tugma,
 .bekor-qilish-tugma {
   flex: 1;
-  padding: 12px;
+  padding: 14px;
   border-radius: 12px;
-  font-weight: 600;
   font-size: 15px;
-  cursor: pointer;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.2s;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .saqlash-tugma {
-  background: #0C73FE;
-  color: white;
+  background: linear-gradient(135deg, #0C73FE, #0056d6);
+  color: #ffffff;
   border: none;
 }
 
 .saqlash-tugma:hover {
-  background: #0a5dd8;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(12, 115, 254, 0.4);
 }
 
 .bekor-qilish-tugma {
-  background: #f1f1f1;
-  color: #666;
-  border: 1.5px solid #ddd;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
 }
 
 .bekor-qilish-tugma:hover {
-  background: #e0e0e0;
+  background: #ffffff;
+  color: #000000;
 }
 
+/* === STATISTIKA SETKASI === */
 .statistika-setka {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin: 24px 0;
+  gap: 1px;
+  background: #333333;
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
 }
 
 .stat-element {
-  background: #f8f9fa;
-  padding: 16px;
-  border-radius: 16px;
+  background: #1a1a1a;
+  padding: 16px 12px;
   text-align: center;
-  transition: transform 0.2s;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .stat-element:hover {
+  background: #0C73FE;
   transform: translateY(-2px);
 }
 
 .stat-belgi {
   color: #0C73FE;
-  font-size: 22px;
+  font-size: 20px;
   margin-bottom: 8px;
 }
 
 .stat-qiymat {
   font-size: 18px;
-  font-weight: 600;
-  color: #000;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
 }
 
 .stat-izoh {
   font-size: 12px;
-  color: #666;
-  margin-top: 4px;
+  color: #cccccc;
 }
 
-.o‘ng-belgi {
-  margin-left: auto;
-  color: #aaa;
-  transition: transform 0.2s;
+.ong-belgi {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  color: #888888;
+  font-size: 18px;
+  transition: transform 0.3s ease;
 }
 
-.o‘ng-belgi.aylantirilgan {
-  transform: rotate(90deg);
+.aylantirilgan {
+  transform: translateY(-50%) rotate(90deg);
 }
 
-.tarix-bo‘limi {
-  margin-top: 20px;
-  border-top: 1.5px solid #eee;
-  padding-top: 16px;
+/* === TARIX BO'LIMI === */
+.tarix-bolimi {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+  background: #1a1a1a;
+}
+
+.kengaytirilgan {
+  max-height: 600px;
+  padding: 20px;
 }
 
 .tarix-mazmuni {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
+  animation: fadeInUp 0.4s ease-out;
 }
 
-.tarix-bo‘limi.kengaytirilgan .tarix-mazmuni {
-  max-height: 500px;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.tarix-ro‘yxati {
-  margin-top: 12px;
+.tarix-royxati {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .tarix-band {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 14px;
+  background: #000000;
+  border-radius: 12px;
+  border: 1px solid #333333;
+  transition: all 0.3s ease;
 }
 
-.tarix-band:last-child {
-  border-bottom: none;
+.tarix-band:hover {
+  border-color: #0C73FE;
+  background: rgba(12, 115, 254, 0.1);
 }
 
 .tarix-belgisi {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  flex-shrink: 0;
 }
 
-.tarix-belgisi.kirim {
-  background: rgba(12, 115, 254, 0.1);
-  color: #0C73FE;
+.kirim {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
 }
 
-.tarix-belgisi.chiqim {
-  background: rgba(255, 0, 0, 0.1);
-  color: #e74c3c;
+.chiqim {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
 }
 
 .tarix-malumot {
   flex: 1;
+  min-width: 0;
 }
 
 .amal-turi {
-  font-weight: 500;
-  color: #000;
-  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .amal-sana {
   font-size: 12px;
-  color: #888;
-  margin: 2px 0 0;
+  color: #aaaaaa;
+  margin: 0;
 }
 
 .amal-miqdor {
-  font-weight: 600;
   font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-.amal-miqdor.musbat {
-  color: #0C73FE;
+.musbat {
+  color: #4caf50;
 }
 
-.amal-miqdor.manfiy {
-  color: #e74c3c;
+.manfiy {
+  color: #f44336;
 }
 
-.tarix-yo‘q {
+.tarix-yoq {
   text-align: center;
-  color: #999;
+  color: #888888;
+  font-size: 14px;
   font-style: italic;
-  padding: 20px 0;
+  padding: 20px;
 }
 
+/* === CHIQISH TUGMASI === */
 .chiqish-tugma {
-  margin-top: 24px;
   width: 100%;
-  padding: 14px;
-  background: #ff3b30;
-  color: white;
-  border: none;
-  border-radius: 14px;
-  font-size: 16px;
+  background: rgba(244, 67, 54, 0.15);
+  color: #f44336;
+  border: 1.5px solid rgba(244, 67, 54, 0.3);
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 15px;
   font-weight: 600;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  transition: background 0.2s;
+  gap: 8px;
+  cursor: pointer;
+  margin-top: 24px;
+  transition: all 0.3s ease;
 }
 
 .chiqish-tugma:hover {
-  background: #e32d22;
+  background: #f44336;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(244, 67, 54, 0.3);
 }
 
+/* === YUKLANMOQDA === */
 .yuklanmoqda {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  color: #666;
+  min-height: 100vh;
+  color: #cccccc;
 }
 
 .aylanuvchi {
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
+  border: 4px solid #333333;
   border-top: 4px solid #0C73FE;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -401,6 +462,66 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
+
+/* === RESPONSIVE === */
+@media (max-width: 480px) {
+  .profil-sahifa {
+    padding: 16px;
+    padding-bottom: 100px;
+  }
+
+  .rasm-quti {
+    width: 80px;
+    height: 80px;
+  }
+
+  .foydalanuvchi-ism {
+    font-size: 20px;
+  }
+
+  .stat-qiymat {
+    font-size: 16px;
+  }
+
+  .statistika-setka {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-element:hover {
+    transform: none;
+  }
+
+  .tarix-band {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .tarix-belgisi {
+    margin-bottom: 8px;
+  }
+
+  .amal-miqdor {
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .profil-sarlavha h1 {
+    font-size: 20px;
+  }
+
+  .balans-belgisi {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+}
+
+
+
+
+
+ 

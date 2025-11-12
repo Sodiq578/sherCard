@@ -1,45 +1,56 @@
-// src/components/Cards.jsx
 import React, { useState, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { useNavigate } from "react-router-dom";
+import { FiChevronLeft } from "react-icons/fi";   // Chevron ikonka
 import "../styles/Cards.css";
 import Logo from "../assets/images/logo.png";
-import CardFrontImage from "../assets/images/card.png";
-import CardBackImage from "../assets/images/cardback.png";
+import CardFrontImage from "../assets/images/cardorg.png";
+import GoldCardImage from "../assets/images/cardorg.png";
+import CardBackImage from "../assets/images/cardorg.png";
 
 function Cards({ user, updateUser }) {
   const navigate = useNavigate();
 
-  // ---- holatlar ----
+  // ==== HOLATLAR ====
   const [flippedCards, setFlippedCards] = useState({});
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [showBuyCardModal, setShowBuyCardModal] = useState(false);
-  const [showTopupModal, setShowTopupModal] = useState(null);
-  const [topupAmount, setTopupAmount] = useState("");
-  const [selectedQuickAmount, setSelectedQuickAmount] = useState(null);
-  const [previewNormalNumber, setPreviewNormalNumber] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [previewNormalNumber, setPreviewNormalNumber] = useState("");
+  const [selectedCardType, setSelectedCardType] = useState("normal");
   const [copiedCardNumber, setCopiedCardNumber] = useState(null);
-  const [touchStart, setTouchStart] = useState(null);
-  const [longPressTimer, setLongPressTimer] = useState(null);
-  const [showActionsFor, setShowActionsFor] = useState(null);
 
-  // ---- yordamchi funksiyalar ----
+  // ==== ALERT MODAL HOLATI ====
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  // ==== YORDAMCHI FUNKSIYALAR ====
   const generateNormalCardNumber = () => {
     let num = "";
     for (let i = 0; i < 12; i++) num += Math.floor(Math.random() * 10);
     return num;
   };
 
+  const generateGoldCardNumber = () => {
+    const patterns = ["7777", "8888", "9999", "777888", "999777"];
+    const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
+    let num = "";
+    while (num.length < 12) num += randomPattern;
+    return num.slice(0, 12);
+  };
+
   useEffect(() => {
     if (showBuyCardModal) {
       setIsGenerating(true);
       setTimeout(() => {
-        setPreviewNormalNumber(generateNormalCardNumber());
+        const num =
+          selectedCardType === "gold"
+            ? generateGoldCardNumber()
+            : generateNormalCardNumber();
+        setPreviewNormalNumber(num);
         setIsGenerating(false);
       }, 800);
     }
-  }, [showBuyCardModal]);
+  }, [showBuyCardModal, selectedCardType]);
 
   const getVirtualCardNumber = () => {
     const key = `virtual_${user.login}`;
@@ -50,20 +61,29 @@ function Cards({ user, updateUser }) {
     return newNum;
   };
 
+  const formatCardNumber = (num) =>
+    num ? num.replace(/(\d{4})/g, "$1 ").trim() : "";
+
+  // ==== YANGI KARTA YARATISH ====
   const generatePhysicalCard = () => {
-    const price = 2000;
+    const price = selectedCardType === "gold" ? 10000 : 2000;
     if (user.balance < price) {
-      alert(`Yetarli mablag' yo'q! Kerak: ${price.toLocaleString()} UZS`);
+      setAlertMessage(
+        `Yetarli mablag' yo'q! Kerak: ${price.toLocaleString()} UZS`
+      );
+      setShowAlert(true);
       return;
     }
+
     const newCard = {
       id: `card_${Date.now()}`,
       number: previewNormalNumber,
       balance: 0,
-      type: "physical",
+      type: selectedCardType === "gold" ? "gold" : "physical",
       createdAt: new Date().toLocaleString("uz-UZ"),
       deleted: false,
     };
+
     const updatedUser = {
       ...user,
       balance: user.balance - price,
@@ -72,230 +92,160 @@ function Cards({ user, updateUser }) {
         ...(user.history || []),
         {
           time: new Date().toLocaleString("uz-UZ"),
-          action: "Oddiy karta sotib olindi",
+          action:
+            selectedCardType === "gold"
+              ? "Gold karta sotib olindi"
+              : "Oddiy karta sotib olindi",
           amount: `-${price.toLocaleString()} UZS`,
         },
       ],
     };
+
     updateUser(updatedUser);
     setShowBuyCardModal(false);
-    alert(`Karta yaratildi!\nRaqam: ${formatCardNumber(previewNormalNumber)}`);
+
+    setAlertMessage(
+      `${selectedCardType === "gold" ? "Gold" : "Oddiy"
+      } karta yaratildi!\nRaqam: ${formatCardNumber(previewNormalNumber)}`
+    );
+    setShowAlert(true);
   };
 
-  const formatCardNumber = (num) =>
-    num ? num.replace(/(\d{4})/g, "$1 ").trim() : "";
-
+  // ==== KARTALAR ====
   const virtualCard = {
     id: "virtual",
     number: getVirtualCardNumber(),
     balance: user.balance || 0,
     type: "virtual",
   };
-  const allCards = [virtualCard, ...(user.cards?.filter((c) => !c.deleted) || [])];
+
+  const allCards = [
+    virtualCard,
+    ...(user.cards?.filter((c) => !c.deleted) || []),
+  ];
+
   const displayName = user.profile?.name || user.login || "Foydalanuvchi";
   const totalBalance = allCards.reduce(
     (sum, card) => sum + (card.balance || 0),
     0
   );
 
-  // ---- flip ----
   const toggleFlip = (cardId) => {
     setFlippedCards((prev) => ({ ...prev, [cardId]: !prev[cardId] }));
   };
 
-  // ---- swipe (touch) ----
-  const handleTouchStart = (cardId, e) => {
-    setTouchStart({ x: e.touches[0].clientX, cardId });
-  };
-  const handleTouchEnd = (cardId, e) => {
-    if (!touchStart) return;
-    const diffX = e.changedTouches[0].clientX - touchStart.x;
-    if (Math.abs(diffX) > 50) toggleFlip(cardId);
-    setTouchStart(null);
-  };
-
-  // ---- copy number ----
   const copyCardNumber = async (cardNumber) => {
     try {
       await navigator.clipboard.writeText(cardNumber);
       setCopiedCardNumber(cardNumber);
       setTimeout(() => setCopiedCardNumber(null), 2000);
     } catch {
-      const el = document.createElement("textarea");
-      el.value = cardNumber;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand("copy");
-      document.body.removeChild(el);
       setCopiedCardNumber(cardNumber);
       setTimeout(() => setCopiedCardNumber(null), 2000);
     }
   };
 
-  // ---- long press (800 ms) ----
-  const handleLongPressStart = (cardId, e) => {
-    e.preventDefault();
-    const timer = setTimeout(() => setShowActionsFor(cardId), 800);
-    setLongPressTimer(timer);
-  };
-  const handleLongPressEnd = () => {
-    if (longPressTimer) clearTimeout(longPressTimer);
-  };
-
   return (
     <div className="cards-page">
       <div className="cards-container">
-        {/* ==== HEADER ==== */}
-        <div className="cards-header">
-          <h2>Mening Kartalarim</h2>
-          <button
-            className="add-card-btn"
-            onClick={() => setShowBuyCardModal(true)}
-          >
-            + Yangi karta
-          </button>
-        </div>
+        {/* ==== HEADER: CHEVRON + SARLAVHA + YANGI KARTA ==== */}
+  <div className="cards-header">
+  <div className="header-box">
+    <button
+      className="back-chevron-btn"
+      onClick={() => navigate(-1)}
+      aria-label="Orqaga"
+    >
+      <FiChevronLeft size={24} /> {/* 28 emas, 24 — mobilga mos */}
+    </button>
+
+    <h2>Mening Kartalarim</h2>
+  </div>
+
+  <button
+    className="add-card-btn"
+    onClick={() => {
+      setSelectedCardType("normal");
+      setShowBuyCardModal(true);
+    }}
+  >
+    + Yangi karta
+  </button>
+</div>
 
         {/* ==== KARTALAR GRID ==== */}
         <div className="cards-grid">
-          {allCards.map((card) => {
-            const isFlipped = flippedCards[card.id];
-            const actionsVisible = showActionsFor === card.id;
-
-            return (
-              <div key={card.id} className="card-box">
-                {/* ---- KARTA O'ZI ---- */}
+          {allCards.map((card) => (
+            <div key={card.id} className="card-box">
+              <div
+                className={`card-wrapper ${flippedCards[card.id] ? "flipped" : ""
+                  }`}
+                onClick={() => toggleFlip(card.id)}
+              >
+                {/* FRONT */}
                 <div
-                  className={`card-wrapper ${isFlipped ? "flipped" : ""}`}
-                  onClick={() => toggleFlip(card.id)}
-                  onTouchStart={(e) => {
-                    handleTouchStart(card.id, e);
-                    handleLongPressStart(card.id, e);
+                  className="card-side card-front"
+                  style={{
+                    backgroundImage: `url(${card.type === "gold" ? GoldCardImage : CardFrontImage
+                      })`,
                   }}
-                  onTouchEnd={(e) => {
-                    handleTouchEnd(card.id, e);
-                    handleLongPressEnd();
-                  }}
-                  onMouseDown={(e) => handleLongPressStart(card.id, e)}
-                  onMouseUp={handleLongPressEnd}
-                  onMouseLeave={handleLongPressEnd}
                 >
-                  {/* OLD TOMON - card.png rasmi bilan */}
-                  <div 
-                    className="card-side card-front"
-                    style={{ backgroundImage: `url(${CardFrontImage})` }}
-                  >
-               
-                    
-                    <div className="card-top">
-                      <img src={Logo} alt="Logo" className="logo-img" />
-                       
-                    </div>
-                    
-                    <div className="card-middle">
-                      <div className="card-name">{displayName}</div>
-                      <div className="card-balance">
-                        {card.balance.toLocaleString()} UZS
-                      </div>
-                    </div>
-                    
-                    <div className="card-footer">
-                      <div className="card-number">
-                        {formatCardNumber(card.number)}
-                      </div>
-                      <div className="card-type">
-                        <span>{card.type === 'virtual' ? 'Virtual' : 'Plastik'}</span>
-                        <span className="visa-logo">VISA</span>
-                      </div>
+                  <div className="card-top">
+                    <img src={Logo} alt="Logo" className="logo-img" />
+                  </div>
+
+                  <div className="card-middle">
+                    <div className="card-name">{displayName}</div>
+                    <div className="card-balance">
+                      {card.balance.toLocaleString()} UZS
                     </div>
                   </div>
 
-                  {/* ORQA TOMON - cardback.png rasmi bilan */}
-                  <div 
-                    className="card-side card-back"
-                    style={{ backgroundImage: `url(${CardBackImage})` }}
-                  >
-                 
-                    
-                   
-                    
-                    <div className="back-content">
-                      <div className="qr-section">
-                        <div className="qr-container">
-                          <QRCodeCanvas
-                            value={card.number}
-                            size={80}
-                            bgColor="#fff"
-                            fgColor="#000"
-                          />
-                        </div>
-                        <div className="card-number-back">
-                          {formatCardNumber(card.number)}
-                        </div>
-                      </div>
-                      <button
-                        className="copy-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          copyCardNumber(card.number);
-                        }}
-                      >
-                        {copiedCardNumber === card.number ? "Nusqalandi" : "Raqamni nusxalash"}
-                      </button>
+                  <div className="card-footer">
+                    <div className="card-number">
+                      {formatCardNumber(card.number)}
+                    </div>
+                    <div className="card-type">
+                      {card.type === "gold"
+                        ? "Gold"
+                        : card.type === "virtual"
+                          ? "Oddiy"
+                          : "Plastik"}
                     </div>
                   </div>
                 </div>
 
-                {/* 3 NUQTA TUGMASI */}
-                <button
-                  className="more-options-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowActionsFor(card.id);
-                  }}
+                {/* BACK */}
+                <div
+                  className="card-side card-back"
+                  style={{ backgroundImage: `url(${CardBackImage})` }}
                 >
-                  ⋯
-                </button>
-
-                {/* ACTIONS (faqat kerak bo'lganda) */}
-                {actionsVisible && (
-                  <div className="card-actions visible">
+                  <div className="back-content">
+                    <QRCodeCanvas
+                      value={card.number}
+                      size={80}
+                      bgColor="#fff"
+                      fgColor="#000"
+                    />
+                    <div className="card-number-back">
+                      {formatCardNumber(card.number)}
+                    </div>
                     <button
-                      className="topup-btn"
+                      className="copy-btn"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setShowTopupModal(card.id);
-                        setShowActionsFor(null);
+                        copyCardNumber(card.number);
                       }}
                     >
-                      To'ldirish
-                    </button>
-                    {card.id !== "virtual" && (
-                      <button
-                        className="delete-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowDeleteConfirm(card.id);
-                          setShowActionsFor(null);
-                        }}
-                      >
-                        O'chirish
-                      </button>
-                    )}
-                    <button
-                      className="close-actions-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowActionsFor(null);
-                      }}
-                    >
-                      ✕
+                      {copiedCardNumber === card.number
+                        ? "Nusxa olindi"
+                        : "Raqamni nusxalash"}
                     </button>
                   </div>
-                )}
+                </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
 
         {/* ==== JAMI BALANS ==== */}
@@ -316,52 +266,76 @@ function Cards({ user, updateUser }) {
       {/* ==== YANGI KARTA MODALI ==== */}
       {showBuyCardModal && (
         <div
-          className="modal-overlay show"
+          className="buycard-overlay active"
           onClick={() => setShowBuyCardModal(false)}
         >
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Yangi karta</h3>
-            <div className="balance-info">
-              Joriy balans:{" "}
-              <strong>{user.balance.toLocaleString()} UZS</strong>
-            </div>
-            <div className="card-preview-box">
-              <div 
-                className="card-preview"
-                style={{ backgroundImage: `url(${CardFrontImage})` }}
+          <div className="buycard-modal" onClick={(e) => e.stopPropagation()}>
+            <h3 className="buycard-title">Yangi karta</h3>
+
+            <div className="card-type-select">
+              <button
+                className={`type-btn ${selectedCardType === "normal" ? "active" : ""
+                  }`}
+                onClick={() => setSelectedCardType("normal")}
               >
-                <div className="card-overlay"></div>
-                <div className="preview-top">
+                Oddiy (2,000 UZS)
+              </button>
+              <button
+                className={`type-btn ${selectedCardType === "gold" ? "active" : ""
+                  }`}
+                onClick={() => setSelectedCardType("gold")}
+              >
+                Gold (10,000 UZS)
+              </button>
+            </div>
+
+            <div className="buycard-balance">
+              Joriy balans: <strong>{user.balance.toLocaleString()} UZS</strong>
+            </div>
+
+            <div className="buycard-preview-wrapper">
+              <div
+                className="buycard-preview"
+                style={{
+                  backgroundImage: `url(${selectedCardType === "gold"
+                    ? GoldCardImage
+                    : CardFrontImage
+                    })`,
+                }}
+              >
+                <div className="buycard-header">
                   <img src={Logo} alt="Logo" />
-                  <div className="chip-icon"></div>
                 </div>
-                <div className="preview-middle">
-                  <div className="preview-name">{displayName}</div>
-                  <div className="preview-number">
+
+                <div className="buycard-body">
+                  <div className="buycard-username">{displayName}</div>
+                  <div className="buycard-number">
                     {isGenerating
                       ? "•••• •••• ••••"
                       : formatCardNumber(previewNormalNumber)}
                   </div>
                 </div>
-                <div className="preview-footer">
-                  <div className="card-type">
-                    <span>Plastik</span>
-                    <span className="visa-logo">VISA</span>
-                  </div>
-                </div>
               </div>
-              <div className="price">Narxi: 2,000 UZS</div>
+
+              <div className="buycard-price">
+                Narxi:{" "}
+                {selectedCardType === "gold" ? "10,000 UZS" : "2,000 UZS"}
+              </div>
             </div>
-            <div className="modal-actions">
+
+            <div className="buycard-actions">
               <button
-                className="btn-cancel"
+                className="buycard-btn cancel"
                 onClick={() => setShowBuyCardModal(false)}
               >
                 Bekor
               </button>
               <button
-                className="btn-confirm"
-                disabled={user.balance < 2000 || isGenerating}
+                className="buycard-btn confirm"
+                disabled={
+                  user.balance <
+                  (selectedCardType === "gold" ? 10000 : 2000) || isGenerating
+                }
                 onClick={generatePhysicalCard}
               >
                 {isGenerating ? "Yuklanmoqda..." : "Sotib olish"}
@@ -371,117 +345,12 @@ function Cards({ user, updateUser }) {
         </div>
       )}
 
-      {/* ==== TO'LDIRISH MODALI ==== */}
-      {showTopupModal && (
-        <div
-          className="modal-overlay show"
-          onClick={() => setShowTopupModal(null)}
-        >
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Balans to'ldirish</h3>
-            <div className="quick-amounts">
-              {[50000, 100000, 200000, 500000].map((amount) => (
-                <button
-                  key={amount}
-                  className={`quick-btn ${
-                    selectedQuickAmount === amount ? "selected" : ""
-                  }`}
-                  onClick={() => {
-                    setSelectedQuickAmount(amount);
-                    setTopupAmount("");
-                  }}
-                >
-                  {amount.toLocaleString()}
-                </button>
-              ))}
-            </div>
-            <input
-              type="text"
-              placeholder="Boshqa summa"
-              value={topupAmount}
-              onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, "");
-                setTopupAmount(
-                  val ? parseInt(val).toLocaleString() + " UZS" : ""
-                );
-                setSelectedQuickAmount(null);
-              }}
-            />
-            <div className="modal-actions">
-              <button
-                className="btn-cancel"
-                onClick={() => setShowTopupModal(null)}
-              >
-                Bekor
-              </button>
-              <button
-                className="btn-confirm"
-                onClick={() => {
-                  const amount =
-                    selectedQuickAmount ||
-                    parseInt(topupAmount.replace(/\D/g, ""), 10);
-                  if (!amount || amount <= 0)
-                    return alert("Summa kiriting!");
-                  const idx = allCards.findIndex(
-                    (c) => c.id === showTopupModal
-                  );
-                  if (idx === -1) return;
-                  const updated = [...allCards];
-                  updated[idx].balance += amount;
-                  updateUser({
-                    ...user,
-                    balance: user.balance + amount,
-                    cards:
-                      user.cards?.map((c) =>
-                        c.id === showTopupModal
-                          ? { ...c, balance: c.balance + amount }
-                          : c
-                      ) || [],
-                  });
-                  setShowTopupModal(null);
-                  alert(`${amount.toLocaleString()} UZS to'ldirildi!`);
-                }}
-                disabled={!selectedQuickAmount && !topupAmount}
-              >
-                To'ldirish
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ==== O'CHIRISH TASDIQLASH MODALI ==== */}
-      {showDeleteConfirm && (
-        <div className="modal-overlay show">
-          <div className="modal">
-            <h3>Kartani o'chirish</h3>
-            <p>Bu amalni ortga qaytarib bo'lmaydi. Davom etasizmi?</p>
-            <div className="modal-actions">
-              <button
-                className="btn-cancel"
-                onClick={() => setShowDeleteConfirm(null)}
-              >
-                Yo'q
-              </button>
-              <button
-                className="btn-confirm"
-                onClick={() => {
-                  if (showDeleteConfirm === "virtual") {
-                    localStorage.removeItem(`virtual_${user.login}`);
-                  } else {
-                    updateUser({
-                      ...user,
-                      cards: user.cards.map((c) =>
-                        c.id === showDeleteConfirm ? { ...c, deleted: true } : c
-                      ),
-                    });
-                  }
-                  setShowDeleteConfirm(null);
-                }}
-              >
-                Ha
-              </button>
-            </div>
+      {/* ==== ALERT MODAL ==== */}
+      {showAlert && (
+        <div className="alert-overlay" onClick={() => setShowAlert(false)}>
+          <div className="alert-box" onClick={(e) => e.stopPropagation()}>
+            <p>{alertMessage}</p>
+            <button onClick={() => setShowAlert(false)}>OK</button>
           </div>
         </div>
       )}
