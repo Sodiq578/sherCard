@@ -52,7 +52,7 @@
   object-fit: contain;
 }
 
-/* === ACTION BUTTONS (Buy, Sell, Deposit, Withdraw) === */
+/* === ACTION BUTTONS === */
 .action-buttons {
   margin-bottom: 28px;
 }
@@ -102,7 +102,7 @@
   color: #ffffff;
 }
 
-/* === PROMOTIONS SECTION (Do'kon mahsulotlari) === */
+/* === PROMOTIONS SECTION === */
 .promotions-section {
   margin-bottom: 32px;
 }
@@ -137,7 +137,7 @@
   background: rgba(12, 115, 254, 0.2);
 }
 
-/* === PROMO GRID (Do'kon kartalari) === */
+/* === PROMO GRID === */
 .promotions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
@@ -215,7 +215,181 @@
   box-shadow: 0 4px 12px rgba(12, 115, 254, 0.4);
 }
 
-/* === MODAL (Mahsulot batafsil ko'rinishi) === */
+/* === STORIES STYLE AD SLIDER === */
+.stories-ad-container {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto 24px auto;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  background: #1a1a1a;
+}
+
+.stories-ad-slider {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.story-ad-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  cursor: pointer;
+}
+
+.story-ad-item.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.story-ad-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.75);
+}
+
+.story-ad-content {
+  position: relative;
+  z-index: 2;
+  padding: 16px;
+  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.7) 70%);
+  color: #fff;
+}
+
+.story-ad-text {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.story-ad-seller {
+  font-size: 13px;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Progress Bar */
+.story-progress-container {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  z-index: 3;
+}
+
+.story-progress-bar {
+  flex: 1;
+  height: 3px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.story-progress-fill {
+  height: 100%;
+  background: #0C73FE;
+  width: 0%;
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+.story-progress-fill.active {
+  width: 100%;
+  animation: progressFill linear;
+}
+
+@keyframes progressFill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+/* === ADS FORM === */
+.ads-section {
+  margin-top: 32px;
+  background: #1a1a1a;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid #333;
+}
+
+.ads-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.ads-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ads-form textarea,
+.ads-form input {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #333;
+  background: #0a0a0a;
+  color: #fff;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.ads-form textarea {
+  min-height: 80px;
+  resize: none;
+}
+
+.ads-form input[type="number"] {
+  width: 80px;
+}
+
+.ads-form p {
+  margin: 8px 0 0 0;
+  font-size: 15px;
+  color: #0C73FE;
+  font-weight: 600;
+}
+
+.place-ad-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.3s ease;
+}
+
+.place-ad-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(255,107,107,0.5);
+}
+
+/* === MODAL === */
 .full-modal-overlay {
   position: fixed;
   top: 0;
@@ -276,55 +450,7 @@
   padding-top: 50px;
 }
 
-/* Modal ichidagi katta karta */
-.modal-product-img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 16px;
-  margin-bottom: 16px;
-}
-
-.modal-product-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 8px 0;
-}
-
-.modal-product-desc {
-  font-size: 14px;
-  color: #cccccc;
-  line-height: 1.5;
-  margin-bottom: 16px;
-}
-
-.modal-product-price {
-  font-size: 22px;
-  font-weight: 700;
-  color: #0C73FE;
-  margin-bottom: 20px;
-}
-
-.modal-buy-btn {
-  width: 100%;
-  background: linear-gradient(135deg, #0C73FE, #0056d6);
-  color: #ffffff;
-  border: none;
-  padding: 14px;
-  border-radius: 14px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.modal-buy-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(12, 115, 254, 0.4);
-}
-
-/* === ANIMATSİYALAR === */
+/* === ANIMATIONS === */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -393,6 +519,18 @@
     height: 90px;
   }
 
+  .stories-ad-slider {
+    height: 150px;
+  }
+
+  .story-ad-text {
+    font-size: 15px;
+  }
+
+  .story-ad-seller {
+    font-size: 12px;
+  }
+
   .full-modal-content {
     max-width: 100%;
     border-radius: 16px;
@@ -402,10 +540,6 @@
   .modal-body {
     padding: 16px;
     padding-top: 45px;
-  }
-
-  .modal-product-img {
-    height: 160px;
   }
 }
 
@@ -433,11 +567,359 @@
     padding: 7px;
   }
 
-  .modal-product-title {
-    font-size: 18px;
+  .stories-ad-slider {
+    height: 130px;
   }
 
-  .modal-product-price {
-    font-size: 20px;
+  .story-ad-text {
+    font-size: 14px;
+  }
+
+  .story-ad-seller {
+    font-size: 11px;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* === TELEGRAM STORYGA O'XSHASH REKLAMA STILLARI === */
+.story-ad-section {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto 20px auto;
+}
+
+.story-ad-banner {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  border: 2px solid rgba(12, 115, 254, 0.3);
+}
+
+.story-ad-banner:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(12, 115, 254, 0.4);
+  border-color: #0C73FE;
+}
+
+.story-ad-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.8);
+  transition: filter 0.3s ease;
+}
+
+.story-ad-banner:hover .story-ad-bg {
+  filter: brightness(1);
+}
+
+.story-ad-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg, 
+    rgba(0, 0, 0, 0.3) 0%, 
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.story-ad-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.story-ad-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  line-height: 1.3;
+}
+
+.story-ad-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.story-ad-seller {
+  font-weight: 600;
+  color: #0C73FE;
+}
+
+.story-ad-duration {
+  opacity: 0.8;
+}
+
+.story-ad-indicator {
+  width: 100%;
+}
+
+.story-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.story-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0C73FE, #00C6FF);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Reklama formasi stillari */
+.ads-section {
+  margin-top: 32px;
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #333;
+}
+
+.ads-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.ads-price {
+  background: linear-gradient(135deg, #0C73FE, #0056d6);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ads-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ads-form textarea,
+.ads-form input {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #333;
+  background: #0a0a0a;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.ads-form textarea:focus,
+.ads-form input:focus {
+  outline: none;
+  border-color: #0C73FE;
+  box-shadow: 0 0 0 2px rgba(12, 115, 254, 0.2);
+}
+
+.ads-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.duration-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+}
+
+.duration-selector label {
+  font-size: 14px;
+  color: #cccccc;
+  white-space: nowrap;
+}
+
+.duration-selector input {
+  width: 80px;
+  text-align: center;
+}
+
+.ad-summary {
+  background: rgba(12, 115, 254, 0.1);
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(12, 115, 254, 0.3);
+}
+
+.ad-summary p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.ad-note {
+  font-size: 12px !important;
+  color: #888 !important;
+  margin-top: 8px !important;
+}
+
+.place-ad-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: #ffffff;
+  border: none;
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+.place-ad-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+}
+
+/* Reklama tafsilotlari modali */
+.ad-detail-modal {
+  max-width: 400px;
+}
+
+.ad-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ad-detail-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.ad-detail-info {
+  padding: 0 8px;
+}
+
+.ad-detail-text {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 16px 0;
+  line-height: 1.4;
+}
+
+.ad-detail-meta {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.ad-detail-meta p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #cccccc;
+}
+
+.ad-detail-meta strong {
+  color: #ffffff;
+}
+
+.visit-ad-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #0C73FE, #0056d6);
+  color: #ffffff;
+  border: none;
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.visit-ad-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(12, 115, 254, 0.4);
+}
+
+/* Animatsiyalar */
+@keyframes storySlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .story-ad-banner {
+    height: 180px;
+    border-radius: 16px;
+  }
+  
+  .story-ad-text {
+    font-size: 16px;
+  }
+  
+  .ads-section {
+    padding: 16px;
+  }
+  
+  .duration-selector {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .story-ad-banner {
+    height: 160px;
+  }
+  
+  .story-ad-text {
+    font-size: 15px;
+  }
+  
+  .story-ad-meta {
+    font-size: 12px;
+  }
+}
+
+
