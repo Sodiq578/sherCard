@@ -1,4 +1,4 @@
-/* === MARKET PAGE === */
+
 .market-page {
   min-height: 100vh;
   background-color: #000000;
@@ -886,7 +886,7 @@
   }
 }
 
-/* Responsive */
+ 
 @media (max-width: 480px) {
   .story-ad-banner {
     height: 180px;
