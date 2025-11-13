@@ -11,29 +11,7 @@ function Market({ user, updateUser }) {
   const [modalOpen, setModalOpen] = useState(null);
   const [ads, setAds] = useState([]);
   const [activeAdIndex, setActiveAdIndex] = useState(0);
-  const [adForm, setAdForm] = useState({
-    text: "",
-    image: "",
-    duration: 1,
-  });
-
-  // Virtual karta
-  const getCardNumber = (key) => {
-    const saved = localStorage.getItem(`cardNumber_${key}`);
-    if (saved) return saved;
-    let card = "";
-    for (let i = 0; i < 16; i++) {
-      card += Math.floor(Math.random() * 10);
-    }
-    localStorage.setItem(`cardNumber_${key}`, card);
-    return card;
-  };
-
-  const virtualCard = {
-    id: "virtual",
-    number: getCardNumber(user.login),
-    balance: user.balance || 0,
-  };
+  const [adForm, setAdForm] = useState({ text: "", image: "", duration: 1 });
 
   const promotions = [
     { id: 1, name: "Pitsa 1+1", price: 1000, image: "https://via.placeholder.com/120?text=Pitsa" },
@@ -44,6 +22,7 @@ function Market({ user, updateUser }) {
     { id: 6, name: "Kofe", price: 400, image: "https://via.placeholder.com/120?text=Kofe" },
   ];
 
+  // Mahsulot sotib olish funksiyasi
   const handleBuy = (item) => {
     if ((user.balance || 0) < item.price) {
       alert("Balans yetarli emas!");
@@ -65,31 +44,29 @@ function Market({ user, updateUser }) {
     alert(`${item.name} muvaffaqiyatli sotib olindi!`);
   };
 
-  // ======================
-  // Ads (Reklama) - Telegram Storyga o'xshash
-  // ======================
+  // Ads (Reklama) yuklash
   useEffect(() => {
     const savedAds = JSON.parse(localStorage.getItem("marketplaceAds") || "[]");
-    const now = new Date().getTime();
+    const now = Date.now();
     const activeAds = savedAds.filter(ad => ad.expiresAt > now);
     setAds(activeAds);
     localStorage.setItem("marketplaceAds", JSON.stringify(activeAds));
   }, []);
 
-  // Reklamalar uchun avtomatik o'tish
+  // Reklamalarni avtomatik o‘zgartirish
   useEffect(() => {
     if (ads.length < 2) return;
     const interval = setInterval(() => {
       setActiveAdIndex(prev => (prev + 1) % ads.length);
-    }, 5000); // har 5 soniyada reklama o'zgaradi
+    }, 5000);
     return () => clearInterval(interval);
   }, [ads]);
 
   const handleAdChange = (e) => {
     const { name, value } = e.target;
-    setAdForm(prev => ({ 
-      ...prev, 
-      [name]: name === "duration" ? Math.max(1, Math.min(30, parseInt(value) || 1)) : value 
+    setAdForm(prev => ({
+      ...prev,
+      [name]: name === "duration" ? Math.max(1, Math.min(30, parseInt(value) || 1)) : value
     }));
   };
 
@@ -103,14 +80,14 @@ function Market({ user, updateUser }) {
       alert("Rasm URL manzilini kiriting.");
       return;
     }
-    
+
     const cost = duration * 500;
     if ((user.balance || 0) < cost) {
-      alert("Balans yetarli emas! Reklama narxi: " + cost.toLocaleString() + " so'm");
+      alert(`Balans yetarli emas! Reklama narxi: ${cost.toLocaleString()} so'm`);
       return;
     }
 
-    const expiresAt = new Date().getTime() + duration * 24 * 60 * 60 * 1000;
+    const expiresAt = Date.now() + duration * 24 * 60 * 60 * 1000;
     const newAd = {
       id: Date.now(),
       text,
@@ -121,8 +98,7 @@ function Market({ user, updateUser }) {
       createdAt: new Date().toLocaleString(),
     };
 
-    // Faqat bitta faol reklama bo'ladi
-    const updatedAds = [newAd];
+    const updatedAds = [newAd]; // faqat bitta faol reklama
     localStorage.setItem("marketplaceAds", JSON.stringify(updatedAds));
     setAds(updatedAds);
     setActiveAdIndex(0);
@@ -145,26 +121,22 @@ function Market({ user, updateUser }) {
     setAdForm({ text: "", image: "", duration: 1 });
   };
 
-  // Reklama bosilganda ochiladigan modal
-  const handleAdClick = (ad) => {
-    setModalOpen("ad");
-  };
+  const handleAdClick = () => setModalOpen("ad");
 
-  // Qolgan kunlarni hisoblash
   const remainingDays = (expiresAt) => {
-    const now = new Date().getTime();
+    const now = Date.now();
     const diff = expiresAt - now;
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   };
 
   return (
     <>
-      {/* ==== TELEGRAM STORYGA O'XSHASH REKLAMA BANNER ==== */}
+      {/* Reklama Banner */}
       {ads.length > 0 && (
         <div className="story-ad-section">
           <div 
             className="story-ad-banner" 
-            onClick={() => handleAdClick(ads[activeAdIndex])}
+            onClick={handleAdClick}
             style={{ animation: 'storySlideIn 0.5s ease-out' }}
           >
             <img src={ads[activeAdIndex].image} alt="Reklama" className="story-ad-bg" />
@@ -180,10 +152,8 @@ function Market({ user, updateUser }) {
                 <div className="story-progress-bar">
                   <div 
                     className="story-progress-fill" 
-                    style={{ 
-                      width: `${((30 - remainingDays(ads[activeAdIndex].expiresAt)) / 30) * 100}%` 
-                    }}
-                  ></div>
+                    style={{ width: `${((30 - remainingDays(ads[activeAdIndex].expiresAt)) / 30) * 100}%` }}
+                  />
                 </div>
               </div>
             </div>
@@ -224,7 +194,7 @@ function Market({ user, updateUser }) {
               <button className="view-all-btn">Barchasi</button>
             </div>
             <div className="promotions-grid">
-              {promotions.map((item) => (
+              {promotions.map(item => (
                 <div key={item.id} className="promo-card-small">
                   <img src={item.image} alt={item.name} className="promo-img-small" />
                   <div className="promo-info-small">
@@ -237,7 +207,7 @@ function Market({ user, updateUser }) {
             </div>
           </section>
 
-          {/* Reklama Joylashtirish Bo'limi */}
+          {/* Reklama Joylashtirish */}
           <section className="ads-section">
             <div className="section-header">
               <h3>Reklama Joylashtirish</h3>
@@ -274,9 +244,7 @@ function Market({ user, updateUser }) {
                 <p>Jami narx: <strong>{(adForm.duration * 500).toLocaleString()} so'm</strong></p>
                 <p className="ad-note">Reklama storyda ko'rinadi va boshqa reklamani almashtiradi</p>
               </div>
-              <button className="place-ad-btn" onClick={handlePlaceAd}>
-                Reklamani Joylashtirish
-              </button>
+              <button className="place-ad-btn" onClick={handlePlaceAd}>Reklamani Joylashtirish</button>
             </div>
           </section>
 
@@ -286,9 +254,10 @@ function Market({ user, updateUser }) {
       {/* MODAL - KARTALAR */}
       {modalOpen === "cards" && (
         <div className="full-modal-overlay" onClick={() => setModalOpen(null)}>
-          <div className="full-modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="full-modal-content" onClick={e => e.stopPropagation()}>
             <button className="modal-close-btn" onClick={() => setModalOpen(null)}>✕</button>
             <div className="modal-body">
+              {/* virtualCard faqat Cards komponentida ishlatiladi */}
               <Cards user={user} updateUser={updateUser} />
             </div>
           </div>
@@ -298,15 +267,11 @@ function Market({ user, updateUser }) {
       {/* MODAL - REKLAMA TAFSILOTLARI */}
       {modalOpen === "ad" && ads.length > 0 && (
         <div className="full-modal-overlay" onClick={() => setModalOpen(null)}>
-          <div className="full-modal-content ad-detail-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="full-modal-content ad-detail-modal" onClick={e => e.stopPropagation()}>
             <button className="modal-close-btn" onClick={() => setModalOpen(null)}>✕</button>
             <div className="modal-body">
               <div className="ad-detail-content">
-                <img 
-                  src={ads[activeAdIndex].image} 
-                  alt="Reklama" 
-                  className="ad-detail-image" 
-                />
+                <img src={ads[activeAdIndex].image} alt="Reklama" className="ad-detail-image" />
                 <div className="ad-detail-info">
                   <h3 className="ad-detail-text">{ads[activeAdIndex].text}</h3>
                   <div className="ad-detail-meta">
@@ -314,10 +279,7 @@ function Market({ user, updateUser }) {
                     <p><strong>Joylashtirilgan:</strong> {ads[activeAdIndex].createdAt}</p>
                     <p><strong>Muddati tugaydi:</strong> {remainingDays(ads[activeAdIndex].expiresAt)} kun qoldi</p>
                   </div>
-                  <button 
-                    className="visit-ad-btn"
-                    onClick={() => window.open(ads[activeAdIndex].image, "_blank")}
-                  >
+                  <button className="visit-ad-btn" onClick={() => window.open(ads[activeAdIndex].image, "_blank")}>
                     Tafsilotlarni Ko'rish
                   </button>
                 </div>

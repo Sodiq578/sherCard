@@ -26,8 +26,9 @@ function BottomNav() {
     if (!items || items.length === 0) return;
 
     const activeIndex = Array.from(items).findIndex(
-      (item) => item.getAttribute('href') === location.pathname
+      (item) => item.getAttribute('to') === location.pathname
     );
+
     if (activeIndex === -1) return;
 
     const activeItem = items[activeIndex];
@@ -42,11 +43,13 @@ function BottomNav() {
   };
 
   useEffect(() => {
-    updateIndicator();
+    updateIndicator(); // komponent yuklanganda indikatorni joylashtirish
+
     const handleResize = () => updateIndicator();
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize); // ekran o'zgarganda indikatorni yangilash
+
     return () => window.removeEventListener('resize', handleResize);
-  }, [location]);
+  }, [location.pathname]); // faqat path o'zgarganda ishlaydi
 
   return (
     <nav className="bottom-nav">
@@ -61,7 +64,6 @@ function BottomNav() {
               <Link
                 to={item.to}
                 className={`nav-item ${isActive ? 'active' : ''}`}
-                href={item.to}
               >
                 <span className="icon">
                   <Icon size={26} />
