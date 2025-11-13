@@ -33,6 +33,7 @@ import ChatDetail from "./components/ChatDetail";
 import "./styles/App.css";
 
 // ==================== YO'NALTIRUVCHI KOMPONENT ====================
+// eslint-disable-next-line no-unused-vars
 const RedirectChatToProfile = () => {
   const { id } = useParams();
   return <Navigate to={`/profile/${id}`} replace />;
