@@ -31,7 +31,7 @@ function ViewProfile() {
   // Modal statelari
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [alertType, setAlertType] = useState("success"); // success, error, info
+  const [alertType, setAlertType] = useState("success");
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
@@ -76,7 +76,7 @@ function ViewProfile() {
     setIsProcessing(true);
 
     // Simulyatsiya qilish uchun kichik kechikish
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
     try {
       // Token o'tkazish
@@ -251,7 +251,7 @@ function ViewProfile() {
         </button>
         <h2>Foydalanuvchi Profili</h2>
         <div className="header-actions">
-     
+          {/* Kelajakda qo'shimcha harakatlar uchun joy */}
         </div>
       </div>
 
@@ -330,7 +330,7 @@ function ViewProfile() {
                     onClick={() => handleSendToken(amount)}
                     disabled={currentUser.balance < amount || isProcessing}
                   >
-                    <FiDollarSign className="amount-icon" />
+                   
                     {amount.toLocaleString()} UZS
                     {currentUser.balance < amount && (
                       <span className="insufficient-badge">Yetarli emas</span>
@@ -435,8 +435,6 @@ function ViewProfile() {
 
         {/* Harakatlar paneli */}
         <div className="action-buttons-section">
-        
-          
           <button 
             className="secondary-action-btn"
             onClick={() => navigate(-1)}

@@ -235,31 +235,6 @@
   gap: 12px;
 }
 
-.chat-btn {
-  background: linear-gradient(135deg, #0C73FE, #0056d6);
-  border: none;
-  color: #ffffff;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.chat-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(12, 115, 254, 0.4);
-}
-
-.chat-btn-icon {
-  font-size: 16px;
-}
-
 .error-message {
   display: flex;
   justify-content: center;
@@ -443,12 +418,14 @@
 }
 
 .transfer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 20px;
   padding: 16px;
   background: rgba(12, 115, 254, 0.1);
   border-radius: 12px;
   border: 1px solid rgba(12, 115, 254, 0.3);
-  flex-direction: column;
 }
 
 .balance-info, .recipient-info {
@@ -457,11 +434,6 @@
   align-items: center;
   color: #ffffff;
   font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.balance-info:last-child, .recipient-info:last-child {
-  margin-bottom: 0;
 }
 
 .current-balance {
@@ -698,7 +670,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.05);
   border-radius: 8px;
   border: 1px solid #333333;
 }
