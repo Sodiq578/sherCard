@@ -32,10 +32,13 @@ function MainMenu({ user, updateUser }) {
   const [showCustomAmountModal, setShowCustomAmountModal] = useState(false);
   const [tempCustomAmount, setTempCustomAmount] = useState("");
 
+  // Universal Alert Modal State
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success");
   const [alertTitle, setAlertTitle] = useState("");
+  const [alertAction, setAlertAction] = useState(null);
+  const [alertActionText, setAlertActionText] = useState("");
 
   /* ==================== USERS ==================== */
   useEffect(() => {
@@ -69,7 +72,7 @@ function MainMenu({ user, updateUser }) {
     setFilteredUsers(filtered);
   }, [searchQuery, allUsers]);
 
-  /* ==================== UNREAD ==================== */
+  /* ==================== UNREAD COUNT ==================== */
   useEffect(() => {
     if (!user?.messages) {
       setUnreadCount(0);
@@ -79,24 +82,28 @@ function MainMenu({ user, updateUser }) {
     setUnreadCount(unread);
   }, [user]);
 
-  /* ==================== BEAUTIFUL ALERT ==================== */
-  const showAlertMessage = (message, type = "success", title = "") => {
+  /* ==================== UNIVERSAL ALERT ==================== */
+  const showAlertMessage = (message, type = "success", title = "", action = null, actionText = "") => {
     setAlertMessage(message);
     setAlertType(type);
     setAlertTitle(title);
+    setAlertAction(() => action);
+    setAlertActionText(actionText);
     setShowAlert(true);
-    setTimeout(() => setShowAlert(false), 4000);
   };
+
+  const handleAlertAction = () => {
+    if (alertAction) alertAction();
+    setShowAlert(false);
+  };
+
+  const closeAlert = () => setShowAlert(false);
 
   /* ==================== TOKEN CALCULATION ==================== */
   const calculateTokensReceived = (paidAmount) => {
-    if (user?.isPremium) {
-      return paidAmount;
-    } else {
-      const commissionRate = 0.02;
-      const commission = Math.floor(paidAmount * commissionRate);
-      return paidAmount - commission;
-    }
+    if (user?.isPremium) return paidAmount;
+    const commission = Math.floor(paidAmount * 0.02);
+    return paidAmount - commission;
   };
 
   /* ==================== EXTERNAL TOP UP ==================== */
@@ -109,40 +116,44 @@ function MainMenu({ user, updateUser }) {
     const tokensToAdd = calculateTokensReceived(amount);
     const commission = user?.isPremium ? 0 : amount - tokensToAdd;
 
-    const confirmed = window.confirm(
+    const confirmTopUp = () => {
+      const updatedUser = {
+        ...user,
+        balance: (user.balance || 0) + tokensToAdd,
+        history: [
+          ...(user.history || []),
+          {
+            time: new Date().toLocaleString("uz-UZ"),
+            action: "Balans to'ldirildi",
+            amount: `+${tokensToAdd.toLocaleString()} token`,
+            details: `${amount.toLocaleString()} UZS to'lov${commission > 0 ? ` (komissiya: ${commission.toLocaleString()} UZS)` : ""}`,
+          },
+        ],
+      };
+
+      localStorage.setItem("userData", JSON.stringify(updatedUser));
+      updateUser(updatedUser);
+
+      showAlertMessage(
+        `Tabriklaymiz! +${tokensToAdd.toLocaleString()} token balansingizga qo'shildi!`,
+        "success",
+        "Muvaffaqiyatli"
+      );
+    };
+
+    showAlertMessage(
       `To'lov tasdiqlansinmi?\n\n` +
       `To'lov summasi: ${amount.toLocaleString()} UZS\n` +
       `Balansga qo'shiladi: ${tokensToAdd.toLocaleString()} token\n` +
-      `${commission > 0 ? `Komissiya: ${commission.toLocaleString()} UZS (2%)` : "Premium — komissiyasiz!"}`
-    );
-
-    if (!confirmed) return;
-
-    const updatedUser = {
-      ...user,
-      balance: (user.balance || 0) + tokensToAdd,
-      history: [
-        ...(user.history || []),
-        {
-          time: new Date().toLocaleString("uz-UZ"),
-          action: "Balans to'ldirildi",
-          amount: `+${tokensToAdd.toLocaleString()} token`,
-          details: `${amount.toLocaleString()} UZS to'lov${commission > 0 ? ` (komissiya: ${commission.toLocaleString()} UZS)` : ""}`,
-        },
-      ],
-    };
-
-    localStorage.setItem("userData", JSON.stringify(updatedUser));
-    updateUser(updatedUser);
-
-    showAlertMessage(
-      `Tabriklaymiz! +${tokensToAdd.toLocaleString()} token balansingizga qo'shildi!`,
-      "success",
-      "Muvaffaqiyatli"
+      `${commission > 0 ? `Komissiya: ${commission.toLocaleString()} UZS (2%)` : "Premium — komissiyasiz!"}`,
+      "info",
+      "To'lovni tasdiqlash",
+      confirmTopUp,
+      "Tasdiqlash"
     );
   };
 
-  /* ==================== PREMIUM ==================== */
+  /* ==================== BUY PREMIUM ==================== */
   const handleBuyPremium = () => {
     const price = 10000;
     if (user.balance < price) {
@@ -154,25 +165,35 @@ function MainMenu({ user, updateUser }) {
       return;
     }
 
-    const updated = {
-      ...user,
-      balance: user.balance - price,
-      isPremium: true,
-      premiumSince: new Date().toISOString(),
-      history: [
-        ...(user.history || []),
-        {
-          time: new Date().toLocaleString("uz-UZ"),
-          action: "Premium obuna sotib olindi",
-          amount: `-${price.toLocaleString()} token`,
-        },
-      ],
+    const confirmPremium = () => {
+      const updated = {
+        ...user,
+        balance: user.balance - price,
+        isPremium: true,
+        premiumSince: new Date().toISOString(),
+        history: [
+          ...(user.history || []),
+          {
+            time: new Date().toLocaleString("uz-UZ"),
+            action: "Premium obuna sotib olindi",
+            amount: `-${price.toLocaleString()} token`,
+          },
+        ],
+      };
+
+      localStorage.setItem("userData", JSON.stringify(updated));
+      updateUser(updated);
+      setShowPremiumModal(false);
+      showAlertMessage("Premium muvaffaqiyatli faollashtirildi!", "success", "Tabriklaymiz");
     };
 
-    localStorage.setItem("userData", JSON.stringify(updated));
-    updateUser(updated);
-    setShowPremiumModal(false);
-    showAlertMessage("Premium muvaffaqiyatli faollashtirildi!", "success", "Tabriklaymiz");
+    showAlertMessage(
+      `Premium obunani sotib olishni tasdiqlaysizmi?\n\nNarxi: ${price.toLocaleString()} token\nJoriy balans: ${user.balance.toLocaleString()} token`,
+      "info",
+      "Premium sotib olish",
+      confirmPremium,
+      "Tasdiqlash"
+    );
   };
 
   const displayName = user?.profile?.name || user?.profile?.username || "Foydalanuvchi";
@@ -180,7 +201,7 @@ function MainMenu({ user, updateUser }) {
   return (
     <div className="main-menu-container">
 
-      {/* BEAUTIFUL ALERT MODAL */}
+      {/* UNIVERSAL ALERT MODAL */}
       {showAlert && (
         <div className="menu-alert-modal-overlay">
           <div className={`menu-alert-modal menu-alert-${alertType}`}>
@@ -188,17 +209,21 @@ function MainMenu({ user, updateUser }) {
               {alertType === "success" && <FiCheck className="menu-alert-header-icon" />}
               {alertType === "error" && <FiAlertCircle className="menu-alert-header-icon" />}
               {alertType === "info" && <FiInfo className="menu-alert-header-icon" />}
-              <h3 className="menu-alert-title">{alertTitle || (alertType === "success" ? "Muvaffaqiyatli" : alertType === "error" ? "Xatolik" : "Ma'lumot")}</h3>
+              <h3 className="menu-alert-title">
+                {alertTitle || (alertType === "success" ? "Muvaffaqiyatli" : alertType === "error" ? "Xatolik" : "Ma'lumot")}
+              </h3>
             </div>
             <div className="menu-alert-body">
               <p>{alertMessage}</p>
             </div>
             <div className="menu-alert-footer">
-              <button 
-                className="menu-alert-close-btn"
-                onClick={() => setShowAlert(false)}
-              >
-                Yopish
+              {alertAction && (
+                <button className="menu-alert-action-btn" onClick={handleAlertAction}>
+                  {alertActionText || "Tasdiqlash"}
+                </button>
+              )}
+              <button className="menu-alert-close-btn" onClick={closeAlert}>
+                {alertAction ? "Bekor qilish" : "Yopish"}
               </button>
             </div>
           </div>
@@ -296,19 +321,12 @@ function MainMenu({ user, updateUser }) {
         <h3 className="menu-topup-title"><FiPlusCircle /> Balansni to'ldirish</h3>
         <div className="menu-topup-modern">
           <div className="menu-topup-presets">
-            {[5000, 10000, 20000, 50000, 100000].map((amount) => (
-              <button
-                key={amount}
-                className="menu-topup-preset-btn"
-                onClick={() => startExternalTopUp(amount)}
-              >
+            {[10000, 50000, 100000].map((amount) => (
+              <button key={amount} className="menu-topup-preset-btn" onClick={() => startExternalTopUp(amount)}>
                 {amount.toLocaleString()} so'm
               </button>
             ))}
-            <button
-              className="menu-topup-preset-btn menu-topup-custom-btn"
-              onClick={() => setShowCustomAmountModal(true)}
-            >
+            <button className="menu-topup-preset-btn menu-topup-custom-btn" onClick={() => setShowCustomAmountModal(true)}>
               Boshqa summa
             </button>
           </div>
@@ -329,8 +347,8 @@ function MainMenu({ user, updateUser }) {
         </div>
       </div>
 
-      {/* CHAT ENTRY */}
-      <div className="menu-chat-entry" onClick={() => navigate("/chats")}>
+      {/* XABARLAR BO'LIMI – TO'G'RI /chat ga o'tadi */}
+      <div className="menu-chat-entry" onClick={() => navigate("/chat")}>
         <div className="menu-chat-icon">
           <FiMessageCircle size={24} />
         </div>
@@ -340,12 +358,12 @@ function MainMenu({ user, updateUser }) {
         </div>
         {unreadCount > 0 && (
           <div className="menu-unread-badge">
-            {unreadCount}
+            {unreadCount > 99 ? "99+" : unreadCount}
           </div>
         )}
       </div>
 
-      {/* PREMIUM FEATURES SECTION */}
+      {/* PREMIUM FEATURES */}
       {!user?.isPremium && (
         <div className="menu-premium-section">
           <div className="menu-premium-header">
@@ -353,27 +371,12 @@ function MainMenu({ user, updateUser }) {
             <h3>Premium Afzalliklar</h3>
           </div>
           <div className="menu-premium-features-grid">
-            <div className="menu-premium-feature">
-              <FiZap className="menu-premium-feature-icon" />
-              <span>Komissiyasiz to'ldirish</span>
-            </div>
-            <div className="menu-premium-feature">
-              <FiShield className="menu-premium-feature-icon" />
-              <span>Maxsus badge</span>
-            </div>
-            <div className="menu-premium-feature">
-              <FiAward className="menu-premium-feature-icon" />
-              <span>Premium status</span>
-            </div>
-            <div className="menu-premium-feature">
-              <FiTrendingUp className="menu-premium-feature-icon" />
-              <span>Yuqori limitlar</span>
-            </div>
+            <div className="menu-premium-feature"><FiZap className="menu-premium-feature-icon" /><span>Komissiyasiz to'ldirish</span></div>
+            <div className="menu-premium-feature"><FiShield className="menu-premium-feature-icon" /><span>Maxsus badge</span></div>
+            <div className="menu-premium-feature"><FiAward className="menu-premium-feature-icon" /><span>Premium status</span></div>
+            <div className="menu-premium-feature"><FiTrendingUp className="menu-premium-feature-icon" /><span>Yuqori limitlar</span></div>
           </div>
-          <button 
-            className="menu-premium-section-btn"
-            onClick={() => setShowPremiumModal(true)}
-          >
+          <button className="menu-premium-section-btn" onClick={() => setShowPremiumModal(true)}>
             Premium sotib olish
           </button>
         </div>
@@ -385,14 +388,8 @@ function MainMenu({ user, updateUser }) {
           <div className="menu-modal-content menu-custom-amount-modal">
             <div className="menu-modal-header">
               <h3>Balansni to'ldirish</h3>
-              <button 
-                className="menu-modal-close-btn"
-                onClick={() => setShowCustomAmountModal(false)}
-              >
-                <FiX size={20} />
-              </button>
+              <button className="menu-modal-close-btn" onClick={() => setShowCustomAmountModal(false)}><FiX size={20} /></button>
             </div>
-
             <div className="menu-modal-body">
               <input
                 type="number"
@@ -402,7 +399,6 @@ function MainMenu({ user, updateUser }) {
                 className="menu-custom-amount-input"
                 min="1000"
               />
-
               {tempCustomAmount >= 1000 && (
                 <div className="menu-amount-preview">
                   <div className="menu-amount-row">
@@ -424,7 +420,6 @@ function MainMenu({ user, updateUser }) {
                 </div>
               )}
             </div>
-
             <div className="menu-modal-footer">
               <button
                 className="menu-primary-btn"
@@ -434,18 +429,13 @@ function MainMenu({ user, updateUser }) {
                     setShowCustomAmountModal(false);
                     setTempCustomAmount("");
                     startExternalTopUp(amount);
-                  } else {
-                    showAlertMessage("Kamida 1 000 UZS kiriting", "error", "Xatolik");
                   }
                 }}
                 disabled={!tempCustomAmount || tempCustomAmount < 1000}
               >
                 To'lov qilish
               </button>
-              <button
-                className="menu-secondary-btn"
-                onClick={() => setShowCustomAmountModal(false)}
-              >
+              <button className="menu-secondary-btn" onClick={() => setShowCustomAmountModal(false)}>
                 Bekor qilish
               </button>
             </div>
@@ -462,52 +452,28 @@ function MainMenu({ user, updateUser }) {
                 <FiStar className="menu-premium-star-icon" />
                 <h3>Premium Obuna</h3>
               </div>
-              <button 
-                className="menu-modal-close-btn"
-                onClick={() => setShowPremiumModal(false)}
-              >
-                <FiX size={20} />
-              </button>
+              <button className="menu-modal-close-btn" onClick={() => setShowPremiumModal(false)}><FiX size={20} /></button>
             </div>
-
             <div className="menu-modal-body">
               <div className="menu-premium-features-list">
-                <div className="menu-premium-feature-item">
-                  <FiCheck className="menu-premium-feature-check" />
-                  <span>Komissiyasiz balans to'ldirish</span>
-                </div>
-                <div className="menu-premium-feature-item">
-                  <FiCheck className="menu-premium-feature-check" />
-                  <span>Maxsus Premium badge va status</span>
-                </div>
-                <div className="menu-premium-feature-item">
-                  <FiCheck className="menu-premium-feature-check" />
-                  <span>Yuqori transfer limitlari</span>
-                </div>
-                <div className="menu-premium-feature-item">
-                  <FiCheck className="menu-premium-feature-check" />
-                  <span>Eksklyuziv funksiyalar</span>
-                </div>
-                <div className="menu-premium-feature-item">
-                  <FiCheck className="menu-premium-feature-check" />
-                  <span>Birinchilardan xabardor bo'lish</span>
-                </div>
+                <div className="menu-premium-feature-item"><FiCheck className="menu-premium-feature-check" /><span>Komissiyasiz balans to'ldirish</span></div>
+                <div className="menu-premium-feature-item"><FiCheck className="menu-premium-feature-check" /><span>Maxsus Premium badge va status</span></div>
+                <div className="menu-premium-feature-item"><FiCheck className="menu-premium-feature-check" /><span>Yuqori transfer limitlari</span></div>
+                <div className="menu-premium-feature-item"><FiCheck className="menu-premium-feature-check" /><span>Eksklyuziv funksiyalar</span></div>
+                <div className="menu-premium-feature-item"><FiCheck className="menu-premium-feature-check" /><span>Birinchilardan xabardor bo'lish</span></div>
               </div>
-
               <div className="menu-premium-price-section">
                 <div className="menu-premium-price">10 000 token</div>
                 <div className="menu-premium-balance-info">
                   Joriy balans: {(user?.balance || 0).toLocaleString()} token
                 </div>
               </div>
-
               {user?.balance < 10000 && (
                 <div className="menu-insufficient-balance">
                   Yetarli token mavjud emas! Balansingizni to'ldiring.
                 </div>
               )}
             </div>
-
             <div className="menu-modal-footer">
               <button
                 className={`menu-primary-btn ${user?.balance < 10000 ? 'menu-btn-disabled' : ''}`}
@@ -516,10 +482,7 @@ function MainMenu({ user, updateUser }) {
               >
                 {user?.isPremium ? 'Sizda Premium mavjud' : 'Premium sotib olish'}
               </button>
-              <button
-                className="menu-secondary-btn"
-                onClick={() => setShowPremiumModal(false)}
-              >
+              <button className="menu-secondary-btn" onClick={() => setShowPremiumModal(false)}>
                 Bekor qilish
               </button>
             </div>
@@ -527,17 +490,23 @@ function MainMenu({ user, updateUser }) {
         </div>
       )}
 
-      {/* BOTTOM NAVIGATION */}
+      {/* BOTTOM NAVIGATION – Xabarlar tugmasi to'g'ri ishlaydi */}
       <div className="menu-bottom-nav">
         <button className="menu-nav-item menu-nav-item-active">
           <FiCreditCard size={20} />
           <span>Asosiy</span>
         </button>
-        <button className="menu-nav-item" onClick={() => navigate("/chats")}>
+
+        <button className="menu-nav-item" onClick={() => navigate("/chat")}>
           <FiMessageCircle size={20} />
           <span>Xabarlar</span>
-          {unreadCount > 0 && <div className="menu-nav-badge">{unreadCount}</div>}
+          {unreadCount > 0 && (
+            <div className="menu-nav-badge">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </div>
+          )}
         </button>
+
         <button className="menu-nav-item" onClick={() => navigate("/profile")}>
           <FiUser size={20} />
           <span>Profil</span>

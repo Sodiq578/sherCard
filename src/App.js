@@ -6,6 +6,7 @@ import {
   Navigate,
   useLocation,
   useParams,
+  useNavigate,
 } from "react-router-dom";
 
 // ==================== KOMPONENTLAR ====================
@@ -31,13 +32,6 @@ import ViewProfile from "./components/ViewProfile";
 import ChatDetail from "./components/ChatDetail";
 
 import "./styles/App.css";
-
-// ==================== YO'NALTIRUVCHI KOMPONENT ====================
-// eslint-disable-next-line no-unused-vars
-const RedirectChatToProfile = () => {
-  const { id } = useParams();
-  return <Navigate to={`/profile/${id}`} replace />;
-};
 
 // ==================== BOTTOM NAV WRAPPER ====================
 const BottomNavWrapper = ({ isAuthenticated, isAdmin }) => {
@@ -288,7 +282,11 @@ function App() {
         <Route
           path="/chat"
           element={
-            isAuthenticated && !isAdmin ? <ChatList /> : <Navigate to="/" />
+            isAuthenticated && !isAdmin ? (
+              <ChatList allUsers={allUsers} currentUser={user} />
+            ) : (
+              <Navigate to="/" />
+            )
           }
         />
 
@@ -297,19 +295,7 @@ function App() {
           path="/chat/:userId"
           element={
             isAuthenticated && !isAdmin ? (
-              <ChatDetail />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        {/* BOSHQA FOYDALANUVCHI PROFILI */}
-        <Route
-          path="/profile/:login"
-          element={
-            isAuthenticated && !isAdmin ? (
-              <ViewProfile />
+              <ChatDetail currentUser={user} updateUser={updateUser} />
             ) : (
               <Navigate to="/" />
             )
@@ -332,6 +318,15 @@ function App() {
           }
         />
 
+        {/* BOSHQA FOYDALANUVCHI PROFILI */}
+        <Route
+          path="/profile/:login"
+          element={
+            isAuthenticated && !isAdmin ? <ViewProfile /> : <Navigate to="/" />
+          }
+        />
+
+        {/* MARKET */}
         <Route
           path="/market"
           element={
@@ -368,11 +363,7 @@ function App() {
         <Route
           path="/all-shops"
           element={
-            isAuthenticated && !isAdmin ? (
-              <AllShops user={user} />
-            ) : (
-              <Navigate to="/" />
-            )
+            isAuthenticated && !isAdmin ? <AllShops user={user} /> : <Navigate to="/" />
           }
         />
 
@@ -390,11 +381,7 @@ function App() {
         <Route
           path="/history"
           element={
-            isAuthenticated && !isAdmin ? (
-              <History user={user} />
-            ) : (
-              <Navigate to="/" />
-            )
+            isAuthenticated && !isAdmin ? <History user={user} /> : <Navigate to="/" />
           }
         />
 
@@ -441,7 +428,6 @@ function App() {
   );
 }
 
- 
 export default function AppWrapper() {
   return (
     <BrowserRouter>
