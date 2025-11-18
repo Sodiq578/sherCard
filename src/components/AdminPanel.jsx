@@ -41,10 +41,17 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [selectedUserHistory, setSelectedUserHistory] = useState(null);
 
+  // Advertisement states
+  const [pendingAds, setPendingAds] = useState([]);
+  const [approvedAds, setApprovedAds] = useState([]);
+  const [rejectedAds, setRejectedAds] = useState([]);
+  const [adFilter, setAdFilter] = useState('pending'); // 'pending', 'approved', 'rejected'
+
   useEffect(() => {
     setUsers(allUsers || []);
     loadMarketCards();
     loadShops();
+    loadAds();
   }, [allUsers]);
 
   const loadMarketCards = () => {
@@ -66,9 +73,106 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
     }
   };
 
+  const loadAds = () => {
+    // Load pending ads
+    const pending = JSON.parse(localStorage.getItem('pendingMarketAds') || '[]');
+    setPendingAds(pending);
+
+    // Load approved ads
+    const approved = JSON.parse(localStorage.getItem('approvedMarketAds') || '[]');
+    setApprovedAds(approved);
+
+    // Load rejected ads
+    const rejected = JSON.parse(localStorage.getItem('rejectedMarketAds') || '[]');
+    setRejectedAds(rejected);
+  };
+
   const showNotification = (message, type = 'success') => {
     setNotification({ show: true, message, type });
     setTimeout(() => setNotification({ show: false, message: '', type: '' }), 3000);
+  };
+
+  // Advertisement management functions
+  const approveAd = (ad) => {
+    // Remove from pending
+    const updatedPending = pendingAds.filter(p => p.id !== ad.id);
+    setPendingAds(updatedPending);
+    localStorage.setItem('pendingMarketAds', JSON.stringify(updatedPending));
+
+    // Add to approved
+    const approvedAd = {
+      ...ad,
+      status: 'approved',
+      approvedAt: Date.now(),
+      expiresAt: Date.now() + (ad.duration * 24 * 60 * 60 * 1000)
+    };
+    const updatedApproved = [...approvedAds, approvedAd];
+    setApprovedAds(updatedApproved);
+    localStorage.setItem('approvedMarketAds', JSON.stringify(updatedApproved));
+
+    showNotification('Reklama tasdiqlandi!', 'success');
+  };
+
+  const rejectAd = (ad) => {
+    // Remove from pending
+    const updatedPending = pendingAds.filter(p => p.id !== ad.id);
+    setPendingAds(updatedPending);
+    localStorage.setItem('pendingMarketAds', JSON.stringify(updatedPending));
+
+    // Add to rejected
+    const rejectedAd = {
+      ...ad,
+      status: 'rejected',
+      rejectedAt: Date.now()
+    };
+    const updatedRejected = [...rejectedAds, rejectedAd];
+    setRejectedAds(updatedRejected);
+    localStorage.setItem('rejectedMarketAds', JSON.stringify(updatedRejected));
+
+    // Refund user balance
+    const user = users.find(u => u.login === ad.seller);
+    if (user) {
+      const updatedUser = {
+        ...user,
+        balance: (user.balance || 0) + ad.cost,
+        history: [...(user.history || []), {
+          date: new Date().toLocaleString(),
+          action: `Reklama rad etildi (${ad.duration} kun)`,
+          amount: +ad.cost,
+          description: 'Pul qaytarildi'
+        }]
+      };
+      updateUser(updatedUser);
+    }
+
+    showNotification('Reklama rad etildi! Pul foydalanuvchiga qaytarildi.', 'warning');
+  };
+
+  const deleteApprovedAd = (ad) => {
+    if (window.confirm('Reklamani o\'chirmoqchimisiz?')) {
+      const updatedApproved = approvedAds.filter(a => a.id !== ad.id);
+      setApprovedAds(updatedApproved);
+      localStorage.setItem('approvedMarketAds', JSON.stringify(updatedApproved));
+      showNotification('Reklama o\'chirildi!', 'info');
+    }
+  };
+
+  const deleteRejectedAd = (ad) => {
+    if (window.confirm('Reklamani o\'chirmoqchimisiz?')) {
+      const updatedRejected = rejectedAds.filter(a => a.id !== ad.id);
+      setRejectedAds(updatedRejected);
+      localStorage.setItem('rejectedMarketAds', JSON.stringify(updatedRejected));
+      showNotification('Reklama o\'chirildi!', 'info');
+    }
+  };
+
+  const getAdsByFilter = () => {
+    switch (adFilter) {
+      case 'pending': return pendingAds;
+      case 'approved': return approvedAds;
+      case 'rejected': return rejectedAds;
+      default: return [];
+    }
   };
 
   // === FOYDALANUVCHILAR ===
@@ -173,7 +277,7 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
 
   const removeBalanceFromUser = (user, amount) => {
     if ((user.balance || 0) < amount) {
-      showNotification('Yetarli ball yo‘q!', 'error');
+      showNotification('Yetarli ball yo\'q!', 'error');
       return;
     }
     const updated = { ...user, balance: (user.balance || 0) - amount };
@@ -234,23 +338,23 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
     saveShops(updated);
     setNewShop({ name: '', logo: '' });
     setShowAddShop(false);
-    showNotification('Do‘kon qo‘shildi!');
+    showNotification('Dokon qoshildi!');
   };
 
   const deleteShop = (id) => {
-    if (window.confirm('Do‘kon va menyusi o‘chsinmi?')) {
+    if (window.confirm('Dokon va menyusi ochsinmi?')) {
       const filtered = shops.filter(s => s.id !== id);
       setShops(filtered);
       saveShops(filtered);
       setSelectedShop(null);
-      showNotification('Do‘kon o‘chirildi!', 'warning');
+      showNotification('Dokon ochirildi!', 'warning');
     }
   };
 
   const addMenuItem = () => {
     if (!selectedShop) return;
     if (!newMenuItem.name.trim() || !newMenuItem.price || newMenuItem.price <= 0) {
-      showNotification('Nomi va narxi to‘g‘ri bo‘lishi kerak!', 'error');
+      showNotification('Nomi va narxi togri bolishi kerak!', 'error');
       return;
     }
     const item = { id: Date.now(), name: newMenuItem.name.trim(), price: parseInt(newMenuItem.price) };
@@ -261,17 +365,17 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
     saveShops(updatedShops);
     setNewMenuItem({ name: '', price: '' });
     setShowAddMenu(false);
-    showNotification('Maxsulot qo‘shildi!');
+    showNotification('Maxsulot qoshildi!');
   };
 
   const deleteMenuItem = (shopId, itemId) => {
-    if (window.confirm('Maxsulot o‘chirilsinmi?')) {
+    if (window.confirm('Maxsulot ochirilsinmi?')) {
       const updatedShops = shops.map(s =>
         s.id === shopId ? { ...s, menu: (s.menu || []).filter(i => i.id !== itemId) } : s
       );
       setShops(updatedShops);
       saveShops(updatedShops);
-      showNotification('Maxsulot o‘chirildi!', 'warning');
+      showNotification('Maxsulot ochirildi!', 'warning');
     }
   };
 
@@ -282,7 +386,7 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
 
   const saveEditMenuItem = () => {
     if (!editingMenuItem || !newMenuItem.name.trim() || newMenuItem.price <= 0) {
-      showNotification('Ma\'lumotlar to‘g‘ri emas!', 'error');
+      showNotification('Malumotlar togri emas!', 'error');
       return;
     }
     const updatedShops = shops.map(s =>
@@ -322,6 +426,23 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
     scales: { y: { beginAtZero: true } }
   };
 
+  // Format date function
+  const formatDate = (timestamp) => {
+    return new Date(timestamp).toLocaleString('uz-UZ');
+  };
+
+  // Calculate remaining time
+  const getRemainingTime = (expiresAt) => {
+    const now = Date.now();
+    const diff = expiresAt - now;
+    if (diff <= 0) return 'Muddati tugagan';
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    return `${days} kun ${hours} soat`;
+  };
+
   return (
     <div className="admin-panel">
       <div className="admin-container">
@@ -340,7 +461,8 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
             <div className="header-stats">
               <span>Foydalanuvchilar: {users.length}</span>
               <span>Kartalar: {marketCards.length}</span>
-              <span>Do‘konlar: {shops.length}</span>
+              <span>Do'konlar: {shops.length}</span>
+              <span>Reklamalar: {pendingAds.length} kutilmoqda</span>
             </div>
           </div>
           <div className="header-actions">
@@ -360,7 +482,10 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
             Market
           </button>
           <button className={`tab-btn ${activeTab === 'shops' ? 'active' : ''}`} onClick={() => setActiveTab('shops')}>
-            Do‘konlar
+            Do'konlar
+          </button>
+          <button className={`tab-btn ${activeTab === 'ads' ? 'active' : ''}`} onClick={() => setActiveTab('ads')}>
+            Reklamalar ({pendingAds.length})
           </button>
           <button className={`tab-btn ${activeTab === 'chart' ? 'active' : ''}`} onClick={() => setActiveTab('chart')}>
             Statistika
@@ -443,12 +568,12 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
                       <div>Narx: {card.price.toLocaleString()} ball</div>
                       <div>Foyda: {(card.price - card.balance).toLocaleString()} ball</div>
                     </div>
-                    <button onClick={() => deleteMarketCard(card.id)} className="danger">O‘chirish</button>
+                    <button onClick={() => deleteMarketCard(card.id)} className="danger">O'chirish</button>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="no-data">Kartalar yo‘q</div>
+              <div className="no-data">Kartalar yo'q</div>
             )}
           </div>
         )}
@@ -457,8 +582,8 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
         {activeTab === 'shops' && (
           <div className="admin-section">
             <div className="section-header">
-              <h2>Do‘konlar ({shops.length})</h2>
-              <button onClick={() => setShowAddShop(true)} className="add-btn">Yangi do‘kon</button>
+              <h2>Do'konlar ({shops.length})</h2>
+              <button onClick={() => setShowAddShop(true)} className="add-btn">Yangi do'kon</button>
             </div>
             <div className="shops-admin-grid">
               {shops.map(shop => (
@@ -468,7 +593,7 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
                     <strong>{shop.name}</strong>
                     <div>{(shop.menu || []).length} ta maxsulot</div>
                   </div>
-                  <button onClick={(e) => { e.stopPropagation(); deleteShop(shop.id); }} className="danger">O‘chirish</button>
+                  <button onClick={(e) => { e.stopPropagation(); deleteShop(shop.id); }} className="danger">O'chirish</button>
                 </div>
               ))}
             </div>
@@ -489,16 +614,101 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
                         </div>
                         <div className="menu-actions">
                           <button onClick={() => startEditMenuItem(selectedShop.id, item)} className="edit">Tahrirlash</button>
-                          <button onClick={() => deleteMenuItem(selectedShop.id, item.id)} className="danger">O‘chirish</button>
+                          <button onClick={() => deleteMenuItem(selectedShop.id, item.id)} className="danger">O'chirish</button>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="no-data">Menyu bo‘sh</p>
+                  <p className="no-data">Menyu bo'sh</p>
                 )}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ADVERTISEMENTS */}
+        {activeTab === 'ads' && (
+          <div className="admin-section">
+            <div className="section-header">
+              <h2>Reklama So'rovlari</h2>
+              <div className="ad-filters">
+                <button 
+                  className={`filter-btn ${adFilter === 'pending' ? 'active' : ''}`}
+                  onClick={() => setAdFilter('pending')}
+                >
+                  Kutilmoqda ({pendingAds.length})
+                </button>
+                <button 
+                  className={`filter-btn ${adFilter === 'approved' ? 'active' : ''}`}
+                  onClick={() => setAdFilter('approved')}
+                >
+                  Tasdiqlangan ({approvedAds.length})
+                </button>
+                <button 
+                  className={`filter-btn ${adFilter === 'rejected' ? 'active' : ''}`}
+                  onClick={() => setAdFilter('rejected')}
+                >
+                  Rad etilgan ({rejectedAds.length})
+                </button>
+              </div>
+            </div>
+
+            <div className="ads-grid">
+              {getAdsByFilter().length > 0 ? getAdsByFilter().map(ad => (
+                <div key={ad.id} className={`ad-card ${ad.status}`}>
+                  <div className="ad-image">
+                    <img src={ad.image} alt="Reklama" />
+                  </div>
+                  <div className="ad-details">
+                    <div className="ad-text">
+                      <strong>Matn:</strong> {ad.text}
+                    </div>
+                    <div className="ad-meta">
+                      <div><strong>Foydalanuvchi:</strong> @{ad.seller}</div>
+                      <div><strong>Muddati:</strong> {ad.duration} kun</div>
+                      <div><strong>Narxi:</strong> {ad.cost.toLocaleString()} so'm</div>
+                      <div><strong>Yuborilgan:</strong> {formatDate(ad.createdAt)}</div>
+                      
+                      {ad.status === 'approved' && (
+                        <>
+                          <div><strong>Tasdiqlangan:</strong> {formatDate(ad.approvedAt)}</div>
+                          <div><strong>Tugash muddati:</strong> {formatDate(ad.expiresAt)}</div>
+                          <div><strong>Qolgan vaqt:</strong> {getRemainingTime(ad.expiresAt)}</div>
+                        </>
+                      )}
+                      
+                      {ad.status === 'rejected' && (
+                        <div><strong>Rad etilgan:</strong> {formatDate(ad.rejectedAt)}</div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="ad-actions">
+                    {ad.status === 'pending' && (
+                      <>
+                        <button onClick={() => approveAd(ad)} className="success-btn">Tasdiqlash</button>
+                        <button onClick={() => rejectAd(ad)} className="danger-btn">Rad etish</button>
+                      </>
+                    )}
+                    
+                    {ad.status === 'approved' && (
+                      <button onClick={() => deleteApprovedAd(ad)} className="danger-btn">O'chirish</button>
+                    )}
+                    
+                    {ad.status === 'rejected' && (
+                      <button onClick={() => deleteRejectedAd(ad)} className="danger-btn">O'chirish</button>
+                    )}
+                  </div>
+                </div>
+              )) : (
+                <div className="no-data">
+                  {adFilter === 'pending' && "Kutilayotgan reklama so'rovlari yo'q"}
+                  {adFilter === 'approved' && "Tasdiqlangan reklamalar yo'q"}
+                  {adFilter === 'rejected' && "Rad etilgan reklamalar yo'q"}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -517,11 +727,11 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
           <div className="modal">
             <div className="modal-overlay" onClick={() => setShowAddShop(false)}></div>
             <div className="modal-content">
-              <h3>Yangi do‘kon</h3>
+              <h3>Yangi do'kon</h3>
               <input placeholder="Nomi" value={newShop.name} onChange={e => setNewShop({ ...newShop, name: e.target.value })} />
               <input placeholder="Logo URL" value={newShop.logo} onChange={e => setNewShop({ ...newShop, logo: e.target.value })} />
               <div className="modal-actions">
-                <button onClick={addShop} className="save-btn">Qo‘shish</button>
+                <button onClick={addShop} className="save-btn">Qo'shish</button>
                 <button onClick={() => setShowAddShop(false)} className="cancel-btn">Bekor</button>
               </div>
             </div>
@@ -537,7 +747,7 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
               <input type="number" placeholder="Narxi (token)" value={newMenuItem.price} onChange={e => setNewMenuItem({ ...newMenuItem, price: e.target.value })} />
               <div className="modal-actions">
                 <button onClick={editingMenuItem ? saveEditMenuItem : addMenuItem} className="save-btn">
-                  {editingMenuItem ? 'Saqlash' : 'Qo‘shish'}
+                  {editingMenuItem ? 'Saqlash' : 'Qoshish'}
                 </button>
                 <button onClick={() => { setShowAddMenu(false); setEditingMenuItem(null); setNewMenuItem({ name: '', price: '' }); }} className="cancel-btn">
                   Bekor
@@ -572,49 +782,46 @@ function AdminPanel({ onLogout, allUsers, updateUser }) {
             <div className="modal-content" style={{ width: '600px', maxHeight: '80vh', overflowY: 'auto' }}>
               <h3>@{selectedUserHistory.login} — Amallar tarixi</h3>
               {selectedUserHistory.history && selectedUserHistory.history.length > 0 ? (
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Arial, sans-serif', borderRadius: '6px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
-  <thead>
-    <tr style={{ backgroundColor: '#333', color: '#fff', textAlign: 'left' }}>
-      <th style={{ padding: '12px', border: '1px solid #444' }}>Sana</th>
-      <th style={{ padding: '12px', border: '1px solid #444' }}>Amal</th>
-      <th style={{ padding: '12px', border: '1px solid #444' }}>Miqdor</th>
-      <th style={{ padding: '12px', border: '1px solid #444' }}>Izoh</th>
-    </tr>
-  </thead>
-  <tbody>
-    {selectedUserHistory.history.map((item, idx) => (
-      <tr
-        key={idx}
-        style={{
-          backgroundColor: idx % 2 === 0 ? '#222' : '#111',
-          color: '#fff',
-          transition: 'background-color 0.3s',
-          cursor: 'default'
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#444')}
-        onMouseLeave={(e) =>
-          (e.currentTarget.style.backgroundColor = idx % 2 === 0 ? '#222' : '#111')
-        }
-      >
-        <td style={{ padding: '10px', border: '1px solid #444', fontSize: '14px' }}>
-          {new Date(item.date).toLocaleString('uz-UZ')}
-        </td>
-        <td style={{ padding: '10px', border: '1px solid #444' }}>{item.action}</td>
-        <td style={{ padding: '10px', border: '1px solid #444' }}>
-          {item.amount ? `${item.amount > 0 ? '+' : ''}${item.amount}` : '-'}
-        </td>
-        <td style={{ padding: '10px', border: '1px solid #444', fontStyle: 'italic' }}>
-          {item.description || '-'}
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-
-
-
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Arial, sans-serif', borderRadius: '6px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+                  <thead>
+                    <tr style={{ backgroundColor: '#333', color: '#fff', textAlign: 'left' }}>
+                      <th style={{ padding: '12px', border: '1px solid #444' }}>Sana</th>
+                      <th style={{ padding: '12px', border: '1px solid #444' }}>Amal</th>
+                      <th style={{ padding: '12px', border: '1px solid #444' }}>Miqdor</th>
+                      <th style={{ padding: '12px', border: '1px solid #444' }}>Izoh</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedUserHistory.history.map((item, idx) => (
+                      <tr
+                        key={idx}
+                        style={{
+                          backgroundColor: idx % 2 === 0 ? '#222' : '#111',
+                          color: '#fff',
+                          transition: 'background-color 0.3s',
+                          cursor: 'default'
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#444')}
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.backgroundColor = idx % 2 === 0 ? '#222' : '#111')
+                        }
+                      >
+                        <td style={{ padding: '10px', border: '1px solid #444', fontSize: '14px' }}>
+                          {new Date(item.date).toLocaleString('uz-UZ')}
+                        </td>
+                        <td style={{ padding: '10px', border: '1px solid #444' }}>{item.action}</td>
+                        <td style={{ padding: '10px', border: '1px solid #444' }}>
+                          {item.amount ? `${item.amount > 0 ? '+' : ''}${item.amount}` : '-'}
+                        </td>
+                        <td style={{ padding: '10px', border: '1px solid #444', fontStyle: 'italic' }}>
+                          {item.description || '-'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               ) : (
-                <p style={{ textAlign: 'center', color: '#777' }}>Tarix bo‘sh</p>
+                <p style={{ textAlign: 'center', color: '#777' }}>Tarix bo'sh</p>
               )}
               <div className="modal-actions" style={{ marginTop: '15px' }}>
                 <button onClick={() => setShowHistoryModal(false)} className="cancel-btn">Yopish</button>

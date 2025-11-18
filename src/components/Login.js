@@ -5,6 +5,26 @@ import Backround from "../assets/images/backround.svg";
 import "../styles/Login.css";
 import Logo from "../assets/images/logo.png";
 
+// === CUSTOM MESSAGE MODAL ===
+const MessageModal = ({ isOpen, message, type = "info", onClose }) => {
+  if (!isOpen) return null;
+
+  const typeClass = type === "success" ? "success" : type === "error" ? "error" : "info";
+
+  return (
+    <div className="message-modal-overlay">
+      <div className={`message-modal ${typeClass}`}>
+        <div className="message-modal-content">
+          <p>{message}</p>
+          <button onClick={onClose} className="message-modal-close">
+            Yopish
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // === ADMIN MODAL ===
 const AdminModal = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
@@ -22,14 +42,13 @@ const AdminModal = ({ isOpen, onClose, onConfirm }) => {
   );
 };
 
-// === GENERATE USERNAME ===
+// === GENERATE USERNAME & CARD ===
 const generateUsername = (fullName) => {
   const cleaned = fullName.trim().toLowerCase().replace(/[^a-zA-Z0-9]/g, '_');
   const random = Math.floor(Math.random() * 9999);
   return `${cleaned}_${random}`;
 };
 
-// === GENERATE CARD NUMBER ===
 const generateCardNumber = () => {
   let card = "";
   for (let i = 0; i < 12; i++) {
@@ -46,7 +65,24 @@ const Login = ({ onLogin }) => {
   const [phone, setPhone] = useState("");
   const [isRegister, setIsRegister] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+
+  // Message Modal State
+  const [messageModal, setMessageModal] = useState({
+    isOpen: false,
+    message: "",
+    type: "info",
+  });
+
   const navigate = useNavigate();
+
+  // === SHOW MESSAGE ===
+  const showMessage = (msg, type = "info") => {
+    setMessageModal({ isOpen: true, message: msg, type });
+  };
+
+  const closeMessage = () => {
+    setMessageModal({ ...messageModal, isOpen: false });
+  };
 
   // === ADMIN HOTKEY: Ctrl + Alt + T ===
   useEffect(() => {
@@ -77,69 +113,60 @@ const Login = ({ onLogin }) => {
     navigate("/admin");
   };
 
-  // === ADMIN CANCEL ===
-  const handleAdminClose = () => setIsAdminModalOpen(false);
-
   // === FORM SUBMIT ===
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // === VALIDATION ===
-    if (isRegister && (!login || !password || !fullName || !phone)) {
-      alert("Barcha maydonlarni to'ldiring!");
-      return;
-    }
-    if (!isRegister && (!login || !password)) {
-      alert("Login va parolni kiriting!");
-      return;
-    }
-
     if (isRegister) {
-      // === YANGI FOYDALANUVCHI RO'YXATDAN O'TISH ===
+      if (!login || !password || !fullName || !phone) {
+        showMessage("Barcha maydonlarni to'ldiring!", "error");
+        return;
+      }
+
       const username = generateUsername(fullName);
       const cardNumber = generateCardNumber();
       const newUser = {
         login,
         password,
-        profile: {
-          name: fullName,
-          phone,
-          email: "",
-          avatar: "",
-          username,
-        },
-        balance: 10000, // Ro'yxatdan o'tganda 10,000 UZS
+        profile: { name: fullName, phone, email: "", avatar: "", username },
+        balance: 10000,
         cards: [],
         history: [],
         messages: [],
         isPremium: false,
       };
 
-      // localStorage ga saqlash
       localStorage.setItem(`cardNumber_${login}`, cardNumber);
       localStorage.setItem("userData", JSON.stringify(newUser));
 
-      // allUsers ga qo'shish
       const allUsers = JSON.parse(localStorage.getItem("allUsers") || "[]");
       if (!allUsers.find(u => u.login === login)) {
         allUsers.push(newUser);
         localStorage.setItem("allUsers", JSON.stringify(allUsers));
       }
 
-      // Kirish bonusi belgisi
       localStorage.setItem(`login_bonus_${login}`, "true");
 
-      alert(`Tabriklaymiz, ${fullName}!\nSizning nikneymingiz: @${username}\nKarta: ${cardNumber}\n+1,000 UZS bonus oldingiz!`);
-      onLogin(newUser);
-      navigate("/hello");
+      showMessage(
+        `Tabriklaymiz, ${fullName}!\nSizning nikneymingiz: @${username}\nKarta raqamingiz: ${cardNumber}\n+10,000 UZS bonus hisobingizga o'tkazildi!`,
+        "success"
+      );
+
+      setTimeout(() => {
+        onLogin(newUser);
+        navigate("/hello");
+      }, 2500);
     } else {
-      // === KIRISH ===
+      if (!login || !password) {
+        showMessage("Login va parolni kiriting!", "error");
+        return;
+      }
+
       const savedUser = JSON.parse(localStorage.getItem("userData"));
       if (savedUser && savedUser.login === login && savedUser.password === password) {
         let updatedUser = { ...savedUser };
-
-        // === BIR MARTALIK KIRISH BONUSI: +1000 UZS ===
         const hasReceivedBonus = localStorage.getItem(`login_bonus_${login}`);
+
         if (!hasReceivedBonus) {
           updatedUser.balance = (updatedUser.balance || 0) + 1000;
           updatedUser.history = [
@@ -152,13 +179,17 @@ const Login = ({ onLogin }) => {
           ];
           localStorage.setItem(`login_bonus_${login}`, "true");
           localStorage.setItem("userData", JSON.stringify(updatedUser));
-          alert("Tabriklaymiz! Kirish uchun +1,000 UZS bonus oldingiz!");
+          showMessage("Tabriklaymiz! Kirish uchun +1,000 UZS bonus oldingiz!", "success");
+        } else {
+          showMessage("Xush kelibsiz, " + savedUser.profile.name + "!", "success");
         }
 
-        onLogin(updatedUser);
-        navigate("/hello");
+        setTimeout(() => {
+          onLogin(updatedUser);
+          navigate("/hello");
+        }, hasReceivedBonus ? 1500 : 2500);
       } else {
-        alert("Login yoki parol xato!");
+        showMessage("Login yoki parol xato!", "error");
       }
     }
   };
@@ -168,10 +199,12 @@ const Login = ({ onLogin }) => {
       <div className="loginx-background">
         <img src={Backround} alt="Background" className="loginx-bg-image" />
       </div>
+
       <div className="loginx-content">
         <div className="loginx-logo-container">
           <img src={Logo} alt="Hamyon Logo" className="loginx-logo-img" />
         </div>
+
         <div className="loginx-form">
           <h2 className="loginx-title">{isRegister ? "Ro'yxatdan o'tish" : "Kirish"}</h2>
           <form onSubmit={handleSubmit} className="loginx-inputs">
@@ -225,12 +258,22 @@ const Login = ({ onLogin }) => {
             </div>
           </form>
         </div>
+
         <p className="loginx-footer">© 2025 Sodiqov</p>
       </div>
+
+      {/* Modallar */}
       <AdminModal
         isOpen={isAdminModalOpen}
-        onClose={handleAdminClose}
+        onClose={() => setIsAdminModalOpen(false)}
         onConfirm={handleAdminConfirm}
+      />
+
+      <MessageModal
+        isOpen={messageModal.isOpen}
+        message={messageModal.message}
+        type={messageModal.type}
+        onClose={closeMessage}
       />
     </div>
   );

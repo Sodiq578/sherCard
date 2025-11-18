@@ -32,29 +32,26 @@ function Market({ user, updateUser }) {
     { id: 6, name: "Kofe", price: 400, image: "https://via.placeholder.com/120?text=Kofe" },
   ];
 
-  // Reklamalarni yuklash + KO'RILMAGANLAR BIRINCHI BO'LADI
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("marketplaceAds") || "[]");
+    const saved = JSON.parse(localStorage.getItem("approvedMarketAds") || "[]");
     const now = Date.now();
     const active = saved.filter(ad => ad.expiresAt > now);
+    localStorage.setItem("approvedMarketAds", JSON.stringify(active));
 
     const viewed = JSON.parse(localStorage.getItem("viewedMarketStories") || "[]");
 
-    // MUHIM: Ko'rilmaganlarni birinchi qilib tartiblash
     const sortedAds = active.sort((a, b) => {
       const aViewed = viewed.includes(a.id);
       const bViewed = viewed.includes(b.id);
       if (!aViewed && bViewed) return -1;
       if (aViewed && !bViewed) return 1;
-      return b.createdAt - a.createdAt; // yangi yaratilganlar oldinda
+      return b.createdAt - a.createdAt;
     });
 
     setAds(sortedAds);
     setViewedAds(viewed);
-    localStorage.setItem("marketplaceAds", JSON.stringify(active));
   }, []);
 
-  // Progress bar — 8 sekund silliq
   useEffect(() => {
     if (modalOpen === "story" && ads.length > 0) {
       setProgress(0);
@@ -93,9 +90,7 @@ function Market({ user, updateUser }) {
   };
 
   const goPrev = () => {
-    if (currentStoryIndex > 0) {
-      setCurrentStoryIndex(prev => prev - 1);
-    }
+    if (currentStoryIndex > 0) setCurrentStoryIndex(prev => prev - 1);
   };
 
   const goNext = () => {
@@ -108,32 +103,25 @@ function Market({ user, updateUser }) {
     }
   };
 
-  // Rasm tanlash
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      showAlertMessage("Iltimos, faqat rasm faylini tanlang!", "error", "Xatolik");
+      showAlertMessage("Faqat rasm tanlang!", "error", "Xatolik");
       return;
     }
     const reader = new FileReader();
     reader.onloadend = () => {
-      setAdForm(prev => ({
-        ...prev,
-        imageFile: file,
-        imagePreview: reader.result,
-      }));
+      setAdForm(prev => ({ ...prev, imageFile: file, imagePreview: reader.result }));
     };
     reader.readAsDataURL(file);
   };
 
-  // Rasmni o'chirish
   const removeImage = () => {
     setAdForm(prev => ({ ...prev, imageFile: null, imagePreview: "" }));
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // Reklama joylashtirish
   const handlePlaceAd = () => {
     const { text, imagePreview, duration } = adForm;
     if (!text.trim()) return showAlertMessage("Reklama matnini kiriting!", "error", "Xatolik");
@@ -141,84 +129,35 @@ function Market({ user, updateUser }) {
     if (!imagePreview) return showAlertMessage("Rasm tanlang!", "error", "Xatolik");
 
     const cost = duration * 500;
-    if ((user?.balance || 0) < cost) {
-      return showAlertMessage(`Balans yetarli emas! Kerak: ${cost.toLocaleString()} so'm`, "error", "Xatolik");
-    }
+    if ((user?.balance || 0) < cost) return showAlertMessage(`Balans yetarli emas! Kerak: ${cost} so'm`, "error", "Xatolik");
 
-    const confirmPlaceAd = () => {
-      const newAd = {
-        id: Date.now() + Math.random(),
-        text: text.trim(),
-        image: imagePreview,
-        duration,
-        expiresAt: Date.now() + duration * 24 * 60 * 60 * 1000,
-        seller: user.login,
-        createdAt: Date.now(),
-      };
-
-      const updatedAds = [...ads, newAd];
-      localStorage.setItem("marketplaceAds", JSON.stringify(updatedAds));
-      setAds(prev => {
-        const sorted = [...prev, newAd].sort((a, b) => {
-          const aViewed = viewedAds.includes(a.id);
-          const bViewed = viewedAds.includes(b.id);
-          if (!aViewed && bViewed) return -1;
-          if (aViewed && !bViewed) return 1;
-          return b.createdAt - a.createdAt;
-        });
-        return sorted;
-      });
-
-      updateUser({
-        ...user,
-        balance: (user.balance || 0) - cost,
-        history: [
-          ...(user.history || []),
-          { time: new Date().toLocaleString(), action: `Reklama joylashtirildi (${duration} kun)`, amount: -cost },
-        ],
-      });
-
-      showAlertMessage("Reklama muvaffaqiyatli joylashtirildi! Storyda ko'rinadi", "success", "Muvaffaqiyatli");
-      setAdForm({ text: "", imageFile: null, imagePreview: "", duration: 1 });
-      if (fileInputRef.current) fileInputRef.current.value = "";
+    const newAd = {
+      id: Date.now() + Math.random(),
+      text: text.trim(),
+      image: imagePreview,
+      duration,
+      cost,
+      expiresAt: Date.now() + duration * 24 * 60 * 60 * 1000,
+      seller: user.login,
+      createdAt: Date.now(),
+      status: "pending"
     };
 
-    showAlertMessage(
-      `Reklamani joylashtirishni tasdiqlaysizmi?\n\nMatn: ${text.trim()}\nMuddati: ${duration} kun\nNarxi: ${cost.toLocaleString()} so'm\n\nBalansingiz: ${user?.balance?.toLocaleString()} so'm`,
-      "info",
-      "Tasdiqlash",
-      confirmPlaceAd,
-      "Joylashtirish"
-    );
+    const pending = JSON.parse(localStorage.getItem("pendingMarketAds") || "[]");
+    pending.push(newAd);
+    localStorage.setItem("pendingMarketAds", JSON.stringify(pending));
+
+    updateUser({
+      ...user,
+      balance: user.balance - cost,
+      history: [...(user.history || []), { date: new Date().toLocaleString(), action: `Reklama so‘rovi yuborildi (${duration} kun)`, amount: -cost }]
+    });
+
+    showAlertMessage("So‘rov yuborildi! Admin tasdiqlashini kuting", "success", "Muvaffaqiyatli");
+    setAdForm({ text: "", imageFile: null, imagePreview: "", duration: 1 });
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // Mahsulot sotib olish
-  const handleBuy = (item) => {
-    if ((user?.balance || 0) < item.price) {
-      showAlertMessage("Balans yetarli emas!", "error", "Xatolik");
-      return;
-    }
-    const confirmBuy = () => {
-      updateUser({
-        ...user,
-        balance: (user.balance || 0) - item.price,
-        history: [
-          ...(user.history || []),
-          { time: new Date().toLocaleString(), action: `Sotib olindi: ${item.name}`, amount: -item.price },
-        ],
-      });
-      showAlertMessage(`${item.name} muvaffaqiyatli sotib olindi!`, "success", "Muvaffaqiyatli");
-    };
-    showAlertMessage(
-      `${item.name} ni sotib olishni tasdiqlaysizmi?\nNarxi: ${item.price.toLocaleString()} so'm`,
-      "info",
-      "Sotib olish",
-      confirmBuy,
-      "Ha, sotib olaman"
-    );
-  };
-
-  /* ==================== UNIVERSAL ALERT ==================== */
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success");
@@ -242,50 +181,52 @@ function Market({ user, updateUser }) {
 
   const closeAlert = () => setShowAlert(false);
 
+  const handleBuy = (item) => {
+    if ((user?.balance || 0) < item.price) return showAlertMessage("Balans yetarli emas!", "error", "Xatolik");
+    const confirmBuy = () => {
+      updateUser({
+        ...user,
+        balance: user.balance - item.price,
+        history: [...(user.history || []), { time: new Date().toLocaleString(), action: `Sotib olindi: ${item.name}`, amount: -item.price }]
+      });
+      showAlertMessage(`${item.name} muvaffaqiyatli sotib olindi!`, "success", "Muvaffaqiyatli");
+    };
+    showAlertMessage(`Sotib olishni tasdiqlaysizmi? Narxi: ${item.price}`, "info", "Sotib olish", confirmBuy, "Ha, sotib olaman");
+  };
+
   return (
     <>
-      {/* UNIVERSAL ALERT */}
+      {/* ALERT */}
       {showAlert && (
         <div className="market-alert-modal-overlay">
           <div className={`market-alert-modal market-alert-${alertType}`}>
             <div className="market-alert-header">
-              {alertType === "success" && <FiCheck className="market-alert-header-icon" />}
-              {alertType === "error" && <FiAlertCircle className="market-alert-header-icon" />}
-              {alertType === "info" && <FiInfo className="market-alert-header-icon" />}
-              <h3 className="market-alert-title">{alertTitle || (alertType === "success" ? "Muvaffaqiyatli" : "Xatolik")}</h3>
+              {alertType === "success" && <FiCheck />}
+              {alertType === "error" && <FiAlertCircle />}
+              {alertType === "info" && <FiInfo />}
+              <h3>{alertTitle || (alertType === "success" ? "Muvaffaqiyatli" : "Xatolik")}</h3>
             </div>
-            <div className="market-alert-body">
-              <p>{alertMessage}</p>
-            </div>
+            <div className="market-alert-body"><p>{alertMessage}</p></div>
             <div className="market-alert-footer">
-              {alertAction && (
-                <button className="market-alert-action-btn" onClick={handleAlertAction}>
-                  {alertActionText || "Tasdiqlash"}
-                </button>
-              )}
-              <button className="market-alert-close-btn" onClick={closeAlert}>
-                {alertAction ? "Bekor qilish" : "Yopish"}
-              </button>
+              {alertAction && <button onClick={handleAlertAction}>{alertActionText || "Tasdiqlash"}</button>}
+              <button onClick={closeAlert}>{alertAction ? "Bekor qilish" : "Yopish"}</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* STORIES BAR — Ko'rilmaganlar birinchi */}
+      {/* STORIES BAR */}
       {ads.length > 0 && (
         <div className="stories-bar">
           <div className="stories-wrapper">
-            {ads.map((ad, index) => {
-              const isViewed = viewedAds.includes(ad.id);
-              return (
-                <div key={ad.id} className="story-circle" onClick={() => openStory(index)}>
-                  <div className={`story-ring ${isViewed ? "viewed" : "new"}`}>
-                    <img src={ad.image} alt={ad.seller} className="story-avatar" />
-                  </div>
-                  <p className="story-username">@{ad.seller}</p>
+            {ads.map((ad, index) => (
+              <div key={ad.id} className="story-circle" onClick={() => openStory(index)}>
+                <div className={`story-ring ${viewedAds.includes(ad.id) ? "viewed" : "new"}`}>
+                  <img src={ad.image} alt={ad.seller} className="story-avatar" />
                 </div>
-              );
-            })}
+                <p className="story-username">@{ad.seller}</p>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -299,9 +240,7 @@ function Market({ user, updateUser }) {
                 <div key={i} className="progress-segment-wrapper">
                   <div
                     className="progress-segment"
-                    style={{
-                      width: i < currentStoryIndex ? "100%" : i === currentStoryIndex ? `${progress}%` : "0%",
-                    }}
+                    style={{ width: i < currentStoryIndex ? "100%" : i === currentStoryIndex ? `${progress}%` : "0%" }}
                   />
                 </div>
               ))}
@@ -310,21 +249,21 @@ function Market({ user, updateUser }) {
             <div className="story-tap-right" onClick={goNext} />
             <img src={ads[currentStoryIndex].image} alt="Reklama" className="story-full-image" />
             <div className="story-overlay-bottom">
-              <p className="story-full-text">{ads[currentStoryIndex].text}</p>
-              <p className="story-full-meta">@{ads[currentStoryIndex].seller}</p>
+              <p>{ads[currentStoryIndex].text}</p>
+              <p>@{ads[currentStoryIndex].seller}</p>
             </div>
             <button className="story-close-btn" onClick={() => setModalOpen(null)}>×</button>
           </div>
         </div>
       )}
 
-      {/* MAIN PAGE */}
+      {/* MARKET PAGE */}
       <div className="market-page">
         <div className="market-container">
           <div className="market-header">
             <h2>Market</h2>
             <div className="balance-display">
-              <img src={ValyutaLogo} alt="so'm" className="balance-logo-small" />
+              <img src={ValyutaLogo} alt="so'm" />
               <span>{(user?.balance || 0).toLocaleString()}</span>
             </div>
           </div>
@@ -332,41 +271,34 @@ function Market({ user, updateUser }) {
           <section className="action-buttons">
             <div className="action-grid">
               <div onClick={() => setModalOpen("cards")} className="action-item">
-                <img src={CardIcon} alt="Kartalar" className="action-icon" />
+                <img src={CardIcon} alt="Kartalar" />
                 <p>Kartalar</p>
               </div>
               <div onClick={() => navigate("/all-shops")} className="action-item">
-                <img src={MarketIcon} alt="Do'konlar" className="action-icon" />
+                <img src={MarketIcon} alt="Do'konlar" />
                 <p>Barcha Do'konlar</p>
               </div>
             </div>
           </section>
 
           <section className="promotions-section">
-            <div className="section-header">
-              <h3>Chegirmadagi mahsulotlar</h3>
-            </div>
+            <div className="section-header"><h3>Chegirmadagi mahsulotlar</h3></div>
             <div className="promotions-grid">
               {promotions.map(item => (
                 <div key={item.id} className="promo-card-small">
-                  <img src={item.image} alt={item.name} className="promo-img-small" />
-                  <div className="promo-info-small">
-                    <h4>{item.name}</h4>
-                    <p className="price-small">{item.price.toLocaleString()} so'm</p>
-                    <button className="buy-btn-small" onClick={() => handleBuy(item)}>
-                      Sotib olish
-                    </button>
-                  </div>
+                  <img src={item.image} alt={item.name} />
+                  <h4>{item.name}</h4>
+                  <p>{item.price.toLocaleString()} so'm</p>
+                  <button onClick={() => handleBuy(item)}>Sotib olish</button>
                 </div>
               ))}
             </div>
           </section>
 
-          {/* REKLAMA JOYLASHTIRISH */}
           <section className="ads-section">
             <div className="section-header">
               <h3>Reklama Joylashtirish</h3>
-              <span className="ads-price">500 so'm / kun</span>
+              <span>500 so'm / kun</span>
             </div>
             <div className="ads-form">
               <textarea
@@ -375,28 +307,16 @@ function Market({ user, updateUser }) {
                 value={adForm.text}
                 onChange={e => setAdForm(prev => ({ ...prev, text: e.target.value }))}
               />
-              
               <div className="image-upload-area">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  id="ad-image-input"
-                  style={{ display: "none" }}
-                />
-                <label htmlFor="ad-image-input" className="image-upload-btn">
-                  {adForm.imagePreview ? "Rasmni o'zgartirish" : "Rasm tanlash"}
-                </label>
-
+                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} id="ad-image-input" style={{ display: "none" }} />
+                <label htmlFor="ad-image-input">{adForm.imagePreview ? "Rasmni o'zgartirish" : "Rasm tanlash"}</label>
                 {adForm.imagePreview && (
                   <div className="image-preview">
-                    <img src={adForm.imagePreview} alt="Oldindan ko'rish" />
-                    <button className="remove-image-btn" onClick={removeImage}>×</button>
+                    <img src={adForm.imagePreview} alt="Preview" />
+                    <button onClick={removeImage} className="remove-image-btn">×</button>
                   </div>
                 )}
               </div>
-
               <div className="duration-selector">
                 <label>Muddati:</label>
                 <input
@@ -404,21 +324,12 @@ function Market({ user, updateUser }) {
                   min={1}
                   max={30}
                   value={adForm.duration}
-                  onChange={e => setAdForm(prev => ({
-                    ...prev,
-                    duration: Math.max(1, Math.min(30, parseInt(e.target.value) || 1))
-                  }))}
+                  onChange={e => setAdForm(prev => ({ ...prev, duration: Math.max(1, Math.min(30, parseInt(e.target.value) || 1)) }))}
                 />
                 <span>kun</span>
               </div>
-
-              <div className="ad-summary">
-                <p>Jami narx: <strong>{(adForm.duration * 500).toLocaleString()} so'm</strong></p>
-              </div>
-
-              <button className="place-ad-btn" onClick={handlePlaceAd}>
-                Reklamani Joylashtirish
-              </button>
+              <p>Jami narx: {(adForm.duration * 500).toLocaleString()} so'm</p>
+              <button onClick={handlePlaceAd} className="place-ad-btn">Reklamani Joylashtirish</button>
             </div>
           </section>
         </div>
@@ -428,10 +339,8 @@ function Market({ user, updateUser }) {
       {modalOpen === "cards" && (
         <div className="full-modal-overlay" onClick={() => setModalOpen(null)}>
           <div className="full-modal-content" onClick={e => e.stopPropagation()}>
-            <button className="modal-close-btn" onClick={() => setModalOpen(null)}>×</button>
-            <div className="modal-body">
-              <Cards user={user} updateUser={updateUser} />
-            </div>
+            <button onClick={() => setModalOpen(null)} className="modal-close-btn">×</button>
+            <Cards user={user} updateUser={updateUser} />
           </div>
         </div>
       )}
