@@ -12,6 +12,10 @@ import {
   FiCheck,
   FiAlertCircle,
   FiInfo,
+  FiShield,
+  FiZap,
+  FiAward,
+  FiTrendingUp
 } from "react-icons/fi";
 import Logo from "../assets/images/logo.png";
 
@@ -31,6 +35,7 @@ function MainMenu({ user, updateUser }) {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success");
+  const [alertTitle, setAlertTitle] = useState("");
 
   /* ==================== USERS ==================== */
   useEffect(() => {
@@ -74,36 +79,36 @@ function MainMenu({ user, updateUser }) {
     setUnreadCount(unread);
   }, [user]);
 
-  /* ==================== ALERT ==================== */
-  const showAlertMessage = (message, type = "success") => {
+  /* ==================== BEAUTIFUL ALERT ==================== */
+  const showAlertMessage = (message, type = "success", title = "") => {
     setAlertMessage(message);
     setAlertType(type);
+    setAlertTitle(title);
     setShowAlert(true);
     setTimeout(() => setShowAlert(false), 4000);
   };
 
-  /* ==================== TOKEN HISOBLASH (YANGI LOGIKA) ==================== */
+  /* ==================== TOKEN CALCULATION ==================== */
   const calculateTokensReceived = (paidAmount) => {
     if (user?.isPremium) {
-      return paidAmount; // Premium → 1 so'm = 1 token
+      return paidAmount;
     } else {
-      const commissionRate = 0.02; // 2%
+      const commissionRate = 0.02;
       const commission = Math.floor(paidAmount * commissionRate);
       return paidAmount - commission;
     }
   };
 
-  /* ==================== TASHQI TO'LDIRISH (ASOSIY YANGI FUNKSIYA) ==================== */
+  /* ==================== EXTERNAL TOP UP ==================== */
   const startExternalTopUp = (amount) => {
     if (amount < 1000) {
-      showAlertMessage("Minimal to'ldirish summasi: 1 000 UZS", "error");
+      showAlertMessage("Minimal to'ldirish summasi: 1 000 UZS", "error", "Xatolik");
       return;
     }
 
     const tokensToAdd = calculateTokensReceived(amount);
     const commission = user?.isPremium ? 0 : amount - tokensToAdd;
 
-    // Demo uchun confirm. Real loyihada bu yerda Payme/Click link ochiladi
     const confirmed = window.confirm(
       `To'lov tasdiqlansinmi?\n\n` +
       `To'lov summasi: ${amount.toLocaleString()} UZS\n` +
@@ -113,7 +118,6 @@ function MainMenu({ user, updateUser }) {
 
     if (!confirmed) return;
 
-    // To'lov muvaffaqiyatli deb hisoblaymiz
     const updatedUser = {
       ...user,
       balance: (user.balance || 0) + tokensToAdd,
@@ -133,7 +137,8 @@ function MainMenu({ user, updateUser }) {
 
     showAlertMessage(
       `Tabriklaymiz! +${tokensToAdd.toLocaleString()} token balansingizga qo'shildi!`,
-      "success"
+      "success",
+      "Muvaffaqiyatli"
     );
   };
 
@@ -141,11 +146,11 @@ function MainMenu({ user, updateUser }) {
   const handleBuyPremium = () => {
     const price = 10000;
     if (user.balance < price) {
-      showAlertMessage(`Premium uchun ${price.toLocaleString()} token yetishmayapti!`, "error");
+      showAlertMessage(`Premium uchun ${price.toLocaleString()} token yetishmayapti!`, "error", "Xatolik");
       return;
     }
     if (user.isPremium) {
-      showAlertMessage("Sizda allaqachon Premium mavjud!", "info");
+      showAlertMessage("Sizda allaqachon Premium mavjud!", "info", "Ma'lumot");
       return;
     }
 
@@ -167,7 +172,7 @@ function MainMenu({ user, updateUser }) {
     localStorage.setItem("userData", JSON.stringify(updated));
     updateUser(updated);
     setShowPremiumModal(false);
-    showAlertMessage("Premium muvaffaqiyatli faollashtirildi!", "success");
+    showAlertMessage("Premium muvaffaqiyatli faollashtirildi!", "success", "Tabriklaymiz");
   };
 
   const displayName = user?.profile?.name || user?.profile?.username || "Foydalanuvchi";
@@ -175,19 +180,32 @@ function MainMenu({ user, updateUser }) {
   return (
     <div className="main-menu-container">
 
-      {/* ALERT */}
+      {/* BEAUTIFUL ALERT MODAL */}
       {showAlert && (
-        <div className={`menu-alert-modal menu-alert-${alertType}`}>
-          <div className="menu-alert-content">
-            {alertType === "success" && <FiCheck className="menu-alert-icon" />}
-            {alertType === "error" && <FiAlertCircle className="menu-alert-icon" />}
-            {alertType === "info" && <FiInfo className="menu-alert-icon" />}
-            <span className="menu-alert-message">{alertMessage}</span>
+        <div className="menu-alert-modal-overlay">
+          <div className={`menu-alert-modal menu-alert-${alertType}`}>
+            <div className="menu-alert-header">
+              {alertType === "success" && <FiCheck className="menu-alert-header-icon" />}
+              {alertType === "error" && <FiAlertCircle className="menu-alert-header-icon" />}
+              {alertType === "info" && <FiInfo className="menu-alert-header-icon" />}
+              <h3 className="menu-alert-title">{alertTitle || (alertType === "success" ? "Muvaffaqiyatli" : alertType === "error" ? "Xatolik" : "Ma'lumot")}</h3>
+            </div>
+            <div className="menu-alert-body">
+              <p>{alertMessage}</p>
+            </div>
+            <div className="menu-alert-footer">
+              <button 
+                className="menu-alert-close-btn"
+                onClick={() => setShowAlert(false)}
+              >
+                Yopish
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* WELCOME */}
+      {/* WELCOME SECTION */}
       <div className="menu-welcome-section">
         <div className="menu-avatar-circle" onClick={() => navigate("/profile")}>
           {user?.profile?.avatar ? (
@@ -215,7 +233,7 @@ function MainMenu({ user, updateUser }) {
         )}
       </div>
 
-      {/* SEARCH */}
+      {/* SEARCH SECTION */}
       <div className="menu-search-section">
         <div className="menu-search-bar">
           <FiSearch className="menu-search-icon" />
@@ -255,7 +273,7 @@ function MainMenu({ user, updateUser }) {
         )}
       </div>
 
-      {/* BALANS */}
+      {/* BALANCE CARD */}
       <div className="menu-balance-card">
         <div className="menu-balance-top">
           <div className="menu-balance-icon"><FiCreditCard size={32} /></div>
@@ -265,20 +283,26 @@ function MainMenu({ user, updateUser }) {
           </div>
         </div>
         <div className="menu-balance-label">Joriy balans (token)</div>
+        {user?.isPremium && (
+          <div className="menu-premium-balance-badge">
+            <FiStar size={14} />
+            Premium foydalanuvchi
+          </div>
+        )}
       </div>
 
-      {/* YANGI TO'LDIRISH BO'LIMI */}
+      {/* TOP UP SECTION */}
       <div className="menu-topup-section">
-        <h3  className="menu-topup-title"><FiPlusCircle /> Balansni to'ldirish</h3>
+        <h3 className="menu-topup-title"><FiPlusCircle /> Balansni to'ldirish</h3>
         <div className="menu-topup-modern">
           <div className="menu-topup-presets">
-            {[5000, 10000, 20000, 50000, 100000].map((a) => (
+            {[5000, 10000, 20000, 50000, 100000].map((amount) => (
               <button
-                key={a}
+                key={amount}
                 className="menu-topup-preset-btn"
-                onClick={() => startExternalTopUp(a)}
+                onClick={() => startExternalTopUp(amount)}
               >
-                {a.toLocaleString()} so'm
+                {amount.toLocaleString()} so'm
               </button>
             ))}
             <button
@@ -289,94 +313,236 @@ function MainMenu({ user, updateUser }) {
             </button>
           </div>
 
-          <div className="menu-topup-info" style={{ marginTop: "16px", textAlign: "center" }}>
+          <div className="menu-topup-info">
             {user?.isPremium ? (
-              <p style={{ color: "#FFD700", fontWeight: "bold", fontSize: "15px" }}>
-                Premium — 1 so'm = 1 token (komissiyasiz!)
-              </p>
+              <div className="menu-premium-info">
+                <FiStar className="menu-premium-info-icon" />
+                <span>Premium — 1 so'm = 1 token (komissiyasiz!)</span>
+              </div>
             ) : (
-              <p style={{ color: "#e74c3c" }}>
-                2% komissiya<br />
+              <div className="menu-regular-info">
+                <span className="menu-commission-warning">2% komissiya</span>
                 <small>Misol: 10 000 so'm → 9 800 token</small>
-              </p>
+              </div>
             )}
           </div>
         </div>
       </div>
 
+      {/* CHAT ENTRY */}
+      <div className="menu-chat-entry" onClick={() => navigate("/chats")}>
+        <div className="menu-chat-icon">
+          <FiMessageCircle size={24} />
+        </div>
+        <div className="menu-chat-text">
+          <span className="menu-chat-title">Xabarlar</span>
+          <span className="menu-chat-subtitle">Barcha suhbatlaringiz</span>
+        </div>
+        {unreadCount > 0 && (
+          <div className="menu-unread-badge">
+            {unreadCount}
+          </div>
+        )}
+      </div>
+
+      {/* PREMIUM FEATURES SECTION */}
+      {!user?.isPremium && (
+        <div className="menu-premium-section">
+          <div className="menu-premium-header">
+            <FiStar className="menu-premium-section-icon" />
+            <h3>Premium Afzalliklar</h3>
+          </div>
+          <div className="menu-premium-features-grid">
+            <div className="menu-premium-feature">
+              <FiZap className="menu-premium-feature-icon" />
+              <span>Komissiyasiz to'ldirish</span>
+            </div>
+            <div className="menu-premium-feature">
+              <FiShield className="menu-premium-feature-icon" />
+              <span>Maxsus badge</span>
+            </div>
+            <div className="menu-premium-feature">
+              <FiAward className="menu-premium-feature-icon" />
+              <span>Premium status</span>
+            </div>
+            <div className="menu-premium-feature">
+              <FiTrendingUp className="menu-premium-feature-icon" />
+              <span>Yuqori limitlar</span>
+            </div>
+          </div>
+          <button 
+            className="menu-premium-section-btn"
+            onClick={() => setShowPremiumModal(true)}
+          >
+            Premium sotib olish
+          </button>
+        </div>
+      )}
+
       {/* CUSTOM AMOUNT MODAL */}
       {showCustomAmountModal && (
-        <div className="menu-custom-amount-modal">
-          <div className="menu-custom-amount-overlay" onClick={() => setShowCustomAmountModal(false)} />
-          <div className="menu-custom-amount-content">
-            <div className="menu-custom-amount-header">
-              <h3>Boshqa summa</h3>
-              <button onClick={() => setShowCustomAmountModal(false)}><FiX size={20} /></button>
+        <div className="menu-modal-overlay">
+          <div className="menu-modal-content menu-custom-amount-modal">
+            <div className="menu-modal-header">
+              <h3>Balansni to'ldirish</h3>
+              <button 
+                className="menu-modal-close-btn"
+                onClick={() => setShowCustomAmountModal(false)}
+              >
+                <FiX size={20} />
+              </button>
             </div>
 
-            <input
-              type="number"
-              placeholder="1000 UZS dan yuqori"
-              value={tempCustomAmount}
-              onChange={(e) => setTempCustomAmount(e.target.value)}
-              className="menu-custom-amount-input"
-            />
+            <div className="menu-modal-body">
+              <input
+                type="number"
+                placeholder="1000 UZS dan yuqori summa kiriting"
+                value={tempCustomAmount}
+                onChange={(e) => setTempCustomAmount(e.target.value)}
+                className="menu-custom-amount-input"
+                min="1000"
+              />
 
-            {tempCustomAmount >= 1000 && (
-              <div style={{ padding: "14px", background: "#000000ff", borderRadius: "10px", margin: "12px 0", fontSize: "14px" }}>
-                <div>To'lov summasi: <strong>{parseInt(tempCustomAmount).toLocaleString()} UZS</strong></div>
-                <div style={{ marginTop: "8px" }}>
-                  Balansga qo'shiladi:{' '}
-                  <strong style={{ color: user?.isPremium ? "#FFD700" : "#27ae60", fontSize: "18px" }}>
-                    {calculateTokensReceived(parseInt(tempCustomAmount)).toLocaleString()} token
-                  </strong>
-                </div>
-                {!user?.isPremium && (
-                  <div style={{ color: "#e74c3c", marginTop: "6px" }}>
-                    Komissiya: {(tempCustomAmount - calculateTokensReceived(parseInt(tempCustomAmount))).toLocaleString()} UZS (2%)
+              {tempCustomAmount >= 1000 && (
+                <div className="menu-amount-preview">
+                  <div className="menu-amount-row">
+                    <span>To'lov summasi:</span>
+                    <strong>{parseInt(tempCustomAmount).toLocaleString()} UZS</strong>
                   </div>
-                )}
-              </div>
-            )}
+                  <div className="menu-amount-row menu-amount-tokens">
+                    <span>Balansga qo'shiladi:</span>
+                    <strong style={{ color: user?.isPremium ? "#FFD700" : "#27ae60" }}>
+                      {calculateTokensReceived(parseInt(tempCustomAmount)).toLocaleString()} token
+                    </strong>
+                  </div>
+                  {!user?.isPremium && (
+                    <div className="menu-amount-row menu-amount-commission">
+                      <span>Komissiya:</span>
+                      <span>{(tempCustomAmount - calculateTokensReceived(parseInt(tempCustomAmount))).toLocaleString()} UZS (2%)</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
-            <button
-              className="menu-custom-amount-confirm"
-              onClick={() => {
-                const amt = parseInt(tempCustomAmount);
-                if (amt && amt >= 1000) {
-                  setShowCustomAmountModal(false);
-                  setTempCustomAmount("");
-                  startExternalTopUp(amt);
-                } else {
-                  showAlertMessage("Kamida 1 000 UZS kiriting", "error");
-                }
-              }}
-            >
-              To'lov qilish
-            </button>
+            <div className="menu-modal-footer">
+              <button
+                className="menu-primary-btn"
+                onClick={() => {
+                  const amount = parseInt(tempCustomAmount);
+                  if (amount && amount >= 1000) {
+                    setShowCustomAmountModal(false);
+                    setTempCustomAmount("");
+                    startExternalTopUp(amount);
+                  } else {
+                    showAlertMessage("Kamida 1 000 UZS kiriting", "error", "Xatolik");
+                  }
+                }}
+                disabled={!tempCustomAmount || tempCustomAmount < 1000}
+              >
+                To'lov qilish
+              </button>
+              <button
+                className="menu-secondary-btn"
+                onClick={() => setShowCustomAmountModal(false)}
+              >
+                Bekor qilish
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* PREMIUM MODAL */}
       {showPremiumModal && (
-        <div className="menu-premium-modal">
-          <div className="menu-premium-overlay" onClick={() => setShowPremiumModal(false)} />
-          <div className="menu-premium-content">
-            <h3>Premium obuna</h3>
-            <p>Narxi: <strong>10 000 token</strong></p>
-            <p style={{ fontSize: "14px", color: "#666", margin: "10px 0" }}>
-              Premium bilan komissiyasiz to'ldirish va boshqa imtiyozlar!
-            </p>
-            <button className="menu-buy-premium-btn" onClick={handleBuyPremium}>
-              Sotib olish
-            </button>
-            <button className="menu-cancel-premium-btn" onClick={() => setShowPremiumModal(false)}>
-              Bekor qilish
-            </button>
+        <div className="menu-modal-overlay">
+          <div className="menu-modal-content menu-premium-modal">
+            <div className="menu-modal-header">
+              <div className="menu-premium-modal-title">
+                <FiStar className="menu-premium-star-icon" />
+                <h3>Premium Obuna</h3>
+              </div>
+              <button 
+                className="menu-modal-close-btn"
+                onClick={() => setShowPremiumModal(false)}
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+
+            <div className="menu-modal-body">
+              <div className="menu-premium-features-list">
+                <div className="menu-premium-feature-item">
+                  <FiCheck className="menu-premium-feature-check" />
+                  <span>Komissiyasiz balans to'ldirish</span>
+                </div>
+                <div className="menu-premium-feature-item">
+                  <FiCheck className="menu-premium-feature-check" />
+                  <span>Maxsus Premium badge va status</span>
+                </div>
+                <div className="menu-premium-feature-item">
+                  <FiCheck className="menu-premium-feature-check" />
+                  <span>Yuqori transfer limitlari</span>
+                </div>
+                <div className="menu-premium-feature-item">
+                  <FiCheck className="menu-premium-feature-check" />
+                  <span>Eksklyuziv funksiyalar</span>
+                </div>
+                <div className="menu-premium-feature-item">
+                  <FiCheck className="menu-premium-feature-check" />
+                  <span>Birinchilardan xabardor bo'lish</span>
+                </div>
+              </div>
+
+              <div className="menu-premium-price-section">
+                <div className="menu-premium-price">10 000 token</div>
+                <div className="menu-premium-balance-info">
+                  Joriy balans: {(user?.balance || 0).toLocaleString()} token
+                </div>
+              </div>
+
+              {user?.balance < 10000 && (
+                <div className="menu-insufficient-balance">
+                  Yetarli token mavjud emas! Balansingizni to'ldiring.
+                </div>
+              )}
+            </div>
+
+            <div className="menu-modal-footer">
+              <button
+                className={`menu-primary-btn ${user?.balance < 10000 ? 'menu-btn-disabled' : ''}`}
+                onClick={handleBuyPremium}
+                disabled={user?.balance < 10000 || user?.isPremium}
+              >
+                {user?.isPremium ? 'Sizda Premium mavjud' : 'Premium sotib olish'}
+              </button>
+              <button
+                className="menu-secondary-btn"
+                onClick={() => setShowPremiumModal(false)}
+              >
+                Bekor qilish
+              </button>
+            </div>
           </div>
         </div>
       )}
+
+      {/* BOTTOM NAVIGATION */}
+      <div className="menu-bottom-nav">
+        <button className="menu-nav-item menu-nav-item-active">
+          <FiCreditCard size={20} />
+          <span>Asosiy</span>
+        </button>
+        <button className="menu-nav-item" onClick={() => navigate("/chats")}>
+          <FiMessageCircle size={20} />
+          <span>Xabarlar</span>
+          {unreadCount > 0 && <div className="menu-nav-badge">{unreadCount}</div>}
+        </button>
+        <button className="menu-nav-item" onClick={() => navigate("/profile")}>
+          <FiUser size={20} />
+          <span>Profil</span>
+        </button>
+      </div>
     </div>
   );
 }
