@@ -323,7 +323,7 @@ function MainMenu({ user, updateUser }) {
             />
 
             {tempCustomAmount >= 1000 && (
-              <div style={{ padding: "14px", background: "#f9f9f9", borderRadius: "10px", margin: "12px 0", fontSize: "14px" }}>
+              <div style={{ padding: "14px", background: "#000000ff", borderRadius: "10px", margin: "12px 0", fontSize: "14px" }}>
                 <div>To'lov summasi: <strong>{parseInt(tempCustomAmount).toLocaleString()} UZS</strong></div>
                 <div style={{ marginTop: "8px" }}>
                   Balansga qo'shiladi:{' '}

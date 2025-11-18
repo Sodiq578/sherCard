@@ -18,7 +18,7 @@ import {
   FiPhone,
   FiChevronRight,
 } from "react-icons/fi";
-import "../styles/Profile.css";
+import "../styles/Profile.css"; // ← Yuqoridagi CSS fayl
 import Logo from "../assets/images/logo.png";
 
 function Profile({ user, updateUser, onLogout }) {
@@ -34,7 +34,7 @@ function Profile({ user, updateUser, onLogout }) {
 
   useEffect(() => {
     if (user?.profile) {
-      setIsm(user.profile.name || user.login);
+      setIsm(user.profile.name || user.login || "Foydalanuvchi");
       setTelefon(user.profile.phone || "");
       setEmail(user.profile.email || "");
       setRasm(user.profile.avatar || "");
@@ -43,38 +43,43 @@ function Profile({ user, updateUser, onLogout }) {
   }, [user]);
 
   const saqlash = () => {
-    if (!ism.trim() || !telefon.trim()) {
-      alert("Ism va telefon to'ldirilishi shart!");
+    if (!ism.trim()) {
+      alert("Ismni kiriting!");
+      return;
+    }
+    if (!telefon.trim()) {
+      alert("Telefon raqamni kiriting!");
       return;
     }
 
-    const yangilanganFoydalanuvchi = {
+    const yangilangan = {
       ...user,
       profile: {
         ...user.profile,
         name: ism,
         phone: telefon,
-        email,
+        email: email,
         avatar: rasm,
       },
     };
 
-    updateUser(yangilanganFoydalanuvchi);
+    updateUser(yangilangan);
     setTahrirlash(false);
     alert("Profil muvaffaqiyatli yangilandi!");
   };
 
   const rasmOzgartirish = (e) => {
     const fayl = e.target.files[0];
-    if (fayl) {
-      if (fayl.size > 2 * 1024 * 1024) {
-        alert("Rasm hajmi 2MB dan oshmasin!");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (ev) => setRasm(ev.target.result);
-      reader.readAsDataURL(fayl);
+    if (!fayl) return;
+
+    if (fayl.size > 2 * 1024 * 1024) {
+      alert("Rasm hajmi 2MB dan oshmasin!");
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => setRasm(ev.target.result);
+    reader.readAsDataURL(fayl);
   };
 
   const chiqish = () => {
@@ -86,17 +91,19 @@ function Profile({ user, updateUser, onLogout }) {
 
   const tarixniOchish = () => setTarixKorsat((prev) => !prev);
 
-  if (!user)
+  // Yuklanmoqda holati
+  if (!user) {
     return (
       <div className="yuklanmoqda">
         <div className="aylanuvchi"></div>
         <p>Yuklanmoqda...</p>
       </div>
     );
+  }
 
   return (
     <div className="profil-sahifa">
-      {/* === SARLAVHA === */}
+      {/* SARLAVHA */}
       <div className="profil-sarlavha">
         <button onClick={() => navigate(-1)} className="orqaga-tugma">
           <FiArrowLeft size={24} />
@@ -106,26 +113,30 @@ function Profile({ user, updateUser, onLogout }) {
           onClick={() => setTahrirlash(!tahrirlash)}
           className="tahrirlash-tugma"
         >
-          {tahrirlash ? <FiX /> : <FiEdit2 />}
+          {tahrirlash ? <FiX size={22} /> : <FiEdit2 size={20} />}
         </button>
       </div>
 
-      {/* === PROFIL KARTASI === */}
+      {/* ASOSIY KARTA */}
       <div className="profil-kartasi">
-        {/* === AVATAR === */}
+        {/* AVATAR + ISM + BALANS */}
         <div className="rasm-bolimi">
           <div className="rasm-quti">
             {rasm ? (
               <img src={rasm} alt="Avatar" className="foydalanuvchi-rasmi" />
             ) : (
-              <div className="rasm-orniga">{ism.charAt(0).toUpperCase()}</div>
+              <div className="rasm-orniga">
+                {ism.charAt(0).toUpperCase()}
+              </div>
             )}
+
             {tahrirlash && (
               <label htmlFor="rasm-yuklash" className="kamera-belgisi">
                 <FiCamera size={18} />
               </label>
             )}
           </div>
+
           <input
             id="rasm-yuklash"
             type="file"
@@ -133,17 +144,19 @@ function Profile({ user, updateUser, onLogout }) {
             onChange={rasmOzgartirish}
             className="rasm-kirish"
           />
+
           <h2 className="foydalanuvchi-ism">{ism}</h2>
           <p className="foydalanuvchi-nik">
             @{user.profile?.username || "username"}
           </p>
+
           <div className="balans-belgisi">
             <span>{(user.balance || 0).toLocaleString()} UZS</span>
             <img src={Logo} alt="Logo" className="balans-logosi" />
           </div>
         </div>
 
-        {/* === FORMA === */}
+        {/* MA'LUMOTLAR FORMA */}
         <div className="profil-forma">
           <div className="kirish-guruh">
             <label>
@@ -160,14 +173,14 @@ function Profile({ user, updateUser, onLogout }) {
 
           <div className="kirish-guruh">
             <label>
-              <FiPhone /> Telefon
+              <FiPhone /> Telefon raqam
             </label>
             <input
               type="tel"
               value={telefon}
               onChange={(e) => setTelefon(e.target.value)}
               disabled={!tahrirlash}
-              placeholder="+998 ** *** ** **"
+              placeholder="+998 99 123 45 67"
             />
           </div>
 
@@ -184,6 +197,7 @@ function Profile({ user, updateUser, onLogout }) {
             />
           </div>
 
+          {/* SAQLASH / BEKOR QILISH */}
           {tahrirlash && (
             <div className="forma-harakatlar">
               <button onClick={saqlash} className="saqlash-tugma">
@@ -199,7 +213,7 @@ function Profile({ user, updateUser, onLogout }) {
           )}
         </div>
 
-        {/* === STATISTIKA === */}
+        {/* STATISTIKA */}
         <div className="statistika-setka">
           <div className="stat-element">
             <FiDollarSign className="stat-belgi" />
@@ -208,12 +222,18 @@ function Profile({ user, updateUser, onLogout }) {
             </div>
             <div className="stat-izoh">Balans</div>
           </div>
-          <div className="stat-element" onClick={() => navigate("/cards")}>
+
+          <div
+            className="stat-element"
+            onClick={() => navigate("/cards")}
+            style={{ cursor: "pointer" }}
+          >
             <FiCreditCard className="stat-belgi" />
             <div className="stat-qiymat">{kartalarSoni}</div>
             <div className="stat-izoh">Kartalar</div>
             <FiChevronRight className="ong-belgi" />
           </div>
+
           <div
             className="stat-element"
             onClick={tarixniOchish}
@@ -228,10 +248,8 @@ function Profile({ user, updateUser, onLogout }) {
           </div>
         </div>
 
-        {/* === TARIX === */}
-        <div
-          className={`tarix-bolimi ${tarixKorsat ? "kengaytirilgan" : ""}`}
-        >
+        {/* TARIX RO‘YXATI */}
+        <div className={`tarix-bolimi ${tarixKorsat ? "kengaytirilgan" : ""}`}>
           <div className="tarix-mazmuni">
             {user.history && user.history.length > 0 ? (
               <div className="tarix-royxati">
@@ -240,47 +258,47 @@ function Profile({ user, updateUser, onLogout }) {
                   .reverse()
                   .map((item, i) => {
                     const kirim =
-                      item.amount?.toString().startsWith("+") ||
+                      String(item.amount || "").startsWith("+") ||
                       item.action?.includes("to‘ldirildi") ||
-                      item.action?.includes("keldi");
+                      item.action?.includes("keldi") ||
+                      item.type === "deposit";
+
                     return (
                       <div key={i} className="tarix-band">
                         <div className="tarix-belgisi">
                           {kirim ? (
-                            <FiArrowDownLeft className="kirim" />
+                            <FiArrowDownLeft className="kirim" size={20} />
                           ) : (
-                            <FiArrowUpRight className="chiqim" />
+                            <FiArrowUpRight className="chiqim" size={20} />
                           )}
                         </div>
                         <div className="tarix-malumot">
                           <p className="amal-turi">
-                            {item.action || item.type || "Amal"}
+                            {item.action || item.type || "Noma'lum amal"}
                           </p>
                           <p className="amal-sana">
                             {item.time ||
-                              new Date().toLocaleString("uz-UZ")}
+                              new Date(item.date).toLocaleString("uz-UZ")}
                           </p>
                         </div>
                         <div
-                          className={`amal-miqdor ${
-                            kirim ? "musbat" : "manfiy"
-                          }`}
+                          className={`amal-miqdor ${kirim ? "musbat" : "manfiy"
+                            }`}
                         >
-                          {kirim ? "+" : ""}
-                          {Math.abs(parseInt(item.amount) || 0).toLocaleString()}{" "}
-                          UZS
+                          {kirim ? "+" : "-"}
+                          {Math.abs(parseInt(item.amount) || 0).toLocaleString()} UZS
                         </div>
                       </div>
                     );
                   })}
               </div>
             ) : (
-              <p className="tarix-yoq">Hozircha hech qanday amal yo'q.</p>
+              <p className="tarix-yoq">Hozircha hech qanday tranzaksiya yo‘q.</p>
             )}
           </div>
         </div>
 
-        {/* === CHIQISH === */}
+        {/* CHIQISH TUGMASI */}
         <button onClick={chiqish} className="chiqish-tugma">
           <FiLogOut /> Chiqish
         </button>
