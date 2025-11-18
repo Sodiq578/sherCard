@@ -12,29 +12,27 @@ import {
   FiCheck,
   FiAlertCircle,
   FiInfo,
-  FiShield,
-  FiAward,
-  FiTrendingUp,
-  FiDollarSign
 } from "react-icons/fi";
 import Logo from "../assets/images/logo.png";
 
 function MainMenu({ user, updateUser }) {
   const navigate = useNavigate();
+
+  // States
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [showCustomAmountModal, setShowCustomAmountModal] = useState(false);
   const [tempCustomAmount, setTempCustomAmount] = useState("");
+
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success");
-  const [showCardSelectModal, setShowCardSelectModal] = useState(false);
-  const [pendingTopUpAmount, setPendingTopUpAmount] = useState(null);
 
-  // === USERS LOADING ===
+  /* ==================== USERS ==================== */
   useEffect(() => {
     const loadUsers = () => {
       try {
@@ -50,7 +48,7 @@ function MainMenu({ user, updateUser }) {
     return () => clearInterval(interval);
   }, [user]);
 
-  // === SEARCH USERS ===
+  /* ==================== SEARCH ==================== */
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredUsers([]);
@@ -58,20 +56,17 @@ function MainMenu({ user, updateUser }) {
     }
     const query = searchQuery.toLowerCase().trim();
     const filtered = allUsers.filter((u) => {
-      if (!u || !u.profile) return false;
+      if (!u?.profile) return false;
       const username = u.profile.username || "";
       const name = u.profile.name || "";
-      return (
-        username.toLowerCase().includes(query) ||
-        name.toLowerCase().includes(query)
-      );
+      return username.toLowerCase().includes(query) || name.toLowerCase().includes(query);
     });
     setFilteredUsers(filtered);
   }, [searchQuery, allUsers]);
 
-  // === UNREAD MESSAGES COUNT ===
+  /* ==================== UNREAD ==================== */
   useEffect(() => {
-    if (!user || !user.messages) {
+    if (!user?.messages) {
       setUnreadCount(0);
       return;
     }
@@ -79,171 +74,107 @@ function MainMenu({ user, updateUser }) {
     setUnreadCount(unread);
   }, [user]);
 
-  // === ALERT MESSAGE ===
+  /* ==================== ALERT ==================== */
   const showAlertMessage = (message, type = "success") => {
     setAlertMessage(message);
     setAlertType(type);
     setShowAlert(true);
-    setTimeout(() => {
-      setShowAlert(false);
-    }, 3000);
+    setTimeout(() => setShowAlert(false), 4000);
   };
 
-  // === VIRTUAL CARD NUMBER ===
-  const getVirtualCardNumber = () => {
-    const key = `virtual_${user.login}`;
-    const saved = localStorage.getItem(key);
-    if (saved && saved.length === 12) return saved;
-    const newNum = generateNormalCardNumber();
-    localStorage.setItem(key, newNum);
-    return newNum;
-  };
-
-  const generateNormalCardNumber = () => {
-    let num = "";
-    for (let i = 0; i < 12; i++) num += Math.floor(Math.random() * 10);
-    return num;
-  };
-
-  const virtualCard = {
-    id: "virtual",
-    number: getVirtualCardNumber(),
-    balance: user.balance || 0,
-    type: "virtual",
-  };
-
-  const allCards = [
-    virtualCard,
-    ...(user.cards?.filter((c) => !c.deleted) || []),
-  ];
-
-  // === OPEN CARD SELECT MODAL ===
-  const openCardSelectModal = (amount) => {
-    if (amount < 100) {
-      showAlertMessage("Minimal to'ldirish summasi: 100 UZS", "error");
-      return;
-    }
-    setPendingTopUpAmount(amount);
-    setShowCardSelectModal(true);
-  };
-
-  // === TOP UP TO CARD ===
-  const handleTopUpToCard = (cardId) => {
-    if (!pendingTopUpAmount || pendingTopUpAmount < 100) return;
-
-    const targetCard = allCards.find(c => c.id === cardId);
-    if (!targetCard) {
-      showAlertMessage("Karta topilmadi!", "error");
-      return;
-    }
-
-    let updatedUser = { ...user };
-
-    if (cardId === "virtual") {
-      if (user.balance < pendingTopUpAmount) {
-        showAlertMessage("Balansda yetarli mablag' yo'q!", "error");
-        return;
-      }
-      updatedUser.balance -= pendingTopUpAmount;
-      updatedUser.history = [
-        ...(user.history || []),
-        { time: new Date().toLocaleString("uz-UZ"), action: "Virtual kartaga o'tkazma", amount: `-${pendingTopUpAmount.toLocaleString()} UZS` },
-      ];
-      showAlertMessage(`${pendingTopUpAmount.toLocaleString()} UZS virtual kartaga o'tkazildi!`, "success");
+  /* ==================== TOKEN HISOBLASH (YANGI LOGIKA) ==================== */
+  const calculateTokensReceived = (paidAmount) => {
+    if (user?.isPremium) {
+      return paidAmount; // Premium → 1 so'm = 1 token
     } else {
-      updatedUser.cards = user.cards.map(c =>
-        c.id === cardId ? { ...c, balance: (c.balance || 0) + pendingTopUpAmount } : c
-      );
-      updatedUser.history = [
-        ...(user.history || []),
-        { time: new Date().toLocaleString("uz-UZ"), action: `Kartaga to'ldirish (#${targetCard.number.slice(-4)})`, amount: `+${pendingTopUpAmount.toLocaleString()} UZS` },
-      ];
-      showAlertMessage(`${pendingTopUpAmount.toLocaleString()} UZS kartaga qo'shildi!`, "success");
+      const commissionRate = 0.02; // 2%
+      const commission = Math.floor(paidAmount * commissionRate);
+      return paidAmount - commission;
     }
+  };
+
+  /* ==================== TASHQI TO'LDIRISH (ASOSIY YANGI FUNKSIYA) ==================== */
+  const startExternalTopUp = (amount) => {
+    if (amount < 1000) {
+      showAlertMessage("Minimal to'ldirish summasi: 1 000 UZS", "error");
+      return;
+    }
+
+    const tokensToAdd = calculateTokensReceived(amount);
+    const commission = user?.isPremium ? 0 : amount - tokensToAdd;
+
+    // Demo uchun confirm. Real loyihada bu yerda Payme/Click link ochiladi
+    const confirmed = window.confirm(
+      `To'lov tasdiqlansinmi?\n\n` +
+      `To'lov summasi: ${amount.toLocaleString()} UZS\n` +
+      `Balansga qo'shiladi: ${tokensToAdd.toLocaleString()} token\n` +
+      `${commission > 0 ? `Komissiya: ${commission.toLocaleString()} UZS (2%)` : "Premium — komissiyasiz!"}`
+    );
+
+    if (!confirmed) return;
+
+    // To'lov muvaffaqiyatli deb hisoblaymiz
+    const updatedUser = {
+      ...user,
+      balance: (user.balance || 0) + tokensToAdd,
+      history: [
+        ...(user.history || []),
+        {
+          time: new Date().toLocaleString("uz-UZ"),
+          action: "Balans to'ldirildi",
+          amount: `+${tokensToAdd.toLocaleString()} token`,
+          details: `${amount.toLocaleString()} UZS to'lov${commission > 0 ? ` (komissiya: ${commission.toLocaleString()} UZS)` : ""}`,
+        },
+      ],
+    };
 
     localStorage.setItem("userData", JSON.stringify(updatedUser));
     updateUser(updatedUser);
-    setShowCardSelectModal(false);
-    setPendingTopUpAmount(null);
+
+    showAlertMessage(
+      `Tabriklaymiz! +${tokensToAdd.toLocaleString()} token balansingizga qo'shildi!`,
+      "success"
+    );
   };
 
-  const handleTopUp = (amount) => openCardSelectModal(amount);
-
-  // === BUY PREMIUM ===
+  /* ==================== PREMIUM ==================== */
   const handleBuyPremium = () => {
-    if (!user) return;
-    const premiumPrice = 10000;
-
-    if (user.balance < premiumPrice) {
-      showAlertMessage(`Premium sotib olish uchun balansingizda kamida ${premiumPrice.toLocaleString()} UZS bo'lishi kerak!`, "error");
+    const price = 10000;
+    if (user.balance < price) {
+      showAlertMessage(`Premium uchun ${price.toLocaleString()} token yetishmayapti!`, "error");
       return;
     }
-
     if (user.isPremium) {
-      showAlertMessage("Sizda allaqachon Premium obuna aktiv!", "info");
+      showAlertMessage("Sizda allaqachon Premium mavjud!", "info");
       return;
     }
 
-    const updatedUser = {
+    const updated = {
       ...user,
-      balance: user.balance - premiumPrice,
+      balance: user.balance - price,
       isPremium: true,
       premiumSince: new Date().toISOString(),
       history: [
         ...(user.history || []),
-        { time: new Date().toLocaleString("uz-UZ"), action: "Premium obuna sotib olindi", amount: `-${premiumPrice.toLocaleString()} UZS` },
+        {
+          time: new Date().toLocaleString("uz-UZ"),
+          action: "Premium obuna sotib olindi",
+          amount: `-${price.toLocaleString()} token`,
+        },
       ],
     };
-    localStorage.setItem("userData", JSON.stringify(updatedUser));
-    updateUser(updatedUser);
+
+    localStorage.setItem("userData", JSON.stringify(updated));
+    updateUser(updated);
     setShowPremiumModal(false);
-    showAlertMessage("Tabriklaymiz! Siz Premium obunaga ega bo'ldingiz!", "success");
-  };
-
-  const handleUserClick = (targetUser) => {
-    if (!targetUser || !targetUser.login) {
-      showAlertMessage("Foydalanuvchi topilmadi!", "error");
-      return;
-    }
-    if (targetUser.login === user?.login) {
-      showAlertMessage("O'zingiz bilan chat qila olmaysiz!", "info");
-      return;
-    }
-    setSearchQuery("");
-    setFilteredUsers([]);
-    navigate(`/chat/${targetUser.login}`);
-  };
-
-  const handleViewProfile = (targetUser, e) => {
-    e.stopPropagation();
-    if (!targetUser || !targetUser.login) {
-      showAlertMessage("Foydalanuvchi topilmadi!", "error");
-      return;
-    }
-    setSearchQuery("");
-    setFilteredUsers([]);
-    navigate(`/profile/${targetUser.login}`);
-  };
-
-  const openCustomAmountModal = () => {
-    setTempCustomAmount("");
-    setShowCustomAmountModal(true);
-  };
-
-  const handleCustomTopUp = () => {
-    const amount = parseInt(tempCustomAmount);
-    if (!amount || amount < 100) {
-      showAlertMessage("Iltimos, 100 UZS dan kam bo'lmagan summa kiriting", "error");
-      return;
-    }
-    setShowCustomAmountModal(false);
-    openCardSelectModal(amount);
+    showAlertMessage("Premium muvaffaqiyatli faollashtirildi!", "success");
   };
 
   const displayName = user?.profile?.name || user?.profile?.username || "Foydalanuvchi";
 
   return (
     <div className="main-menu-container">
+
       {/* ALERT */}
       {showAlert && (
         <div className={`menu-alert-modal menu-alert-${alertType}`}>
@@ -258,15 +189,15 @@ function MainMenu({ user, updateUser }) {
 
       {/* WELCOME */}
       <div className="menu-welcome-section">
-        <div
-          className="menu-avatar-circle"
-          onClick={() => navigate("/profile")}
-          style={{ cursor: "pointer" }}
-        >
+        <div className="menu-avatar-circle" onClick={() => navigate("/profile")}>
           {user?.profile?.avatar ? (
             <img src={user.profile.avatar} alt="Avatar" className="menu-avatar-img" />
           ) : (
-            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Default Avatar" className="menu-avatar-placeholder-img"/>
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+              alt="Default"
+              className="menu-avatar-placeholder-img"
+            />
           )}
           {user?.isPremium && <div className="menu-premium-badge"><FiStar size={14} /></div>}
         </div>
@@ -279,7 +210,7 @@ function MainMenu({ user, updateUser }) {
         </div>
         {!user?.isPremium && (
           <button className="menu-premium-button" onClick={() => setShowPremiumModal(true)}>
-            <FiStar className="menu-premium-icon" /> Premium
+            <FiStar /> Premium
           </button>
         )}
       </div>
@@ -299,135 +230,129 @@ function MainMenu({ user, updateUser }) {
         {filteredUsers.length > 0 && (
           <div className="menu-search-results">
             {filteredUsers.map((u) => (
-              <div key={u.login} className="menu-search-user-item" onClick={() => handleUserClick(u)}>
+              <div
+                key={u.login}
+                className="menu-search-user-item"
+                onClick={() => {
+                  setSearchQuery("");
+                  setFilteredUsers([]);
+                  navigate(`/chat/${u.login}`);
+                }}
+              >
                 <div className="menu-search-user-avatar">
-                  <img src={u.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} alt={u.profile?.username} />
+                  <img src={u.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} alt="" />
                   {u.isPremium && <div className="menu-user-premium-indicator"></div>}
                 </div>
                 <div className="menu-search-user-info">
-                  <p className="menu-search-username">@{u.profile?.username || "noma'lum"} {u.isPremium && <span className="menu-premium-dot">Premium</span>}</p>
+                  <p className="menu-search-username">
+                    @{u.profile?.username} {u.isPremium && <span className="menu-premium-dot">Premium</span>}
+                  </p>
                   <p className="menu-search-name">{u.profile?.name || "Foydalanuvchi"}</p>
                 </div>
-                <button className="menu-search-profile-btn" onClick={(e) => handleViewProfile(u, e)} title="Profilni ko'rish">
-                  <FiUser size={16} />
-                </button>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* BALANCE CARD */}
+      {/* BALANS */}
       <div className="menu-balance-card">
         <div className="menu-balance-top">
-          <div className="menu-balance-icon">
-            <FiCreditCard size={32} />
-          </div>
+          <div className="menu-balance-icon"><FiCreditCard size={32} /></div>
           <div className="menu-balance-amount">
             {(user?.balance || 0).toLocaleString()}
             <img src={Logo} alt="Logo" className="menu-topup-logo" />
           </div>
         </div>
-        <div className="menu-balance-label">Joriy balans</div>
-        {user?.isPremium && (
-          <div className="menu-premium-balance-badge">
-            <FiStar size={16} /> Premium foydalanuvchi
-          </div>
-        )}
+        <div className="menu-balance-label">Joriy balans (token)</div>
       </div>
 
-      {/* TOP-UP SECTION */}
+      {/* YANGI TO'LDIRISH BO'LIMI */}
       <div className="menu-topup-section">
-        <h3 className="menu-topup-title"><FiPlusCircle /> Balansni to'ldirish</h3>
+        <h3  className="menu-topup-title"><FiPlusCircle /> Balansni to'ldirish</h3>
         <div className="menu-topup-modern">
           <div className="menu-topup-presets">
-            {[5000, 10000, 25000].map((amount) => (
-              <button key={amount} className="menu-topup-preset-btn" onClick={() => handleTopUp(amount)}>
-                +{amount.toLocaleString()}
+            {[5000, 10000, 20000, 50000, 100000].map((a) => (
+              <button
+                key={a}
+                className="menu-topup-preset-btn"
+                onClick={() => startExternalTopUp(a)}
+              >
+                {a.toLocaleString()} so'm
               </button>
             ))}
-            <button className="menu-topup-preset-btn menu-topup-custom-btn" onClick={openCustomAmountModal}>
+            <button
+              className="menu-topup-preset-btn menu-topup-custom-btn"
+              onClick={() => setShowCustomAmountModal(true)}
+            >
               Boshqa summa
             </button>
           </div>
-          <p className="menu-topup-hint">Minimal to'ldirish: <strong>100 UZS</strong></p>
+
+          <div className="menu-topup-info" style={{ marginTop: "16px", textAlign: "center" }}>
+            {user?.isPremium ? (
+              <p style={{ color: "#FFD700", fontWeight: "bold", fontSize: "15px" }}>
+                Premium — 1 so'm = 1 token (komissiyasiz!)
+              </p>
+            ) : (
+              <p style={{ color: "#e74c3c" }}>
+                2% komissiya<br />
+                <small>Misol: 10 000 so'm → 9 800 token</small>
+              </p>
+            )}
+          </div>
         </div>
       </div>
-
-      {/* CHAT ENTRY */}
-      <div className="menu-chat-entry" onClick={() => navigate("/chat")}>
-        <FiMessageCircle size={20} />
-        <span>Chat</span>
-        {unreadCount > 0 && <span className="menu-unread-badge">{unreadCount}</span>}
-      </div>
-
-      {/* PREMIUM SECTION */}
-      {user?.isPremium && (
-        <div className="menu-premium-section">
-          <div className="menu-premium-header">
-            <FiStar className="menu-premium-section-icon" />
-            <h3>Premium Imkoniyatlar</h3>
-          </div>
-          <div className="menu-premium-features-grid">
-            <div className="menu-premium-feature"><FiShield className="menu-premium-feature-icon" /><span>Reklamasiz</span></div>
-            <div className="menu-premium-feature"><FiAward className="menu-premium-feature-icon" /><span>Maxsus profil</span></div>
-            <div className="menu-premium-feature"><FiTrendingUp className="menu-premium-feature-icon" /><span>Birinchilik</span></div>
-            <div className="menu-premium-feature"><FiDollarSign className="menu-premium-feature-icon" /><span>O'tkazmalarda foizsiz</span></div>
-          </div>
-        </div>
-      )}
-
-      {/* === CARD SELECT MODAL === */}
-      {showCardSelectModal && (
-        <div className="card-picker-modal">
-          <div className="card-picker-backdrop" onClick={() => { setShowCardSelectModal(false); setPendingTopUpAmount(null); }}></div>
-          <div className="card-picker-panel">
-            <div className="card-picker-title-bar">
-              <h3>Kartani tanlang</h3>
-              <button className="card-picker-close-btn" onClick={() => { setShowCardSelectModal(false); setPendingTopUpAmount(null); }}><FiX size={20} /></button>
-            </div>
-            <div className="card-picker-amount-info">
-              To'ldirish summasi: <strong>{pendingTopUpAmount?.toLocaleString()} UZS</strong>
-            </div>
-            <div className="card-picker-items">
-              {allCards.map((card) => (
-                <div key={card.id} className="card-picker-option" onClick={() => handleTopUpToCard(card.id)}>
-                  <div className="card-picker-preview">
-                    <div className="card-mini-preview">
-                      <div className="card-mini-number">{card.number.replace(/(\d{4})/g, "$1 ").trim()}</div>
-                      <div className="card-mini-balance">{card.balance.toLocaleString()} UZS</div>
-                    </div>
-                    <div className="card-mini-type">{card.type === "gold" ? "Gold" : card.type === "virtual" ? "Virtual" : "Plastik"}</div>
-                  </div>
-                  <FiPlusCircle size={20} className="card-picker-add-icon" />
-                </div>
-              ))}
-            </div>
-            <div className="card-picker-footer-note">
-              {pendingTopUpAmount >= 10000 && user?.isPremium ? <span className="premium-badge-text">Premium: o'tkazma bepul!</span> : <span>Virtual kartadan boshqa kartaga o'tkazma — 1% foiz</span>}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* CUSTOM AMOUNT MODAL */}
       {showCustomAmountModal && (
         <div className="menu-custom-amount-modal">
-          <div className="menu-custom-amount-overlay" onClick={() => setShowCustomAmountModal(false)}></div>
+          <div className="menu-custom-amount-overlay" onClick={() => setShowCustomAmountModal(false)} />
           <div className="menu-custom-amount-content">
             <div className="menu-custom-amount-header">
-              <h3>Boshqa summa kiriting</h3>
-              <button className="menu-close-custom-amount" onClick={() => setShowCustomAmountModal(false)}><FiX size={20} /></button>
+              <h3>Boshqa summa</h3>
+              <button onClick={() => setShowCustomAmountModal(false)}><FiX size={20} /></button>
             </div>
+
             <input
               type="number"
-              placeholder="Summani kiriting..."
+              placeholder="1000 UZS dan yuqori"
               value={tempCustomAmount}
               onChange={(e) => setTempCustomAmount(e.target.value)}
               className="menu-custom-amount-input"
             />
-            <button className="menu-custom-amount-confirm" onClick={handleCustomTopUp}>
-              Tasdiqlash
+
+            {tempCustomAmount >= 1000 && (
+              <div style={{ padding: "14px", background: "#f9f9f9", borderRadius: "10px", margin: "12px 0", fontSize: "14px" }}>
+                <div>To'lov summasi: <strong>{parseInt(tempCustomAmount).toLocaleString()} UZS</strong></div>
+                <div style={{ marginTop: "8px" }}>
+                  Balansga qo'shiladi:{' '}
+                  <strong style={{ color: user?.isPremium ? "#FFD700" : "#27ae60", fontSize: "18px" }}>
+                    {calculateTokensReceived(parseInt(tempCustomAmount)).toLocaleString()} token
+                  </strong>
+                </div>
+                {!user?.isPremium && (
+                  <div style={{ color: "#e74c3c", marginTop: "6px" }}>
+                    Komissiya: {(tempCustomAmount - calculateTokensReceived(parseInt(tempCustomAmount))).toLocaleString()} UZS (2%)
+                  </div>
+                )}
+              </div>
+            )}
+
+            <button
+              className="menu-custom-amount-confirm"
+              onClick={() => {
+                const amt = parseInt(tempCustomAmount);
+                if (amt && amt >= 1000) {
+                  setShowCustomAmountModal(false);
+                  setTempCustomAmount("");
+                  startExternalTopUp(amt);
+                } else {
+                  showAlertMessage("Kamida 1 000 UZS kiriting", "error");
+                }
+              }}
+            >
+              To'lov qilish
             </button>
           </div>
         </div>
@@ -436,14 +361,19 @@ function MainMenu({ user, updateUser }) {
       {/* PREMIUM MODAL */}
       {showPremiumModal && (
         <div className="menu-premium-modal">
-          <div className="menu-premium-overlay" onClick={() => setShowPremiumModal(false)}></div>
+          <div className="menu-premium-overlay" onClick={() => setShowPremiumModal(false)} />
           <div className="menu-premium-content">
-            <h3>Premium obuna sotib olish</h3>
-            <p>Premium obuna narxi: <strong>10,000 UZS</strong></p>
+            <h3>Premium obuna</h3>
+            <p>Narxi: <strong>10 000 token</strong></p>
+            <p style={{ fontSize: "14px", color: "#666", margin: "10px 0" }}>
+              Premium bilan komissiyasiz to'ldirish va boshqa imtiyozlar!
+            </p>
             <button className="menu-buy-premium-btn" onClick={handleBuyPremium}>
               Sotib olish
             </button>
-            <button className="menu-cancel-premium-btn" onClick={() => setShowPremiumModal(false)}>Bekor qilish</button>
+            <button className="menu-cancel-premium-btn" onClick={() => setShowPremiumModal(false)}>
+              Bekor qilish
+            </button>
           </div>
         </div>
       )}
