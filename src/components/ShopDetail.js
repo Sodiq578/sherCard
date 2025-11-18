@@ -3,7 +3,10 @@ import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiShoppingCart } from "react-icons/fi";
 import { getShops } from "../data/shops";
-import Logo from "../assets/images/logo.png";
+// import Logo from "../assets/images/logo.png"; // Ishlatilmayapti, olib tashlash mumkin
+// Agar balans logosi kerak bo‘lsa, Market componentidan yoki boshqa joydan import qiling:
+// import ValyutaLogo from "../assets/images/valyuta.png";
+
 import "../styles/ShopDetail.css"; // Yangi CSS fayl
 
 function ShopDetail({ user, updateUser }) {
@@ -17,9 +20,11 @@ function ShopDetail({ user, updateUser }) {
       alert(`Yetarli token yo‘q! Kerak: ${item.price.toLocaleString()} token`);
       return;
     }
+
     const confirmBuy = window.confirm(
       `"${item.name}" ni ${item.price.toLocaleString()} token ga sotib olasizmi?`
     );
+
     if (confirmBuy) {
       const updatedUser = {
         ...user,
@@ -67,6 +72,8 @@ function ShopDetail({ user, updateUser }) {
           Joriy balansingiz:{" "}
           <strong>{(user?.balance || 0).toLocaleString()} token</strong>
         </p>
+        {/* Agar balans logosi kerak bo‘lsa */}
+        {/* <img src={ValyutaLogo} alt="Token" className="balance-logo" /> */}
       </div>
 
       <div className="menu-list">

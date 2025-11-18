@@ -441,7 +441,7 @@ function App() {
   );
 }
 
-// ==================== BROWSER ROUTER ====================
+ 
 export default function AppWrapper() {
   return (
     <BrowserRouter>

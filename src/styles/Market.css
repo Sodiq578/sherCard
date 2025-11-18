@@ -388,8 +388,7 @@
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(255,107,107,0.5);
 }
-
-/* === MODAL === */
+ 
 .full-modal-overlay {
   position: fixed;
   top: 0;
@@ -403,7 +402,7 @@
   align-items: center;
   z-index: 1000;
   animation: fadeIn 0.3s ease-out;
-  padding: 16px;
+ 
   box-sizing: border-box;
 }
 
