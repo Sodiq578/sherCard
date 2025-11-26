@@ -4,7 +4,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
-  background: rgba(30, 30, 30, 0.6); /* Kulrang shaffof fon */
+  background: rgba(190, 189, 189, 0.273); /* Kulrang shaffof fon */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: 20px; /* Yumiqlangan burchaklar */

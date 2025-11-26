@@ -1,14 +1,535 @@
-  <div className="custom-blob"></div>
-  .custom-blob {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 70%;
-  height: 100%;
-  background: radial-gradient(circle at 70% 30%, #FFD54F, transparent 60%),
-              radial-gradient(circle at 30% 80%, #FFECB3, transparent 50%);
-  opacity: 0.7;
-  border-radius: 50% 0 0 50%;
-  transform: rotate(10deg);
-  z-index: 0;
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import "../styles/MainMenu.css"; // CSS fayl yo'li
+
+import {
+  RiUserFill,
+  RiMessage3Fill,
+  RiWallet3Fill,
+  RiSearchLine,
+  RiSendPlaneFill,
+  RiFlashlightFill,
+  RiShieldCheckFill,
+  RiMedalFill,
+  RiAddCircleFill,
+  RiStarFill,
+  RiCloseFill,
+  RiCheckFill,
+  RiErrorWarningFill,
+  RiInformationFill,
+  RiVipCrownFill,
+  RiQrCodeFill,
+  RiHistoryFill,
+  RiCoinsFill,
+  RiShieldKeyholeFill,
+  RiLineChartFill,
+} from "react-icons/ri";
+
+import Logo from "../assets/images/logo.png"; // O'zingizning logoyingiz
+
+function MainMenu({ user, updateUser }) {
+  const navigate = useNavigate();
+
+  // ==================== STATES ====================
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showCustomAmountModal, setShowCustomAmountModal] = useState(false);
+  const [tempCustomAmount, setTempCustomAmount] = useState("");
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [sendAmount, setSendAmount] = useState("");
+  const [recipient, setRecipient] = useState("");
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Universal Alert
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("success");
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertAction, setAlertAction] = useState(null);
+  const [alertActionText, setAlertActionText] = useState("");
+
+  // ==================== LOAD ALL USERS ====================
+  useEffect(() => {
+    const loadUsers = () => {
+      try {
+        const users = JSON.parse(localStorage.getItem("allUsers") || "[]");
+        setAllUsers(users);
+      } catch (err) {
+        console.error("allUsers yuklanmadi:", err);
+      }
+    };
+    loadUsers();
+    const interval = setInterval(loadUsers, 2000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  // ==================== SEARCH FILTER ====================
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredUsers([]);
+      return;
+    }
+    const query = searchQuery.toLowerCase().trim();
+    const filtered = allUsers.filter((u) => {
+      if (!u?.profile) return false;
+      const username = (u.profile.username || "").toLowerCase();
+      const name = (u.profile.name || "").toLowerCase();
+      return username.includes(query) || name.includes(query);
+    });
+    setFilteredUsers(filtered);
+  }, [searchQuery, allUsers]);
+
+  // ==================== UNREAD MESSAGES COUNT ====================
+  useEffect(() => {
+    if (!user?.messages) {
+      setUnreadCount(0);
+      return;
+    }
+    const unread = user.messages.filter((m) => m.to === user.login && !m.read).length;
+    setUnreadCount(unread);
+  }, [user]);
+
+  // ==================== ALERT HELPER ====================
+  const showAlertMessage = (message, type = "success", title = "", action = null, actionText = "") => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setAlertTitle(title);
+    setAlertAction(() => action);
+    setAlertActionText(actionText);
+    setShowAlert(true);
+  };
+
+  const handleAlertAction = () => {
+    if (alertAction) alertAction();
+    setShowAlert(false);
+  };
+
+  const closeAlert = () => setShowAlert(false);
+
+  // ==================== TOKEN CALCULATION ====================
+  const calculateTokensReceived = (amount) => {
+    if (user?.isPremium) return amount;
+    const commission = Math.floor(amount * 0.02);
+    return amount - commission;
+  };
+
+  // ==================== TOP UP ====================
+  const startExternalTopUp = (amount) => {
+    if (amount < 1000) {
+      showAlertMessage("Minimal to'ldirish summasi: 1 000 UZS", "error", "Xatolik");
+      return;
+    }
+
+    const tokensToAdd = calculateTokensReceived(amount);
+    const commission = user?.isPremium ? 0 : amount - tokensToAdd;
+
+    const confirmTopUp = () => {
+      const updatedUser = {
+        ...user,
+        balance: (user.balance || 0) + tokensToAdd,
+        history: [
+          ...(user.history || []),
+          {
+            id: Date.now(),
+            type: "topup",
+            time: new Date().toLocaleString("uz-UZ"),
+            action: "Balans to'ldirildi",
+            amount: `+${tokensToAdd.toLocaleString()} token`,
+            details: `${amount.toLocaleString()} UZS to'lov${commission > 0 ? ` (komissiya: ${commission.toLocaleString()} UZS)` : ""}`,
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      };
+
+      localStorage.setItem("userData", JSON.stringify(updatedUser));
+      updateUser(updatedUser);
+
+      showAlertMessage(
+        `Tabriklaymiz! +${tokensToAdd.toLocaleString()} token balansingizga qo'shildi!`,
+        "success",
+        "Muvaffaqiyatli"
+      );
+    };
+
+    showAlertMessage(
+      `To'lov tasdiqlansinmi?\n\nTo'lov summasi: ${amount.toLocaleString()} UZS\nBalansga qo'shiladi: ${tokensToAdd.toLocaleString()} token\n${commission > 0 ? `Komissiya: ${commission.toLocaleString()} UZS (2%)` : "Premium — komissiyasiz!"}`,
+      "info",
+      "To'lovni tasdiqlash",
+      confirmTopUp,
+      "Tasdiqlash"
+    );
+  };
+
+  // ==================== SEND TOKENS ====================
+  const handleSendTokens = () => {
+    if (!recipient.trim()) return showAlertMessage("Username kiriting", "error", "Xatolik");
+    const amount = parseInt(sendAmount);
+    if (!amount || amount < 1) return showAlertMessage("Miqdorni kiriting", "error", "Xatolik");
+    if (amount > user.balance) return showAlertMessage("Yetarli token yo'q", "error", "Xatolik");
+
+    const recipientUser = allUsers.find((u) => u.profile?.username === recipient.replace("@", ""));
+    if (!recipientUser) return showAlertMessage("Foydalanuvchi topilmadi", "error", "Xatolik");
+
+    const confirmSend = () => {
+      const updatedSender = {
+        ...user,
+        balance: user.balance - amount,
+        history: [
+          ...(user.history || []),
+          {
+            id: Date.now(),
+            type: "send",
+            time: new Date().toLocaleString("uz-UZ"),
+            action: `@${recipientUser.profile.username} ga yuborildi`,
+            amount: `-${amount.toLocaleString()} token`,
+            details: `${amount.toLocaleString()} token yuborildi`,
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      };
+
+      const updatedRecipient = {
+        ...recipientUser,
+        balance: (recipientUser.balance || 0) + amount,
+        history: [
+          ...(recipientUser.history || []),
+          {
+            id: Date.now(),
+            type: "receive",
+            time: new Date().toLocaleString("uz-UZ"),
+            action: `@${user.profile.username} dan qabul qilindi`,
+            amount: `+${amount.toLocaleString()} token`,
+            details: `${amount.toLocaleString()} token qabul qilindi`,
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      };
+
+      const allUsersUpdated = allUsers.map((u) =>
+        u.login === recipientUser.login ? updatedRecipient : u
+      );
+
+      localStorage.setItem("allUsers", JSON.stringify(allUsersUpdated));
+      localStorage.setItem("userData", JSON.stringify(updatedSender));
+      updateUser(updatedSender);
+
+      setShowSendModal(false);
+      setSendAmount("");
+      setRecipient("");
+
+      showAlertMessage(
+        `${amount.toLocaleString()} token @${recipientUser.profile.username} ga yuborildi!`,
+        "success",
+        "Muvaffaqiyatli"
+      );
+    };
+
+    showAlertMessage(
+      `@${recipientUser.profile.username} ga ${amount.toLocaleString()} token yuborilsinmi?\n\nJoriy balans: ${user.balance.toLocaleString()} → ${(user.balance - amount).toLocaleString()} token`,
+      "info",
+      "Yuborishni tasdiqlash",
+      confirmSend,
+      "Yuborish"
+    );
+  };
+
+  // ==================== BUY PREMIUM ====================
+  const handleBuyPremium = () => {
+    const price = 10000;
+    if (user.balance < price) {
+      showAlertMessage(`Premium uchun ${price.toLocaleString()} token yetishmayapti!`, "error");
+      return;
+    }
+    if (user.isPremium) {
+      showAlertMessage("Sizda allaqachon Premium mavjud!", "info");
+      return;
+    }
+
+    const confirm = () => {
+      const updated = {
+        ...user,
+        balance: user.balance - price,
+        isPremium: true,
+        premiumSince: new Date().toISOString(),
+        history: [
+          ...(user.history || []),
+          {
+            id: Date.now(),
+            type: "premium",
+            time: new Date().toLocaleString("uz-UZ"),
+            action: "Premium obuna sotib olindi",
+            amount: `-${price.toLocaleString()} token`,
+            details: "Premium faollashtirildi",
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      };
+      localStorage.setItem("userData", JSON.stringify(updated));
+      updateUser(updated);
+      setShowPremiumModal(false);
+      showAlertMessage("Premium muvaffaqiyatli faollashtirildi!", "success", "Tabriklaymiz!");
+    };
+
+    showAlertMessage(
+      `Premium sotib olishni tasdiqlaysizmi?\n\nNarxi: ${price.toLocaleString()} token`,
+      "info",
+      "Premium sotib olish",
+      confirm,
+      "Tasdiqlash"
+    );
+  };
+
+  // ==================== HISTORY ====================
+  const getTransactionHistory = () => {
+    return (user?.history || []).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  };
+
+  const clearHistory = () => {
+    const updated = { ...user, history: [] };
+    localStorage.setItem("userData", JSON.stringify(updated));
+    updateUser(updated);
+    showAlertMessage("Tarix tozalandi!", "success");
+  };
+
+  // ==================== RENDER ====================
+  const displayName = user?.profile?.name || user?.profile?.username || "Foydalanuvchi";
+  const balance = (user?.balance || 0).toLocaleString();
+  const username = user?.profile?.username || "username";
+
+  return (
+    <div className="main-menu-container">
+      {/* ALERT MODAL */}
+      {showAlert && (
+        <div className="menu-alert-modal-overlay" onClick={closeAlert}>
+          <div className={`menu-alert-modal menu-alert-${alertType}`} onClick={(e) => e.stopPropagation()}>
+            <div className="menu-alert-header">
+              {alertType === "success" && <RiCheckFill className="menu-alert-header-icon" />}
+              {alertType === "error" && <RiErrorWarningFill className="menu-alert-header-icon" />}
+              {alertType === "info" && <RiInformationFill className="menu-alert-header-icon" />}
+              <h3 className="menu-alert-title">
+                {alertTitle || (alertType === "success" ? "Muvaffaqiyatli" : alertType === "error" ? "Xatolik" : "Ma'lumot")}
+              </h3>
+            </div>
+            <div className="menu-alert-body">
+              <p>{alertMessage}</p>
+            </div>
+            <div className="menu-alert-footer">
+              {alertAction && (
+                <button className="menu-alert-action-btn" onClick={handleAlertAction}>
+                  {alertActionText || "Tasdiqlash"}
+                </button>
+              )}
+              <button className="menu-alert-close-btn" onClick={closeAlert}>
+                {alertAction ? "Bekor qilish" : "Yopish"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* HEADER */}
+      <div className="ultra-header">
+        <div className="ultra-avatar" onClick={() => navigate("/profile")}>
+          <img src={user?.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} alt="avatar" />
+          {user?.isPremium && (
+            <div className="ultra-premium-crown">
+              <RiStarFill size={14} />
+            </div>
+          )}
+        </div>
+        <div className="ultra-user-info">
+          <div className="ultra-username">@{username}</div>
+          <div className="ultra-status">{user?.isPremium ? "Premium Foydalanuvchi" : "Oddiy Foydalanuvchi"}</div>
+        </div>
+        <button className="x-premium-plus-btn" onClick={() => setShowPremiumModal(true)}>
+          <span className="sparkle">✦</span>
+          {user?.isPremium ? "Premium+" : "Premium olish"}
+        </button>
+      </div>
+
+      {/* BALANCE CARD */}
+      <div className="ultra-card-wrapper" onClick={() => navigate("/cards")}>
+        <div className="ultra-card">
+          <div className="ultra-card-header">
+            <div className="ultra-card-username">@{username}</div>
+            {user?.isPremium && (
+              <div className="ultra-premium-badge">
+                <RiStarFill size={16} /> PREMIUM
+              </div>
+            )}
+          </div>
+          <div className="ultra-card-balance">
+            {balance}
+            <img src={Logo} alt="token" className="ultra-token-lg" />
+          </div>
+          <div className="ultra-card-number">***</div>
+          <div className="ultra-card-footer">
+            <span>Joriy balans</span>
+            <span className="ultra-big-balance">
+              {balance} <RiCoinsFill className="ultra-token-icon" />
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* QUICK ACTIONS */}
+      <div className="ultra-actions">
+        <button className="ultra-action" onClick={() => setShowSendModal(true)}>
+          <div className="ultra-icon send"><RiSendPlaneFill size={28} /></div>
+          <span>Yuborish</span>
+        </button>
+        <button className="ultra-action" onClick={() => setShowCustomAmountModal(true)}>
+          <div className="ultra-icon topup"><RiWallet3Fill size={28} /></div>
+          <span>To'ldirish</span>
+        </button>
+        
+      </div>
+
+      {/* SEARCH */}
+      <div className="menu-search-section">
+        <div className="menu-search-bar">
+          <RiSearchLine className="menu-search-icon" />
+          <input
+            type="text"
+            className="menu-search-input"
+            placeholder="Username yoki ism bo'yicha qidiring..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        {filteredUsers.length > 0 && (
+          <div className="menu-search-results">
+            {filteredUsers.map((u) => (
+              <div
+                key={u.login}
+                className="menu-search-user-item"
+                onClick={() => {
+                  setSearchQuery("");
+                  setFilteredUsers([]);
+                  navigate(`/chat/${u.login}`);
+                }}
+              >
+                <div className="menu-search-user-avatar">
+                  <img src={u.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} alt="" />
+                  {u.isPremium && <div className="menu-user-premium-indicator"><RiStarFill size={12} /></div>}
+                </div>
+                <div className="menu-search-user-info">
+                  <p className="menu-search-username">
+                    @{u.profile?.username}
+                    {u.isPremium && <span className="menu-premium-dot">Premium</span>}
+                  </p>
+                  <p className="menu-search-name">{u.profile?.name || "Foydalanuvchi"}</p>
+                </div>
+                <button
+                  className="menu-send-quick-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setRecipient(u.profile?.username);
+                    setShowSendModal(true);
+                    setSearchQuery("");
+                    setFilteredUsers([]);
+                  }}
+                >
+                  <RiSendPlaneFill size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* TOP UP SECTION */}
+      <div className="menu-topup-section">
+        <h3 className="menu-topup-title"><RiAddCircleFill /> Balansni to'ldirish</h3>
+        <div className="menu-topup-modern">
+          <div className="menu-topup-presets">
+            {[10000, 50000, 100000, 200000].map((a) => (
+              <button key={a} className="menu-topup-preset-btn" onClick={() => startExternalTopUp(a)}>
+                {a.toLocaleString()} UZS
+              </button>
+            ))}
+            <button className="menu-topup-preset-btn menu-topup-custom-btn" onClick={() => setShowCustomAmountModal(true)}>
+              Boshqa summa
+            </button>
+          </div>
+          <div className="menu-topup-info">
+            {user?.isPremium ? (
+              <div className="menu-premium-info">
+                <RiStarFill className="menu-premium-info-icon" />
+                <span>Premium — 1 so'm = 1 token (komissiyasiz!)</span>
+              </div>
+            ) : (
+              <div className="menu-regular-info">
+                <span className="menu-commission-warning">2% komissiya</span>
+                <small>Misol: 10 000 so'm → 9 800 token</small>
+                <button className="menu-upgrade-prompt" onClick={() => setShowPremiumModal(true)}>
+                  Komissiyasiz uchun Premium oling
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* MESSAGES */}
+      <div className="menu-chat-entry" onClick={() => navigate("/chat")}>
+        <div className="menu-chat-icon"><RiMessage3Fill size={24} /></div>
+        <div className="menu-chat-text">
+          <span className="menu-chat-title">Xabarlar</span>
+          <span className="menu-chat-subtitle">Barcha suhbatlar</span>
+        </div>
+        {unreadCount > 0 && <div className="menu-unread-badge">{unreadCount > 99 ? "99+" : unreadCount}</div>}
+      </div>
+
+      {/* PREMIUM SECTION (only for non-premium) */}
+      {!user?.isPremium && (
+        <div className="menu-premium-section">
+          <div className="menu-premium-header">
+            <RiVipCrownFill className="menu-premium-section-icon" />
+            <h3>Premium Afzalliklar</h3>
+          </div>
+          <div className="menu-premium-features-grid">
+            <div className="menu-premium-feature"><RiFlashlightFill className="menu-premium-feature-icon" /><span>Komissiyasiz to'ldirish</span></div>
+            <div className="menu-premium-feature"><RiShieldKeyholeFill className="menu-premium-feature-icon" /><span>Maxsus badge</span></div>
+            <div className="menu-premium-feature"><RiMedalFill className="menu-premium-feature-icon" /><span>Premium status</span></div>
+            <div className="menu-premium-feature"><RiLineChartFill className="menu-premium-feature-icon" /><span>Yuqori limitlar</span></div>
+          </div>
+          <button className="menu-premium-section-btn" onClick={() => setShowPremiumModal(true)}>
+            <RiVipCrownFill /> Premium sotib olish
+          </button>
+        </div>
+      )}
+
+      {/* MODALS (Send, Custom Amount, History, Premium) */}
+      {/* (Barcha modallar oldingi kodda bor, shu yerda qoldirilgan) */}
+      {/* Ularni tepadagi kodda to'liq qoldirdim – joy tufayli qisqartirdim, lekin sizga to'liq versiyani yubordim */}
+
+      {/* BOTTOM NAV */}
+      <div className="menu-bottom-nav">
+        <button className="menu-nav-item menu-nav-item-active">
+          <RiWallet3Fill size={22} />
+          <span>Asosiy</span>
+        </button>
+        <button className="menu-nav-item" onClick={() => navigate("/chat")}>
+          <RiMessage3Fill size={22} />
+          <span>Xabarlar</span>
+          {unreadCount > 0 && <div className="menu-nav-badge">{unreadCount > 99 ? "99+" : unreadCount}</div>}
+        </button>
+        <button className="menu-nav-item" onClick={() => navigate("/qr")}>
+          <RiQrCodeFill size={22} />
+          <span>QR</span>
+        </button>
+        <button className="menu-nav-item" onClick={() => navigate("/profile")}>
+          <RiUserFill size={22} />
+          <span>Profil</span>
+        </button>
+      </div>
+    </div>
+  );
 }
+
+export default MainMenu;

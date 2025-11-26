@@ -1,3 +1,4 @@
+// Market.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ValyutaLogo from "../assets/images/logo.png";
@@ -9,7 +10,7 @@ import "../styles/Market.css";
 
 function Market({ user, updateUser }) {
   const navigate = useNavigate();
-  const [modalOpen, setModalOpen] = useState(null); // "cards" | "story" | null
+  const [modalOpen, setModalOpen] = useState(null);
   const [ads, setAds] = useState([]);
   const [viewedAds, setViewedAds] = useState([]);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
@@ -18,20 +19,13 @@ function Market({ user, updateUser }) {
     text: "",
     imageFile: null,
     imagePreview: "",
-    duration: 1,
+    url: "",
+    duration: 7,
   });
   const fileInputRef = useRef(null);
   const progressInterval = useRef(null);
 
-  const promotions = [
-    { id: 1, name: "Pitsa 1+1", price: 1000, image: "https://via.placeholder.com/120?text=Pitsa" },
-    { id: 2, name: "Burger + Cola", price: 800, image: "https://via.placeholder.com/120?text=Burger" },
-    { id: 3, name: "Shaurma", price: 600, image: "https://via.placeholder.com/120?text=Shaurma" },
-    { id: 4, name: "Kola 1L", price: 500, image: "https://via.placeholder.com/120?text=Kola" },
-    { id: 5, name: "Salat", price: 700, image: "https://via.placeholder.com/120?text=Salat" },
-    { id: 6, name: "Kofe", price: 400, image: "https://via.placeholder.com/120?text=Kofe" },
-  ];
-
+  // Reklamalarni yuklash
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("approvedMarketAds") || "[]");
     const now = Date.now();
@@ -39,19 +33,18 @@ function Market({ user, updateUser }) {
     localStorage.setItem("approvedMarketAds", JSON.stringify(active));
 
     const viewed = JSON.parse(localStorage.getItem("viewedMarketStories") || "[]");
-
-    const sortedAds = active.sort((a, b) => {
+    const sorted = active.sort((a, b) => {
       const aViewed = viewed.includes(a.id);
       const bViewed = viewed.includes(b.id);
       if (!aViewed && bViewed) return -1;
       if (aViewed && !bViewed) return 1;
       return b.createdAt - a.createdAt;
     });
-
-    setAds(sortedAds);
+    setAds(sorted);
     setViewedAds(viewed);
   }, []);
 
+  // Story progress bar
   useEffect(() => {
     if (modalOpen === "story" && ads.length > 0) {
       setProgress(0);
@@ -59,7 +52,6 @@ function Market({ user, updateUser }) {
       const duration = 8000;
       const step = 50;
       const increment = (100 * step) / duration;
-
       progressInterval.current = setInterval(() => {
         setProgress(prev => {
           if (prev >= 100) {
@@ -70,7 +62,6 @@ function Market({ user, updateUser }) {
           return Math.min(prev + increment, 100);
         });
       }, step);
-
       return () => clearInterval(progressInterval.current);
     }
   }, [currentStoryIndex, modalOpen, ads.length]);
@@ -89,17 +80,13 @@ function Market({ user, updateUser }) {
     markAsViewed(ads[index].id);
   };
 
-  const goPrev = () => {
-    if (currentStoryIndex > 0) setCurrentStoryIndex(prev => prev - 1);
-  };
-
+  const goPrev = () => currentStoryIndex > 0 && setCurrentStoryIndex(prev => prev - 1);
   const goNext = () => {
     if (currentStoryIndex < ads.length - 1) {
       setCurrentStoryIndex(prev => prev + 1);
       markAsViewed(ads[currentStoryIndex + 1].id);
     } else {
       setModalOpen(null);
-      setProgress(0);
     }
   };
 
@@ -107,7 +94,7 @@ function Market({ user, updateUser }) {
     const file = e.target.files[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      showAlertMessage("Faqat rasm tanlang!", "error", "Xatolik");
+      showAlertMessage("Faqat rasm yuklash mumkin!", "error");
       return;
     }
     const reader = new FileReader();
@@ -123,18 +110,21 @@ function Market({ user, updateUser }) {
   };
 
   const handlePlaceAd = () => {
-    const { text, imagePreview, duration } = adForm;
-    if (!text.trim()) return showAlertMessage("Reklama matnini kiriting!", "error", "Xatolik");
-    if (text.trim().length > 100) return showAlertMessage("Matn 100 belgidan oshmasin!", "error", "Xatolik");
-    if (!imagePreview) return showAlertMessage("Rasm tanlang!", "error", "Xatolik");
+    const { text, imagePreview, duration, url } = adForm;
+    if (!text.trim()) return showAlertMessage("Reklama matnini kiriting!", "error");
+    if (text.length > 120) return showAlertMessage("Matn 120 belgidan oshmasin!", "error");
+    if (!imagePreview) return showAlertMessage("Rasm yuklang!", "error");
 
     const cost = duration * 500;
-    if ((user?.balance || 0) < cost) return showAlertMessage(`Balans yetarli emas! Kerak: ${cost} so'm`, "error", "Xatolik");
+    if ((user?.balance || 0) < cost) {
+      return showAlertMessage(`Balans yetarli emas! Kerak: ${cost.toLocaleString()} so'm`, "error");
+    }
 
     const newAd = {
       id: Date.now() + Math.random(),
       text: text.trim(),
       image: imagePreview,
+      url: url.trim(),
       duration,
       cost,
       expiresAt: Date.now() + duration * 24 * 60 * 60 * 1000,
@@ -150,66 +140,45 @@ function Market({ user, updateUser }) {
     updateUser({
       ...user,
       balance: user.balance - cost,
-      history: [...(user.history || []), { date: new Date().toLocaleString(), action: `Reklama so‘rovi yuborildi (${duration} kun)`, amount: -cost }]
+      history: [...(user.history || []), {
+        date: new Date().toLocaleString(),
+        action: `Reklama (${duration} kun)`,
+        amount: -cost
+      }]
     });
 
-    showAlertMessage("So‘rov yuborildi! Admin tasdiqlashini kuting", "success", "Muvaffaqiyatli");
-    setAdForm({ text: "", imageFile: null, imagePreview: "", duration: 1 });
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    showAlertMessage(`So‘rov yuborildi!\n${duration} kunlik reklama admin tasdiqlashini kutmoqda`, "success", "Muvaffaqiyatli");
+    setAdForm({ text: "", imageFile: null, imagePreview: "", url: "", duration: 7 });
   };
 
+  // Alert system
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success");
   const [alertTitle, setAlertTitle] = useState("");
-  const [alertAction, setAlertAction] = useState(null);
-  const [alertActionText, setAlertActionText] = useState("");
 
-  const showAlertMessage = (message, type = "success", title = "", action = null, actionText = "") => {
+  const showAlertMessage = (message, type = "success", title = "") => {
     setAlertMessage(message);
     setAlertType(type);
-    setAlertTitle(title);
-    setAlertAction(() => action);
-    setAlertActionText(actionText);
+    setAlertTitle(title || (type === "success" ? "Muvaffaqiyatli" : "Xatolik"));
     setShowAlert(true);
-  };
-
-  const handleAlertAction = () => {
-    if (alertAction) alertAction();
-    setShowAlert(false);
-  };
-
-  const closeAlert = () => setShowAlert(false);
-
-  const handleBuy = (item) => {
-    if ((user?.balance || 0) < item.price) return showAlertMessage("Balans yetarli emas!", "error", "Xatolik");
-    const confirmBuy = () => {
-      updateUser({
-        ...user,
-        balance: user.balance - item.price,
-        history: [...(user.history || []), { time: new Date().toLocaleString(), action: `Sotib olindi: ${item.name}`, amount: -item.price }]
-      });
-      showAlertMessage(`${item.name} muvaffaqiyatli sotib olindi!`, "success", "Muvaffaqiyatli");
-    };
-    showAlertMessage(`Sotib olishni tasdiqlaysizmi? Narxi: ${item.price}`, "info", "Sotib olish", confirmBuy, "Ha, sotib olaman");
   };
 
   return (
     <>
-      {/* ALERT */}
+      {/* ALERT MODAL */}
       {showAlert && (
-        <div className="market-alert-modal-overlay">
-          <div className={`market-alert-modal market-alert-${alertType}`}>
+        <div className="market-alert-modal-overlay" onClick={() => setShowAlert(false)}>
+          <div className={`market-alert-modal market-alert-${alertType}`} onClick={e => e.stopPropagation()}>
             <div className="market-alert-header">
               {alertType === "success" && <FiCheck />}
               {alertType === "error" && <FiAlertCircle />}
               {alertType === "info" && <FiInfo />}
-              <h3>{alertTitle || (alertType === "success" ? "Muvaffaqiyatli" : "Xatolik")}</h3>
+              <h3>{alertTitle}</h3>
             </div>
             <div className="market-alert-body"><p>{alertMessage}</p></div>
             <div className="market-alert-footer">
-              {alertAction && <button onClick={handleAlertAction}>{alertActionText || "Tasdiqlash"}</button>}
-              <button onClick={closeAlert}>{alertAction ? "Bekor qilish" : "Yopish"}</button>
+              <button onClick={() => setShowAlert(false)}>Yopish</button>
             </div>
           </div>
         </div>
@@ -219,10 +188,10 @@ function Market({ user, updateUser }) {
       {ads.length > 0 && (
         <div className="stories-bar">
           <div className="stories-wrapper">
-            {ads.map((ad, index) => (
-              <div key={ad.id} className="story-circle" onClick={() => openStory(index)}>
+            {ads.map((ad, i) => (
+              <div key={ad.id} className="story-circle" onClick={() => openStory(i)}>
                 <div className={`story-ring ${viewedAds.includes(ad.id) ? "viewed" : "new"}`}>
-                  <img src={ad.image} alt={ad.seller} className="story-avatar" />
+                  <img src={ad.image} alt="" className="story-avatar" />
                 </div>
                 <p className="story-username">@{ad.seller}</p>
               </div>
@@ -238,28 +207,31 @@ function Market({ user, updateUser }) {
             <div className="story-progress-container">
               {ads.map((_, i) => (
                 <div key={i} className="progress-segment-wrapper">
-                  <div
-                    className="progress-segment"
-                    style={{ width: i < currentStoryIndex ? "100%" : i === currentStoryIndex ? `${progress}%` : "0%" }}
-                  />
+                  <div className="progress-segment" style={{ width: i < currentStoryIndex ? "100%" : i === currentStoryIndex ? `${progress}%` : "0%" }} />
                 </div>
               ))}
             </div>
             <div className="story-tap-left" onClick={goPrev} />
             <div className="story-tap-right" onClick={goNext} />
-            <img src={ads[currentStoryIndex].image} alt="Reklama" className="story-full-image" />
+            <img src={ads[currentStoryIndex].image} alt="" className="story-full-image" />
             <div className="story-overlay-bottom">
-              <p>{ads[currentStoryIndex].text}</p>
-              <p>@{ads[currentStoryIndex].seller}</p>
+              <p className="story-text">{ads[currentStoryIndex].text}</p>
+              {ads[currentStoryIndex].url && (
+                <a href={ads[currentStoryIndex].url} target="_blank" rel="noopener noreferrer" className="story-link">
+                  Batafsil →
+                </a>
+              )}
+              <p className="story-seller">@{ads[currentStoryIndex].seller}</p>
             </div>
             <button className="story-close-btn" onClick={() => setModalOpen(null)}>×</button>
           </div>
         </div>
       )}
 
-      {/* MARKET PAGE */}
+      {/* MAIN PAGE */}
       <div className="market-page">
         <div className="market-container">
+
           <div className="market-header">
             <h2>Market</h2>
             <div className="balance-display">
@@ -281,55 +253,109 @@ function Market({ user, updateUser }) {
             </div>
           </section>
 
-          <section className="promotions-section">
-            <div className="section-header"><h3>Chegirmadagi mahsulotlar</h3></div>
-            <div className="promotions-grid">
-              {promotions.map(item => (
-                <div key={item.id} className="promo-card-small">
-                  <img src={item.image} alt={item.name} />
-                  <h4>{item.name}</h4>
-                  <p>{item.price.toLocaleString()} so'm</p>
-                  <button onClick={() => handleBuy(item)}>Sotib olish</button>
+          {/* PREMIUM REKLAMA FORMASI */}
+          <section className="ads-section-premium">
+            <div className="ads-card">
+              <div className="ads-balance-header">
+                <span>Reklama joylashtirish</span>
+                <div className="balance-amount">
+                  <img src={ValyutaLogo} alt="so'm" />
+                  <span>{(user?.balance || 0).toLocaleString()}</span>
                 </div>
-              ))}
-            </div>
-          </section>
+              </div>
 
-          <section className="ads-section">
-            <div className="section-header">
-              <h3>Reklama Joylashtirish</h3>
-              <span>500 so'm / kun</span>
-            </div>
-            <div className="ads-form">
-              <textarea
-                placeholder="Reklama matni (maks. 100 belgi)"
-                maxLength={100}
-                value={adForm.text}
-                onChange={e => setAdForm(prev => ({ ...prev, text: e.target.value }))}
-              />
-              <div className="image-upload-area">
-                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} id="ad-image-input" style={{ display: "none" }} />
-                <label htmlFor="ad-image-input">{adForm.imagePreview ? "Rasmni o'zgartirish" : "Rasm tanlash"}</label>
-                {adForm.imagePreview && (
+              {/* Reklama matni */}
+              <div className="ads-input-group">
+                <textarea
+                  placeholder="Masalan: Nikita Panto yangi jamoaga qo‘shildi!"
+                  maxLength={120}
+                  rows={3}
+                  value={adForm.text}
+                  onChange={(e) => setAdForm(prev => ({ ...prev, text: e.target.value }))}
+                />
+                <div className="ads-char-counter">{adForm.text.length}/120</div>
+              </div>
+
+              {/* Rasm yuklash */}
+              <div className="ads-upload-area">
+                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} id="premium-ad-image" style={{ display: "none" }} />
+                {!adForm.imagePreview ? (
+                  <label htmlFor="premium-ad-image" className="upload-placeholder">
+                    <span>16:9 rasm yuklash (tavsiya etiladi)</span>
+                  </label>
+                ) : (
                   <div className="image-preview">
                     <img src={adForm.imagePreview} alt="Preview" />
-                    <button onClick={removeImage} className="remove-image-btn">×</button>
+                    <button onClick={removeImage} className="remove-btn">×</button>
                   </div>
                 )}
               </div>
-              <div className="duration-selector">
-                <label>Muddati:</label>
+
+              {/* Havola */}
+              <div className="ads-input-group">
                 <input
-                  type="number"
-                  min={1}
-                  max={30}
-                  value={adForm.duration}
-                  onChange={e => setAdForm(prev => ({ ...prev, duration: Math.max(1, Math.min(30, parseInt(e.target.value) || 1)) }))}
+                  type="url"
+                  placeholder="Havola (ixtiyoriy) – https://teamsprit.gg"
+                  value={adForm.url}
+                  onChange={(e) => setAdForm(prev => ({ ...prev, url: e.target.value }))}
                 />
-                <span>kun</span>
               </div>
-              <p>Jami narx: {(adForm.duration * 500).toLocaleString()} so'm</p>
-              <button onClick={handlePlaceAd} className="place-ad-btn">Reklamani Joylashtirish</button>
+
+              {/* Muddati */}
+              <div className="ads-duration-section">
+                <div className="duration-info-row">
+                  <div className="duration-text">Ko‘rsatish muddati</div>
+                  <div className="price-info">
+                    <div className="price-row">
+                      <span>500 so'm / kun</span>
+                    </div>
+                    <div className="price-row total">
+                      <strong>{adForm.duration} kun</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="custom-slider-container">
+                  <input
+                    type="range"
+                    min="1"
+                    max="30"
+                    value={adForm.duration}
+                    onChange={(e) => setAdForm(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
+                    className="custom-range"
+                  />
+                  <div className="slider-track"></div>
+                  <div className="slider-fill" style={{ width: `${((adForm.duration - 1) / 29) * 100}%` }}></div>
+                  <div className="slider-thumb" style={{ left: `${((adForm.duration - 1) / 29) * 100}%` }}>
+                    <div className="thumb-circle"></div>
+                  </div>
+                  <div className="thumb-value" style={{ left: `${((adForm.duration - 1) / 29) * 100}%` }}>
+                    {adForm.duration}
+                  </div>
+                </div>
+
+                <div className="duration-labels">
+                  <span>1 kun</span>
+                  <span>30 kun</span>
+                </div>
+              </div>
+
+              {/* Jami narx */}
+              <div className="ads-total-price">
+                <div className="total-label">Jami to‘lov summasi</div>
+                <div className="total-amount">
+                  {(adForm.duration * 500).toLocaleString()} so‘m
+                </div>
+              </div>
+
+              {/* Tugma */}
+              <button
+                onClick={handlePlaceAd}
+                className="ads-submit-premium"
+                disabled={!adForm.text.trim() || !adForm.imagePreview}
+              >
+                Reklama joylashtirish
+              </button>
             </div>
           </section>
         </div>

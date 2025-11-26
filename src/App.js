@@ -5,8 +5,6 @@ import {
   Route,
   Navigate,
   useLocation,
-  useParams,
-  useNavigate,
 } from "react-router-dom";
 
 // ==================== KOMPONENTLAR ====================
@@ -28,8 +26,8 @@ import BottomNav from "./components/BottomNav";
 
 // Chat komponentlari
 import ChatList from "./components/ChatList";
-import ViewProfile from "./components/ViewProfile";
 import ChatDetail from "./components/ChatDetail";
+import UserProfile from "./components/UserProfile"; // Yangi UserProfile
 
 import "./styles/App.css";
 
@@ -53,7 +51,8 @@ const BottomNavWrapper = ({ isAuthenticated, isAdmin }) => {
 
   const isShopPage = /^\/shop\/\d+$/.test(location.pathname);
   const isChatDetailPage = /^\/chat\/[^/]+$/.test(location.pathname);
-  const isAllowedPage = allowedPaths.includes(location.pathname) || isChatDetailPage;
+  const isUserProfilePage = /^\/user-profile\/[^/]+$/.test(location.pathname);
+  const isAllowedPage = allowedPaths.includes(location.pathname) || isChatDetailPage || isUserProfilePage;
 
   const shouldShow = isAuthenticated && !isAdmin && (isAllowedPage || isShopPage);
 
@@ -307,11 +306,7 @@ function App() {
           path="/profile"
           element={
             isAuthenticated && !isAdmin ? (
-              <Profile
-                user={user}
-                updateUser={updateUser}
-                onLogout={handleLogout}
-              />
+              <UserProfile user={user} updateUser={updateUser} />
             ) : (
               <Navigate to="/" />
             )
@@ -320,9 +315,13 @@ function App() {
 
         {/* BOSHQA FOYDALANUVCHI PROFILI */}
         <Route
-          path="/profile/:login"
+          path="/user-profile/:login"
           element={
-            isAuthenticated && !isAdmin ? <ViewProfile /> : <Navigate to="/" />
+            isAuthenticated && !isAdmin ? (
+              <UserProfile user={user} updateUser={updateUser} />
+            ) : (
+              <Navigate to="/" />
+            )
           }
         />
 
@@ -364,7 +363,7 @@ function App() {
           path="/all-shops"
           element={
             isAuthenticated && !isAdmin ? <AllShops user={user} /> : <Navigate to="/" />
-          }
+            }
         />
 
         <Route
@@ -382,7 +381,7 @@ function App() {
           path="/history"
           element={
             isAuthenticated && !isAdmin ? <History user={user} /> : <Navigate to="/" />
-          }
+            }
         />
 
         <Route
@@ -435,10 +434,3 @@ export default function AppWrapper() {
     </BrowserRouter>
   );
 }
-
-
-
-
-
-
-

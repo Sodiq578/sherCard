@@ -2,17 +2,32 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { getShops } from "../data/shops";
-import { FiShoppingBag, FiClock, FiStar } from "react-icons/fi";
+import { FiShoppingBag, FiClock, FiStar, FiArrowLeft } from "react-icons/fi";
 import "../styles/AllShops.css";
 
 function AllShops({ user }) {
   const navigate = useNavigate();
   const shops = getShops();
 
+  // Kategoriyani aniqlash funksiyasi
+  const getCategory = (name) => {
+    const lower = name.toLowerCase();
+    if (lower.includes("burger") || lower.includes("kfc") || lower.includes("mcdonald")) return "Fastfood";
+    if (lower.includes("pizza")) return "Pitsa";
+    if (lower.includes("osh") || lower.includes("plov")) return "Milliy taomlar";
+    if (lower.includes("döner") || lower.includes("shaurma")) return "Döner";
+    if (lower.includes("starbucks") || lower.includes("kofe")) return "Kofe va ichimliklar";
+    return "Restoran";
+  };
+
   return (
     <div className="allshops-page">
       <div className="allshops-container">
-        
+        {/* Orqaga tugmasi */}
+        <button className="allshops-back-btn" onClick={() => navigate(-1)}>
+          <FiArrowLeft className="back-icon" /> Orqaga
+        </button>
+
         {/* Header */}
         <div className="allshops-header">
           <h1 className="allshops-title">
@@ -24,45 +39,48 @@ function AllShops({ user }) {
 
         {/* Do‘konlar Grid */}
         <div className="allshops-grid">
-          {shops.map((shop) => (
+          {shops.map((shop, index) => (
             <div
               key={shop.id}
               className="allshops-card"
               onClick={() => navigate(`/shop/${shop.id}`)}
+              style={{ animationDelay: `${0.1 + index * 0.1}s` }}
             >
-              {/* LOGO - KATTA VA CHIROYLILI */}
+              {/* Logo + Badge + Rating */}
               <div className="allshops-logo-wrapper">
                 <img
                   src={shop.logo}
                   alt={shop.name}
                   className="allshops-logo"
                   onError={(e) => {
-                    e.target.src = `https://via.placeholder.com/300/2d2d2d/ffffff?text=${shop.name.substring(0, 2).toUpperCase()}`;
+                    e.target.src = `https://via.placeholder.com/300/2d2d2d/ffffff?text=${shop.name
+                      .substring(0, 2)
+                      .toUpperCase()}`;
                   }}
                 />
+
+                {/* Menu soni badge */}
+                <div className="allshops-menu-count">
+                  {shop.menu?.length || 0} ta taom
+                </div>
+
+                {/* Reyting */}
                 <div className="allshops-rating">
                   <FiStar className="rating-star" /> 4.8
                 </div>
               </div>
 
-              {/* INFO */}
+              {/* Ma'lumotlar */}
               <div className="allshops-info">
                 <h3 className="allshops-name">{shop.name}</h3>
                 <p className="allshops-category">{getCategory(shop.name)}</p>
-                
+
                 <div className="allshops-footer">
                   <span className="allshops-time">
                     <FiClock className="footer-icon" /> 30-40 daqiqa
                   </span>
-                  <span className="allshops-min-order">
-                    Min: 50 000 so‘m
-                  </span>
+                  <span className="allshops-min-order">Min: 50 000 so‘m</span>
                 </div>
-              </div>
-
-              {/* Menu soni */}
-              <div className="allshops-menu-count">
-                {shop.menu?.length || 0} ta taom
               </div>
             </div>
           ))}
@@ -71,16 +89,5 @@ function AllShops({ user }) {
     </div>
   );
 }
-
-// Kategoriya aniqlash
-const getCategory = (name) => {
-  const lower = name.toLowerCase();
-  if (lower.includes("burger") || lower.includes("kfc") || lower.includes("mcdonald")) return "Fastfood";
-  if (lower.includes("pizza")) return "Pitsa";
-  if (lower.includes("osh") || lower.includes("plov")) return "Milliy taomlar";
-  if (lower.includes("döner") || lower.includes("shaurma")) return "Döner";
-  if (lower.includes("starbucks") || lower.includes("kofe")) return "Kofe va ichimliklar";
-  return "Restoran";
-};
 
 export default AllShops;
