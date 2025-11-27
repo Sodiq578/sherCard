@@ -17,6 +17,10 @@ import {
   RiArrowLeftLine,
   RiVipCrownLine,
   RiStarSFill,
+  RiExternalLinkLine,
+  RiMoneyDollarCircleLine,
+  RiShoppingBagLine,
+  RiCoinLine,
 } from "react-icons/ri";
 import Logo from "../assets/images/logo.png";
 
@@ -29,7 +33,7 @@ function MainMenu({ user, updateUser }) {
 
   // Modallar
   const [showSendTokens, setShowSendTokens] = useState(false);
-  const [showCustomAmountModal, setShowCustomAmountModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   // Token yuborish uchun
@@ -38,8 +42,8 @@ function MainMenu({ user, updateUser }) {
   const [sendTokenSearch, setSendTokenSearch] = useState("");
   const [filteredSendUsers, setFilteredSendUsers] = useState([]);
 
-  // To'ldirish uchun
-  const [tempCustomAmount, setTempCustomAmount] = useState("");
+  // To'lov uchun
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Universal Alert
   const [alert, setAlert] = useState({
@@ -52,9 +56,41 @@ function MainMenu({ user, updateUser }) {
   });
 
   // Main Banner state
-  const [mainBanner, setMainBanner] = useState(null);
+  const [mainBanners, setMainBanners] = useState([]);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
 
-  // ==================== KARTA LOGIKASI – YANGILANDI ====================
+  // ==================== MAHSULOTLAR ====================
+  const products = [
+    {
+      id: 1,
+      name: "Premium Kurs",
+      description: "1 oylik premium kursga kirish",
+      price: 50000,
+      tokens: 50000,
+      duration: "1 oy",
+      features: ["Barcha darslarga kirish", "Premium kontent", "Qo'llab-quvvatlash"]
+    },
+    {
+      id: 2,
+      name: "Pro Paket",
+      description: "3 oylik pro paket",
+      price: 120000,
+      tokens: 120000,
+      duration: "3 oy",
+      features: ["Barcha kurslar", "Shaxsiy murabbiy", "Certifikat"]
+    },
+    {
+      id: 3,
+      name: "VIP Obuna",
+      description: "1 yillik VIP obuna",
+      price: 400000,
+      tokens: 400000,
+      duration: "1 yil",
+      features: ["Barcha imkoniyatlar", "Shaxsiy konsultatsiya", "Premium qo'llab-quvvatlash"]
+    }
+  ];
+
+  // ==================== KARTA LOGIKASI ====================
   const getUserCards = () => {
     if (!user?.cards || user.cards.length === 0) {
       return [{
@@ -73,12 +109,10 @@ function MainMenu({ user, updateUser }) {
           rawNumber = (card.number || card.cardNumber || "").replace(/\s/g, "");
         }
 
-        // Agar raqam 12 yoki 16 bo'lmasa – default
         if (![12, 16].includes(rawNumber.length)) {
           rawNumber = "8989898989898989";
         }
 
-        // 16 ta raqamga to'ldirish
         const fullNumber = rawNumber.padEnd(16, "0").slice(0, 16);
         const formatted = fullNumber.replace(/(\d{4})/g, "$1 ").trim();
 
@@ -92,31 +126,48 @@ function MainMenu({ user, updateUser }) {
   const userCards = getUserCards();
   const [selectedCard, setSelectedCard] = useState(userCards[0] || { number: "8989 8989 8989 8989" });
 
-  // Ultra karta bosilganda → Cards sahifasiga o'tish
   const goToCards = () => {
     navigate("/cards");
   };
 
   // ==================== BANNER FUNKSIYALARI ====================
   useEffect(() => {
-    loadMainBanner();
+    loadMainBanners();
   }, []);
 
-  const loadMainBanner = () => {
-    const bannerData = JSON.parse(localStorage.getItem('mainBanner') || '{}');
-    if (bannerData.isActive && bannerData.image) {
-      setMainBanner(bannerData);
-    } else {
-      setMainBanner(null);
+  const loadMainBanners = () => {
+    try {
+      const bannersData = JSON.parse(localStorage.getItem('mainBanners') || '[]');
+      const activeBanners = bannersData.filter(banner => banner.active);
+      setMainBanners(activeBanners);
+      
+      if (activeBanners.length > 1) {
+        const interval = setInterval(() => {
+          setCurrentBannerIndex(prev => (prev + 1) % activeBanners.length);
+        }, 5000);
+        
+        return () => clearInterval(interval);
+      }
+    } catch (error) {
+      console.error("Bannerlarni yuklashda xato:", error);
     }
   };
 
-  const handleBannerClick = () => {
-    if (mainBanner?.link) {
-      window.open(mainBanner.link, '_blank');
+  const handleBannerClick = (banner) => {
+    if (banner.link) {
+      window.open(banner.link, '_blank', 'noopener,noreferrer');
     } else {
-      setShowSendTokens(true);
+      // BANNER BOSILGANDA TO'LOV MODALINI OCHISH
+      setShowPaymentModal(true);
     }
+  };
+
+  const nextBanner = () => {
+    setCurrentBannerIndex(prev => (prev + 1) % mainBanners.length);
+  };
+
+  const prevBanner = () => {
+    setCurrentBannerIndex(prev => (prev - 1 + mainBanners.length) % mainBanners.length);
   };
 
   // ==================== ALERT FUNKSIYALARI ====================
@@ -152,32 +203,54 @@ function MainMenu({ user, updateUser }) {
     return () => clearInterval(interval);
   }, []);
 
-  // ==================== O'QILMAGAN XABARLAR ====================
-  useEffect(() => {
-    const unread = user?.messages?.filter(m => m.to === user.login && !m.read).length || 0;
-    setUnreadCount(unread);
-  }, [user]);
-
-  // ==================== QIDIRUV (Token yuborish) ====================
-  useEffect(() => {
-    if (!sendTokenSearch.trim()) {
-      setFilteredSendUsers([]);
+  // ==================== TOKEN BILAN TO'LOV FUNKSIYALARI ====================
+  const handleTokenPayment = (product) => {
+    if (user.balance < product.tokens) {
+      showAlert(
+        `Balansingizda yetarli token mavjud emas!\n\nSizda: ${user.balance.toLocaleString()} token\nKerak: ${product.tokens.toLocaleString()} token`,
+        "error"
+      );
       return;
     }
-    const query = sendTokenSearch.toLowerCase();
-    const filtered = allUsers.filter(u => {
-      if (!u.profile || u.login === user.login) return false;
-      const username = (u.profile.username || "").toLowerCase();
-      const name = (u.profile.name || "").toLowerCase();
-      return username.includes(query) || name.includes(query);
-    });
-    setFilteredSendUsers(filtered);
-  }, [sendTokenSearch, allUsers, user.login]);
 
-  // ==================== TOKEN HISOBLASH ====================
-  const calculateTokens = (uzs) => user?.isPremium ? uzs : Math.floor(uzs * 0.98);
+    const confirmPayment = () => {
+      const updatedUser = {
+        ...user,
+        balance: user.balance - product.tokens,
+        history: [...(user.history || []), {
+          time: new Date().toLocaleString("uz-UZ"),
+          action: `To'lov amalga oshirildi - ${product.name}`,
+          amount: `-${product.tokens.toLocaleString()} token`,
+          details: `Mahsulot: ${product.name}`
+        }]
+      };
 
-  // ==================== TOKEN YUBORISH ====================
+      localStorage.setItem("userData", JSON.stringify(updatedUser));
+      updateUser(updatedUser);
+      
+      showAlert(
+        `To'lov muvaffaqiyatli amalga oshirildi!\n\n` +
+        `Mahsulot: ${product.name}\n` +
+        `To'langan: ${product.tokens.toLocaleString()} token\n` +
+        `Yangi balans: ${updatedUser.balance.toLocaleString()} token`,
+        "success"
+      );
+      setShowPaymentModal(false);
+      setSelectedProduct(null);
+    };
+
+    showAlert(
+      `${product.name} sotib olish uchun ${product.tokens.toLocaleString()} token to'lashingiz kerak.\n\n` +
+      `Joriy balans: ${user.balance.toLocaleString()} token\n` +
+      `To'landan keyin: ${(user.balance - product.tokens).toLocaleString()} token`,
+      "info",
+      "To'lovni tasdiqlash",
+      confirmPayment,
+      "Token bilan to'lash"
+    );
+  };
+
+  // ==================== TOKEN YUBORISH FUNKSIYALARI ====================
   const handleSendTokens = () => {
     const amount = parseInt(tokenAmount);
     if (!selectedUser) return showAlert("Foydalanuvchi tanlanmadi!", "error");
@@ -273,41 +346,7 @@ function MainMenu({ user, updateUser }) {
     showAlert("10 000 token evaziga Premium sotib olasizmi?", "info", "Tasdiqlash", confirm, "Sotib olish");
   };
 
-  // ==================== BALANS TO'LDIRISH ====================
-  const startTopUp = (amount) => {
-    if (amount < 1000) return showAlert("Minimal 1 000 UZS", "error");
-    const tokens = calculateTokens(amount);
-    const commission = user.isPremium ? 0 : amount - tokens;
-
-    const confirm = () => {
-      const updated = {
-        ...user,
-        balance: user.balance + tokens,
-        history: [...(user.history || []), {
-          time: new Date().toLocaleString("uz-UZ"),
-          action: "Balans to'ldirildi",
-          amount: `+${tokens.toLocaleString()} token`,
-          details: `${amount.toLocaleString()} UZS${commission > 0 ? ` (komissiya: ${commission} UZS)` : ""}`
-        }]
-      };
-      localStorage.setItem("userData", JSON.stringify(updated));
-      updateUser(updated);
-      showAlert(`+${tokens.toLocaleString()} token qo'shildi!`, "success");
-      setShowCustomAmountModal(false);
-      setTempCustomAmount("");
-    };
-
-    showAlert(
-      `To'lov: ${amount.toLocaleString()} UZS\nQo'shiladi: ${tokens.toLocaleString()} token${commission > 0 ? `\nKomissiya: ${commission} UZS (2%)` : ""}`,
-      "info",
-      "To'lovni tasdiqlash",
-      confirm,
-      "To'lash"
-    );
-  };
-
   // ==================== MA'LUMOTLAR ====================
-  const displayName = user?.profile?.name || user?.profile?.username || "Foydalanuvchi";
   const username = user?.profile?.username || "username";
 
   return (
@@ -349,7 +388,7 @@ function MainMenu({ user, updateUser }) {
         {user?.isPremium && <div className="ultra-premium-badge"><RiVipCrownLine /></div>}
       </div>
 
-      {/* BALANS KARTASI – BOSILSA /cards GA O'TADI */}
+      {/* BALANS KARTASI */}
       <div className="ultra-card-wrapper" onClick={goToCards} style={{ cursor: "pointer" }}>
         <div className="ultra-card">
           <div className="ultra-card-username">@{username}</div>
@@ -369,9 +408,9 @@ function MainMenu({ user, updateUser }) {
           <div className="ultra-icon"><RiSendPlaneLine size={32} /></div>
           <span>Ball yuborish</span>
         </button>
-        <button className="ultra-action" onClick={() => setShowCustomAmountModal(true)}>
-          <div className="ultra-icon blue"><RiAddCircleLine size={32} /></div>
-          <span>To'ldirish</span>
+        <button className="ultra-action" onClick={() => setShowPaymentModal(true)}>
+          <div className="ultra-icon blue"><RiShoppingBagLine size={32} /></div>
+          <span>To'lov qilish</span>
         </button>
         <button className="ultra-action" onClick={() => setShowPremiumModal(true)}>
           <div className="ultra-icon pink"><RiGiftLine size={32} /></div>
@@ -379,29 +418,181 @@ function MainMenu({ user, updateUser }) {
         </button>
       </div>
 
-      {/* ASOSIY REKLAMA BANNER */}
-      {mainBanner && (
-        <div className="main-banner-container" onClick={handleBannerClick}>
-          <div className="main-banner">
-            <img src={mainBanner.image} alt="Reklama" />
-            <div className="banner-content">
-              {mainBanner.title && <h3>{mainBanner.title}</h3>}
-              {mainBanner.description && <p>{mainBanner.description}</p>}
-              <div className="banner-cta">
-                <RiSendPlaneLine size={16} />
-                <span>Token yuborish</span>
+      {/* YANGI ASOSIY REKLAMA BANNER - BOSILGANDA TO'LOV MODALI OCHILADI */}
+      {mainBanners.length > 0 ? (
+        <div className="main-banner-carousel">
+          {mainBanners.map((banner, index) => (
+            <div
+              key={banner.id}
+              className={`main-banner-slide ${index === currentBannerIndex ? 'active' : ''}`}
+              onClick={() => handleBannerClick(banner)}
+            >
+              <img src={banner.image} alt={banner.title} />
+              <div className="banner-content-overlay">
+                {banner.title && <h3 className="banner-title">{banner.title}</h3>}
+                {banner.desc && <p className="banner-description">{banner.desc}</p>}
+                {banner.link ? (
+                  <div className="banner-link-indicator">
+                    <RiExternalLinkLine size={14} />
+                    <span>Havola</span>
+                  </div>
+                ) : (
+                  <div className="banner-payment-indicator">
+                    <RiCoinLine size={14} />
+                    <span>Token bilan to'lash</span>
+                  </div>
+                )}
               </div>
+              
+              {/* Banner navigatsiya */}
+              {mainBanners.length > 1 && (
+                <>
+                  <button className="banner-nav-btn banner-prev" onClick={(e) => { e.stopPropagation(); prevBanner(); }}>
+                    <RiArrowLeftLine />
+                  </button>
+                  <button className="banner-nav-btn banner-next" onClick={(e) => { e.stopPropagation(); nextBanner(); }}>
+                    <RiArrowLeftLine style={{ transform: 'rotate(180deg)' }} />
+                  </button>
+                  
+                  <div className="banner-indicators">
+                    {mainBanners.map((_, idx) => (
+                      <button
+                        key={idx}
+                        className={`banner-indicator ${idx === currentBannerIndex ? 'active' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); setCurrentBannerIndex(idx); }}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
+          ))}
+        </div>
+      ) : (
+        /* AGAR BANNER BO'LMASA, STANDART REKLAMA JOYI */
+        <div className="asosiy-sahifa-reklama" onClick={() => setShowPaymentModal(true)}>
+          <div className="reklama-placeholder">
+            <RiCoinLine size={24} />
+            <span>Token bilan to'lash</span>
           </div>
         </div>
       )}
 
-      {/* AGAR BANNER BO'LMASA, STANDART REKLAMA JOYI */}
-      {!mainBanner && (
-        <div className="asosiy-sahifa-reklama" onClick={() => setShowSendTokens(true)}>
-          <div className="reklama-placeholder">
-            <RiSendPlaneLine size={24} />
-            <span>Token yuborish</span>
+      {/* TOKEN BILAN TO'LOV MODALI */}
+      {showPaymentModal && (
+        <div className="menu-modal-overlay">
+          <div className="menu-modal-content payment-modal">
+            <div className="menu-modal-header">
+              <div className="payment-modal-title">
+                <RiCoinLine className="payment-icon" />
+                <h3>Token bilan to'lash</h3>
+              </div>
+              <button className="menu-modal-close-btn" onClick={() => setShowPaymentModal(false)}>
+                <RiCloseLine />
+              </button>
+            </div>
+
+            <div className="menu-modal-body">
+              {/* Balans ma'lumoti */}
+              <div className="balance-info-section">
+                <div className="balance-display">
+                  <RiCoinLine className="balance-icon" />
+                  <div className="balance-details">
+                    <span className="balance-label">Joriy balans</span>
+                    <span className="balance-amount">{user?.balance?.toLocaleString() || 0} token</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mahsulotlar ro'yxati */}
+              <div className="products-section">
+                <h4>Mavjud mahsulotlar</h4>
+                <div className="products-grid">
+                  {products.map(product => (
+                    <div
+                      key={product.id}
+                      className={`product-card ${selectedProduct?.id === product.id ? 'selected' : ''}`}
+                      onClick={() => setSelectedProduct(product)}
+                    >
+                      <div className="product-header">
+                        <h5 className="product-name">{product.name}</h5>
+                        <div className="product-price">
+                          <RiCoinLine size={16} />
+                          <span>{product.tokens.toLocaleString()} token</span>
+                        </div>
+                      </div>
+                      <p className="product-description">{product.description}</p>
+                      <div className="product-duration">
+                        <span>Davomiylik: {product.duration}</span>
+                      </div>
+                      <div className="product-features">
+                        {product.features.map((feature, index) => (
+                          <div key={index} className="product-feature">
+                            <RiCheckLine size={14} />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tanlangan mahsulot ma'lumotlari */}
+              {selectedProduct && (
+                <div className="selected-product-preview">
+                  <h4>Tanlangan mahsulot</h4>
+                  <div className="selected-product-details">
+                    <div className="selected-product-info">
+                      <h5>{selectedProduct.name}</h5>
+                      <p>{selectedProduct.description}</p>
+                    </div>
+                    <div className="selected-product-price">
+                      <div className="token-price">
+                        <RiCoinLine size={20} />
+                        <span>{selectedProduct.tokens.toLocaleString()} token</span>
+                      </div>
+                      <div className="balance-check">
+                        {user.balance >= selectedProduct.tokens ? (
+                          <div className="sufficient-balance">
+                            <RiCheckLine size={16} />
+                            <span>Balansingiz yetarli</span>
+                          </div>
+                        ) : (
+                          <div className="insufficient-balance">
+                            <RiErrorWarningLine size={16} />
+                            <span>Balansingiz yetarli emas</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="menu-modal-footer">
+              <button
+                className="menu-primary-btn payment-btn"
+                onClick={() => selectedProduct && handleTokenPayment(selectedProduct)}
+                disabled={!selectedProduct || user.balance < selectedProduct.tokens}
+              >
+                {selectedProduct ? (
+                  <>
+                    <RiCoinLine size={18} />
+                    To'lash ({selectedProduct.tokens.toLocaleString()} token)
+                  </>
+                ) : (
+                  "Mahsulot tanlang"
+                )}
+              </button>
+              <button 
+                className="menu-secondary-btn" 
+                onClick={() => setShowPaymentModal(false)}
+              >
+                Bekor qilish
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -437,20 +628,22 @@ function MainMenu({ user, updateUser }) {
                   </div>
 
                   {filteredSendUsers.length > 0 ? (
-                    filteredSendUsers.map(u => (
-                      <div key={u.login} className="menu-search-user-item" onClick={() => setSelectedUser(u)}>
-                        <div className="menu-search-user-avatar">
-                          <img src={u.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} alt="avatar" />
-                          {u.isPremium && <div className="menu-user-premium-indicator" />}
+                    <div className="menu-search-user-list">
+                      {filteredSendUsers.map(u => (
+                        <div key={u.login} className="menu-search-user-item" onClick={() => setSelectedUser(u)}>
+                          <div className="menu-search-user-avatar">
+                            <img src={u.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} alt="avatar" />
+                            {u.isPremium && <div className="menu-user-premium-indicator" />}
+                          </div>
+                          <div className="menu-search-user-info">
+                            <p className="menu-search-username">
+                              @{u.profile?.username} {u.isPremium && <span className="menu-premium-dot">Premium</span>}
+                            </p>
+                            <p className="menu-search-name">{u.profile?.name || "Foydalanuvchi"}</p>
+                          </div>
                         </div>
-                        <div className="menu-search-user-info">
-                          <p className="menu-search-username">
-                            @{u.profile?.username} {u.isPremium && <span className="menu-premium-dot">Premium</span>}
-                          </p>
-                          <p className="menu-search-name">{u.profile?.name || "Foydalanuvchi"}</p>
-                        </div>
-                      </div>
-                    ))
+                      ))}
+                    </div>
                   ) : sendTokenSearch && <div className="menu-no-results">Hech narsa topilmadi</div>}
                 </>
               ) : (
@@ -520,48 +713,6 @@ function MainMenu({ user, updateUser }) {
                 <button className="menu-secondary-btn" onClick={() => setSelectedUser(null)}>Ortga</button>
               </div>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* BALANS TO'LDIRISH MODAL */}
-      {showCustomAmountModal && (
-        <div className="menu-modal-overlay">
-          <div className="menu-modal-content">
-            <div className="menu-modal-header">
-              <h3>Balans to'ldirish</h3>
-              <button className="menu-modal-close-btn" onClick={() => setShowCustomAmountModal(false)}>
-                <RiCloseLine />
-              </button>
-            </div>
-            <div className="menu-modal-body">
-              <input
-                type="number"
-                placeholder="1000 UZS dan yuqori"
-                value={tempCustomAmount}
-                onChange={(e) => setTempCustomAmount(e.target.value)}
-                className="menu-custom-amount-input"
-                autoFocus
-              />
-              {tempCustomAmount >= 1000 && (
-                <div className="menu-amount-preview">
-                  <div>To'lov: <strong>{parseInt(tempCustomAmount).toLocaleString()} UZS</strong></div>
-                  <div>Qo'shiladi: <strong style={{ color: user.isPremium ? "#FFD700" : "#27ae60" }}>
-                    {calculateTokens(parseInt(tempCustomAmount)).toLocaleString()} token
-                  </strong></div>
-                  {!user.isPremium && <div className="menu-amount-commission">Komissiya: 2%</div>}
-                </div>
-              )}
-            </div>
-            <div className="menu-modal-footer">
-              <button
-                className="menu-primary-btn"
-                onClick={() => startTopUp(parseInt(tempCustomAmount))}
-                disabled={tempCustomAmount < 1000}
-              >
-                To'lash
-              </button>
-            </div>
           </div>
         </div>
       )}

@@ -27,7 +27,7 @@ import BottomNav from "./components/BottomNav";
 // Chat komponentlari
 import ChatList from "./components/ChatList";
 import ChatDetail from "./components/ChatDetail";
-import UserProfile from "./components/UserProfile"; // Yangi UserProfile
+import UserProfile from "./components/UserProfile";
 
 import "./styles/App.css";
 
@@ -226,211 +226,207 @@ function App() {
 
   // ==================== ROUTES ====================
   return (
-    <div className="App">
-      <Routes>
-        {/* LOGIN */}
-        <Route
-          path="/"
-          element={
-            !isAuthenticated ? (
-              <Login onLogin={handleLogin} />
-            ) : isAdmin ? (
-              <Navigate to="/admin" />
-            ) : (
-              <Navigate to="/hello" />
-            )
-          }
-        />
-
-        {/* ADMIN */}
-        <Route
-          path="/admin"
-          element={
-            isAuthenticated && isAdmin ? (
-              <AdminPanel
-                onLogout={handleLogout}
-                allUsers={allUsers}
-                updateUser={updateUser}
-              />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        {/* USER PAGES */}
-        <Route
-          path="/hello"
-          element={
-            isAuthenticated && !isAdmin ? <Hello /> : <Navigate to="/" />
-          }
-        />
-
-        <Route
-          path="/main"
-          element={
-            isAuthenticated && !isAdmin ? (
-              <MainMenu user={user} updateUser={updateUser} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        {/* CHAT RO'YXATI */}
-        <Route
-          path="/chat"
-          element={
-            isAuthenticated && !isAdmin ? (
-              <ChatList allUsers={allUsers} currentUser={user} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        {/* CHAT DETAIL */}
-        <Route
-          path="/chat/:userId"
-          element={
-            isAuthenticated && !isAdmin ? (
-              <ChatDetail currentUser={user} updateUser={updateUser} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        {/* O'Z PROFILI */}
-        <Route
-          path="/profile"
-          element={
-            isAuthenticated && !isAdmin ? (
-              <UserProfile user={user} updateUser={updateUser} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        {/* BOSHQA FOYDALANUVCHI PROFILI */}
-        <Route
-          path="/user-profile/:login"
-          element={
-            isAuthenticated && !isAdmin ? (
-              <UserProfile user={user} updateUser={updateUser} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        {/* MARKET */}
-        <Route
-          path="/market"
-          element={
-            isAuthenticated && !isAdmin ? (
-              <Market user={user} updateUser={updateUser} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        <Route
-          path="/marketplace"
-          element={
-            isAuthenticated && !isAdmin ? (
-              <Marketplace user={user} updateUser={updateUser} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        <Route
-          path="/shop/:id"
-          element={
-            isAuthenticated && !isAdmin ? (
-              <ShopDetail user={user} updateUser={updateUser} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        <Route
-          path="/all-shops"
-          element={
-            isAuthenticated && !isAdmin ? <AllShops user={user} /> : <Navigate to="/" />
-            }
-        />
-
-        <Route
-          path="/buy-card"
-          element={
-            isAuthenticated && !isAdmin ? (
-              <BuyCard user={user} updateUser={updateUser} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        <Route
-          path="/history"
-          element={
-            isAuthenticated && !isAdmin ? <History user={user} /> : <Navigate to="/" />
-            }
-        />
-
-        <Route
-          path="/transfer"
-          element={
-            isAuthenticated && !isAdmin ? (
-              <Transfer user={user} updateUser={updateUser} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        <Route
-          path="/banner-transfer"
-          element={
-            isAuthenticated && !isAdmin ? (
-              <BannerTransfer user={user} updateUser={updateUser} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        <Route
-          path="/cards"
-          element={
-            isAuthenticated && !isAdmin ? (
-              <Cards user={user} updateUser={updateUser} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        {/* 404 */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-
-      {/* BOTTOM NAV */}
-      <BottomNavWrapper isAuthenticated={isAuthenticated} isAdmin={isAdmin} />
-    </div>
-  );
-}
-
-export default function AppWrapper() {
-  return (
     <BrowserRouter>
-      <App />
+      <div className="App">
+        <Routes>
+          {/* LOGIN */}
+          <Route
+            path="/"
+            element={
+              !isAuthenticated ? (
+                <Login onLogin={handleLogin} />
+              ) : isAdmin ? (
+                <Navigate to="/admin" />
+              ) : (
+                <Navigate to="/hello" />
+              )
+            }
+          />
+
+          {/* ADMIN */}
+          <Route
+            path="/admin"
+            element={
+              isAuthenticated && isAdmin ? (
+                <AdminPanel
+                  onLogout={handleLogout}
+                  allUsers={allUsers}
+                  updateUser={updateUser}
+                />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          {/* USER PAGES */}
+          <Route
+            path="/hello"
+            element={
+              isAuthenticated && !isAdmin ? <Hello /> : <Navigate to="/" />
+            }
+          />
+
+          <Route
+            path="/main"
+            element={
+              isAuthenticated && !isAdmin ? (
+                <MainMenu user={user} updateUser={updateUser} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          {/* CHAT RO'YXATI */}
+          <Route
+            path="/chat"
+            element={
+              isAuthenticated && !isAdmin ? (
+                <ChatList allUsers={allUsers} currentUser={user} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          {/* CHAT DETAIL */}
+          <Route
+            path="/chat/:userId"
+            element={
+              isAuthenticated && !isAdmin ? (
+                <ChatDetail currentUser={user} updateUser={updateUser} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          {/* O'Z PROFILI */}
+          <Route
+            path="/profile"
+            element={
+              isAuthenticated && !isAdmin ? (
+                <UserProfile user={user} updateUser={updateUser} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          {/* BOSHQA FOYDALANUVCHI PROFILI */}
+          <Route
+            path="/user-profile/:login"
+            element={
+              isAuthenticated && !isAdmin ? (
+                <UserProfile user={user} updateUser={updateUser} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          {/* MARKET */}
+          <Route
+            path="/market"
+            element={
+              isAuthenticated && !isAdmin ? (
+                <Market user={user} updateUser={updateUser} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          <Route
+            path="/marketplace"
+            element={
+              isAuthenticated && !isAdmin ? (
+                <Marketplace user={user} updateUser={updateUser} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          <Route
+            path="/shop/:id"
+            element={
+              isAuthenticated && !isAdmin ? (
+                <ShopDetail user={user} updateUser={updateUser} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          <Route
+            path="/all-shops"
+            element={
+              isAuthenticated && !isAdmin ? <AllShops user={user} /> : <Navigate to="/" />
+            }
+          />
+
+          <Route
+            path="/buy-card"
+            element={
+              isAuthenticated && !isAdmin ? (
+                <BuyCard user={user} updateUser={updateUser} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          <Route
+            path="/history"
+            element={
+              isAuthenticated && !isAdmin ? <History user={user} /> : <Navigate to="/" />
+            }
+          />
+
+          <Route
+            path="/transfer"
+            element={
+              isAuthenticated && !isAdmin ? (
+                <Transfer user={user} updateUser={updateUser} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          <Route
+            path="/banner-transfer"
+            element={
+              isAuthenticated && !isAdmin ? (
+                <BannerTransfer user={user} updateUser={updateUser} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          <Route
+            path="/cards"
+            element={
+              isAuthenticated && !isAdmin ? (
+                <Cards user={user} updateUser={updateUser} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+
+          {/* 404 */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+
+        {/* BOTTOM NAV */}
+        <BottomNavWrapper isAuthenticated={isAuthenticated} isAdmin={isAdmin} />
+      </div>
     </BrowserRouter>
   );
 }
+
+export default App;

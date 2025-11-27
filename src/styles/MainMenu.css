@@ -4,7 +4,7 @@
   background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
   padding: 20px;
   position: relative;
-  padding-bottom: 100px;
+  padding-bottom: 400px;
 }
 
 /* Ultra Header */
@@ -1687,4 +1687,1634 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* src/styles/MainMenu.css */
+
+/* ... existing styles ... */
+
+/* YANGI BANNER CAROUSEL STILLARI */
+.main-banner-carousel {
+  position: relative;
+  margin: 20px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  height: 160px;
+}
+
+.main-banner-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  cursor: pointer;
+}
+
+.main-banner-slide.active {
+  opacity: 1;
+}
+
+.main-banner-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.banner-content-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+  padding: 15px;
+  padding-bottom: 40px; /* Navigatsiya uchun joy */
+}
+
+.banner-title {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.banner-description {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.9;
+  line-height: 1.3;
+}
+
+.banner-link-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  margin-top: 8px;
+  opacity: 0.8;
+}
+
+/* Banner navigatsiya tugmalari */
+.banner-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.banner-nav-btn:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.banner-prev {
+  left: 10px;
+}
+
+.banner-next {
+  right: 10px;
+}
+
+/* Banner indikatorlari */
+.banner-indicators {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  z-index: 10;
+}
+
+.banner-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.banner-indicator.active {
+  background: white;
+  transform: scale(1.2);
+}
+
+/* Standart reklama joyi */
+.asosiy-sahifa-reklama {
+  margin: 20px 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.asosiy-sahifa-reklama:hover {
+  transform: translateY(-2px);
+}
+
+.reklama-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.reklama-placeholder span {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .main-banner-carousel {
+    height: 140px;
+    margin: 15px 0;
+  }
+  
+  .banner-content-overlay {
+    padding: 12px;
+    padding-bottom: 35px;
+  }
+  
+  .banner-title {
+    font-size: 14px;
+  }
+  
+  .banner-description {
+    font-size: 11px;
+  }
+  
+  .banner-nav-btn {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* src/styles/MainMenu.css */
+
+/* ... existing styles ... */
+
+/* YANGI BANNER CAROUSEL STILLARI */
+.main-banner-carousel {
+  position: relative;
+  margin: 20px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  height: 160px;
+  cursor: pointer;
+}
+
+.main-banner-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.main-banner-slide.active {
+  opacity: 1;
+}
+
+.main-banner-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.banner-content-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+  padding: 15px;
+  padding-bottom: 40px; /* Navigatsiya uchun joy */
+}
+
+.banner-title {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.banner-description {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.9;
+  line-height: 1.3;
+}
+
+.banner-link-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  margin-top: 8px;
+  opacity: 0.8;
+}
+
+/* Banner navigatsiya tugmalari */
+.banner-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.banner-nav-btn:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.banner-prev {
+  left: 10px;
+}
+
+.banner-next {
+  right: 10px;
+}
+
+/* Banner indikatorlari */
+.banner-indicators {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  z-index: 10;
+}
+
+.banner-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.banner-indicator.active {
+  background: white;
+  transform: scale(1.2);
+}
+
+/* Standart reklama joyi */
+.asosiy-sahifa-reklama {
+  margin: 20px 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.asosiy-sahifa-reklama:hover {
+  transform: translateY(-2px);
+}
+
+.reklama-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.reklama-placeholder span {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Tez token miqdorlari */
+.menu-quick-amounts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.menu-quick-amount-btn {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 12px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.menu-quick-amount-btn:hover {
+  background: #0C73FE;
+  color: white;
+  border-color: #0C73FE;
+  transform: translateY(-2px);
+}
+
+.menu-quick-amount-btn.active {
+  background: #0C73FE;
+  color: white;
+  border-color: #0C73FE;
+  box-shadow: 0 4px 12px rgba(12, 115, 254, 0.3);
+}
+
+/* User list container */
+.menu-search-user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .main-banner-carousel {
+    height: 140px;
+    margin: 15px 0;
+  }
+  
+  .banner-content-overlay {
+    padding: 12px;
+    padding-bottom: 35px;
+  }
+  
+  .banner-title {
+    font-size: 14px;
+  }
+  
+  .banner-description {
+    font-size: 11px;
+  }
+  
+  .banner-nav-btn {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .menu-quick-amounts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+
+
+
+
+
+
+
+/* src/styles/MainMenu.css */
+
+/* TOKEN BILAN TO'LOV MODALI STILLARI */
+.payment-modal {
+  max-width: 440px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+}
+
+.payment-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.payment-icon {
+  color: #FFD700;
+  font-size: 24px;
+}
+
+/* Balans ma'lumoti */
+.balance-info-section {
+  margin: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 15px;
+  color: white;
+}
+
+.balance-display {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.balance-icon {
+  font-size: 32px;
+  opacity: 0.9;
+}
+
+.balance-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.balance-label {
+  font-size: 14px;
+  opacity: 0.8;
+  margin-bottom: 5px;
+}
+
+.balance-amount {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Mahsulotlar bo'limi */
+.products-section {
+  margin: 25px 20px;
+}
+
+.products-section h4 {
+  margin: 0 0 15px 0;
+  color: #2c3e50;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.products-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.product-card {
+  border: 2px solid #e9ecef;
+  border-radius: 15px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+
+.product-card:hover {
+  border-color: #667eea;
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+}
+
+.product-card.selected {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+}
+
+.product-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.product-name {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.product-price {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFD700;
+  color: #2c3e50;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.product-description {
+  margin: 0 0 10px 0;
+  color: #5a6c7d;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.product-duration {
+  margin-bottom: 12px;
+}
+
+.product-duration span {
+  color: #667eea;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.product-features {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.product-feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #5a6c7d;
+  font-size: 13px;
+}
+
+.product-feature svg {
+  color: #27ae60;
+  flex-shrink: 0;
+}
+
+/* Tanlangan mahsulot ko'rinishi */
+.selected-product-preview {
+  margin: 20px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 15px;
+  border: 1px solid #e9ecef;
+}
+
+.selected-product-preview h4 {
+  margin: 0 0 15px 0;
+  color: #2c3e50;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.selected-product-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.selected-product-info h5 {
+  margin: 0 0 5px 0;
+  color: #2c3e50;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.selected-product-info p {
+  margin: 0;
+  color: #5a6c7d;
+  font-size: 14px;
+}
+
+.selected-product-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.token-price {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFD700;
+  color: #2c3e50;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.sufficient-balance,
+.insufficient-balance {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 10px;
+}
+
+.sufficient-balance {
+  background: rgba(39, 174, 96, 0.1);
+  color: #27ae60;
+}
+
+.insufficient-balance {
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
+/* To'lov tugmasi */
+.payment-btn {
+  background: linear-gradient(135deg, #FFD700, #FFA500) !important;
+  color: #2c3e50 !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  padding: 18px !important;
+  margin: 0 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.payment-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #FFC400, #FF8C00) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4) !important;
+}
+
+.payment-btn:disabled {
+  background: #bdc3c7 !important;
+  color: #7f8c8d !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Modal body va footer */
+.payment-modal .menu-modal-body {
+  padding: 0 !important;
+}
+
+.payment-modal .menu-modal-footer {
+  padding: 20px 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #fafbfc;
+  border-radius: 0 0 20px 20px;
+}
+
+.payment-modal .menu-secondary-btn {
+  margin: 0 20px !important;
+  background: #95a5a6 !important;
+  color: white !important;
+  border: none !important;
+  padding: 16px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+
+.payment-modal .menu-secondary-btn:hover {
+  background: #7f8c8d !important;
+  transform: translateY(-2px);
+}
+
+/* Banner to'lov indikatori */
+.banner-payment-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  margin-top: 8px;
+  opacity: 0.9;
+  background: rgba(255, 215, 0, 0.2);
+  padding: 4px 8px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Standart reklama joyi */
+.asosiy-sahifa-reklama {
+  margin: 20px 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  padding: 20px;
+  text-align: center;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.asosiy-sahifa-reklama:hover {
+  transform: translateY(-2px);
+}
+
+.reklama-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.reklama-placeholder span {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Qolgan stillar... */
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .payment-modal {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .selected-product-details {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .selected-product-price {
+    align-items: flex-start;
+  }
+  
+  .product-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .product-price {
+    align-self: flex-start;
+  }
+}
+
+/* Scrollbar */
+.payment-modal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.payment-modal::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.payment-modal::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.payment-modal::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* TOKEN BILAN TO'LOV MODALI - YANGILANGAN STILLAR */
+.payment-modal {
+  max-width: 440px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.4);
+  z-index: 1001;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  animation: modalAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.payment-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+}
+
+/* Modal header - yangi dizayn */
+.payment-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 28px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: linear-gradient(135deg, #fafbfc 0%, #ffffff 100%);
+  border-radius: 24px 24px 0 0;
+  position: relative;
+}
+
+.payment-modal-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 28px;
+  right: 28px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(12, 115, 254, 0.3), transparent);
+}
+
+.payment-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.payment-icon {
+  color: #FFD700;
+  font-size: 26px;
+  filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
+}
+
+.payment-modal-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 22px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #0C73FE, #5C9DFF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.3px;
+}
+
+/* Modal body - yaxshilangan */
+.payment-modal-body {
+  padding: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+  background: #ffffff;
+}
+
+/* Balans bo'limi - yangi dizayn */
+.balance-info-section {
+  margin: 24px;
+  padding: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  color: white;
+  box-shadow: 
+    0 8px 32px rgba(102, 126, 234, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.balance-info-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+  transform: rotate(30deg);
+}
+
+.balance-display {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  position: relative;
+  z-index: 2;
+}
+
+.balance-icon {
+  font-size: 36px;
+  opacity: 0.9;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+.balance-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.balance-label {
+  font-size: 15px;
+  opacity: 0.9;
+  margin-bottom: 6px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.balance-amount {
+  font-size: 28px;
+  font-weight: 800;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.5px;
+}
+
+/* Mahsulotlar bo'limi - yangilangan */
+.products-section {
+  margin: 28px 24px;
+}
+
+.products-section h4 {
+  margin: 0 0 18px 0;
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.products-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.product-card {
+  border: 2px solid #e9ecef;
+  border-radius: 18px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #f8f9fa;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+  border-color: #667eea;
+  background: white;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+}
+
+.product-card:hover::before {
+  transform: scaleX(1);
+}
+
+.product-card.selected {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.04);
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px);
+}
+
+.product-card.selected::before {
+  transform: scaleX(1);
+}
+
+.product-card.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: #667eea;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.product-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.product-name {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.product-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #2c3e50;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 15px;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.product-description {
+  margin: 0 0 12px 0;
+  color: #5a6c7d;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.product-duration {
+  margin-bottom: 16px;
+}
+
+.product-duration span {
+  color: #667eea;
+  font-size: 14px;
+  font-weight: 700;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 6px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.product-features {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.product-feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #5a6c7d;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.product-feature svg {
+  color: #27ae60;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 2px rgba(39, 174, 96, 0.3));
+}
+
+/* Tanlangan mahsulot ko'rinishi - yangilangan */
+.selected-product-preview {
+  margin: 24px;
+  padding: 24px;
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  border-radius: 18px;
+  border: 2px solid #e9ecef;
+  animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.selected-product-preview h4 {
+  margin: 0 0 18px 0;
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.selected-product-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.selected-product-info h5 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.selected-product-info p {
+  margin: 0;
+  color: #5a6c7d;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.selected-product-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.token-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #2c3e50;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.sufficient-balance,
+.insufficient-balance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 12px;
+}
+
+.sufficient-balance {
+  background: rgba(39, 174, 96, 0.12);
+  color: #27ae60;
+  border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+.insufficient-balance {
+  background: rgba(231, 76, 60, 0.12);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+/* To'lov tugmasi - yangilangan */
+.payment-btn {
+  background: linear-gradient(135deg, #FFD700, #FFA500) !important;
+  color: #2c3e50 !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  padding: 20px !important;
+  margin: 0 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  border: none !important;
+  border-radius: 16px !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  width: calc(100% - 48px) !important;
+  box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  letter-spacing: -0.3px;
+}
+
+.payment-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #FFC400, #FF8C00) !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 12px 32px rgba(255, 215, 0, 0.5) !important;
+}
+
+.payment-btn:active:not(:disabled) {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4) !important;
+}
+
+.payment-btn:disabled {
+  background: #bdc3c7 !important;
+  color: #7f8c8d !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.payment-btn:not(:disabled)::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: rotate(45deg);
+  animation: shimmer 2.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(45deg);
+  }
+}
+
+/* Modal footer - yangilangan */
+.payment-modal-footer {
+  padding: 24px 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #fafbfc;
+  border-radius: 0 0 24px 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.payment-modal .menu-secondary-btn {
+  margin: 0 24px !important;
+  background: #95a5a6 !important;
+  color: white !important;
+  border: none !important;
+  padding: 18px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  border-radius: 16px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  width: calc(100% - 48px) !important;
+  box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3);
+}
+
+.payment-modal .menu-secondary-btn:hover {
+  background: #7f8c8d !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4);
+}
+
+/* Qo'shimcha animatsiyalar */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar - yangilangan */
+.payment-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.payment-modal::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.payment-modal::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #c1c1c1, #a8a8a8);
+  border-radius: 4px;
+}
+
+.payment-modal::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #a8a8a8, #8f8f8f);
+}
+
+.payment-modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.payment-modal-body::-webkit-scrollbar-track {
+  background: #f8f9fa;
+  border-radius: 3px;
+}
+
+.payment-modal-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.payment-modal-body::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive design - yangilangan */
+@media (max-width: 480px) {
+  .payment-modal {
+    width: 95%;
+    max-height: 90vh;
+    margin: 10px;
+    border-radius: 20px;
+  }
+
+  .payment-modal-header {
+    padding: 24px 20px 18px;
+  }
+
+  .balance-info-section {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  .products-section {
+    margin: 24px 20px;
+  }
+
+  .selected-product-preview {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  .selected-product-details {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .selected-product-price {
+    align-items: flex-start;
+  }
+
+  .product-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .product-price {
+    align-self: flex-start;
+  }
+
+  .payment-btn {
+    margin: 0 20px !important;
+    width: calc(100% - 40px) !important;
+    padding: 18px !important;
+    font-size: 16px !important;
+  }
+
+  .payment-modal .menu-secondary-btn {
+    margin: 0 20px !important;
+    width: calc(100% - 40px) !important;
+    padding: 16px !important;
+  }
+  
+  .payment-modal-header h3 {
+    font-size: 20px;
+  }
+  
+  .balance-amount {
+    font-size: 24px;
+  }
+}
+
+/* Yuklanish animatsiyasi - yangilangan */
+.payment-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.payment-loading-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #FFD700;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mahsulot rang sxemalari - yangilangan */
+.product-card:nth-child(1) {
+  border-left: 4px solid #3498db;
+}
+
+.product-card:nth-child(2) {
+  border-left: 4px solid #9b59b6;
+}
+
+.product-card:nth-child(3) {
+  border-left: 4px solid #e74c3c;
+}
+
+.product-card:nth-child(1):hover {
+  border-color: #3498db;
+}
+
+.product-card:nth-child(2):hover {
+  border-color: #9b59b6;
+}
+
+.product-card:nth-child(3):hover {
+  border-color: #e74c3c;
+}
+
+/* Tokenni yetarli/yetmasligi holatlari */
+.balance-sufficient {
+  color: #27ae60;
+  font-weight: 700;
+}
+
+.balance-insufficient {
+  color: #e74c3c;
+  font-weight: 700;
+}
+
+/* Qo'shimcha informativ bloklar */
+.payment-info-box {
+  background: #e8f4ff;
+  border: 1px solid #3498db;
+  border-radius: 14px;
+  padding: 18px;
+  margin: 18px 24px;
+  font-size: 14px;
+  color: #2c3e50;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.payment-info-box.warning {
+  background: #fff8e1;
+  border-color: #ffc107;
+}
+
+.payment-info-box.success {
+  background: #e8f5e8;
+  border-color: #27ae60;
+}
+
+/* Token ikonkalari uchun qo'shimcha stillar */
+.token-icon-large {
+  width: 36px;
+  height: 36px;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+}
+
+.token-icon-medium {
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.token-icon-small {
+  width: 18px;
+  height: 18px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+/* Modal yopish tugmasi - yangilangan */
+.menu-modal-close-btn {
+  background: rgba(0, 0, 0, 0.06) !important;
+  border: none !important;
+  color: #7f8c8d !important;
+  cursor: pointer !important;
+  padding: 10px !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+  font-size: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 44px !important;
+  height: 44px !important;
+}
+
+.menu-modal-close-btn:hover {
+  background: rgba(0, 0, 0, 0.1) !important;
+  color: #2c3e50 !important;
+  transform: rotate(90deg);
 }
