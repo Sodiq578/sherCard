@@ -1,4 +1,4 @@
-/* ===================== PROFILE SAHIFASI ===================== */
+/* ===================== PROFIL SAHIFASI ===================== */
 .profil-sahifa {
   min-height: 100vh;
   background-color: #000000;
@@ -9,7 +9,7 @@
   box-sizing: border-box;
 }
 
-/* === SARLAVHA === */
+/* SARLAVHA */
 .profil-sarlavha {
   display: flex;
   align-items: center;
@@ -48,7 +48,7 @@
   transform: scale(1.05);
 }
 
-/* === PROFIL KARTASI === */
+/* PROFIL KARTASI */
 .profil-kartasi {
   background: rgba(26, 26, 26, 0.6);
   backdrop-filter: blur(12px);
@@ -59,497 +59,203 @@
   margin-bottom: 20px;
 }
 
-/* === AVATAR BO'LIMI === */
-.rasm-bolimi {
-  text-align: center;
-  margin-bottom: 24px;
+/* AVATAR */
+.rasm-bolimi { text-align: center; margin-bottom: 24px; }
+.rasm-quti { position: relative; display: inline-block; }
+.foydalanuvchi-rasmi, .rasm-orniga {
+  width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
+  border: 3px solid #0C73FE; box-shadow: 0 0 15px rgba(12, 115, 254, 0.4);
 }
-
-.rasm-quti {
-  position: relative;
-  display: inline-block;
-}
-
-.foydalanuvchi-rasmi,
-.rasm-orniga {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #0C73FE;
-  box-shadow: 0 0 15px rgba(12, 115, 254, 0.4);
-}
-
 .rasm-orniga {
   background: linear-gradient(135deg, #0C73FE, #0056d6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 36px;
-  font-weight: bold;
-  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; font-weight: bold; color: white;
 }
-
 .kamera-belgisi {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  background: #0C73FE;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: 3px solid #000;
-  transition: 0.3s;
+  position: absolute; bottom: 4px; right: 4px;
+  background: #0C73FE; width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: 3px solid #000; transition: 0.3s;
 }
+.kamera-belgisi:hover { transform: scale(1.1); background: #0056d6; }
+.rasm-kirish { display: none; }
 
-.kamera-belgisi:hover {
-  transform: scale(1.1);
-  background: #0056d6;
-}
-
-.rasm-kirish {
-  display: none;
-}
-
-.foydalanuvchi-ism {
-  font-size: 22px;
-  font-weight: 700;
-  margin: 12px 0 4px;
-}
-
-.foydalanuvchi-nik {
-  color: #aaaaaa;
-  font-size: 14px;
-}
-
+.foydalanuvchi-ism { font-size: 22px; font-weight: 700; margin: 12px 0 4px; }
+.foydalanuvchi-nik { color: #aaaaaa; font-size: 14px; }
 .balans-belgisi {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 12px;
-  font-size: 20px;
-  font-weight: 700;
-  color: #0C73FE;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 12px; font-size: 20px; font-weight: 700; color: #0C73FE;
 }
+.balans-logosi { width: 28px; height: 28px; }
 
-.balans-logosi {
-  width: 28px;
-  height: 28px;
-}
-
-/* === FORMA === */
-.profil-forma {
-  margin-bottom: 24px;
-}
-
-.kirish-guruh {
-  margin-bottom: 16px;
-}
-
+/* FORMA */
+.profil-forma { margin-bottom: 24px; }
+.kirish-guruh { margin-bottom: 16px; }
 .kirish-guruh label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #cccccc;
-  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; color: #cccccc; margin-bottom: 8px;
 }
-
 .kirish-guruh input {
-  width: 100%;
-  background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 12px;
-  padding: 14px 16px;
-  color: #ffffff;
-  font-size: 15px;
-  outline: none;
-  transition: 0.3s;
+  width: 100%; background: #1a1a1a; border: 1px solid #333;
+  border-radius: 12px; padding: 14px 16px; color: #ffffff;
+  font-size: 15px; outline: none; transition: 0.3s;
 }
-
-.kirish-guruh input:focus {
-  border-color: #0C73FE;
-  box-shadow: 0 0 0 3px rgba(12, 115, 254, 0.2);
-}
-
-.kirish-guruh input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+.kirish-guruh input:focus { border-color: #0C73FE; box-shadow: 0 0 0 3px rgba(12, 115, 254, 0.2); }
+.kirish-guruh input:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .forma-harakatlar {
-  display: flex;
-  gap: 12px;
-  margin-top: 20px;
+  display: flex; gap: 12px; margin-top: 20px;
 }
-
-.saqlash-tugma,
-.bekor-qilish-tugma {
-  flex: 1;
-  padding: 14px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 15px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+.saqlash-tugma, .bekor-qilish-tugma {
+  flex: 1; padding: 14px; border-radius: 12px;
+  font-weight: 600; font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
   transition: 0.3s;
 }
-
 .saqlash-tugma {
   background: linear-gradient(135deg, #0C73FE, #0056d6);
-  color: white;
-  border: none;
+  color: white; border: none;
 }
-
 .saqlash-tugma:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(12, 115, 254, 0.4);
 }
-
 .bekor-qilish-tugma {
   background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid #444;
+  color: white; border: 1px solid #444;
 }
 
-/* === STATISTIKA === */
+/* STATISTIKA */
 .statistika-setka {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 12px; margin-bottom: 20px;
 }
-
 .stat-element {
-  background: rgba(26, 26, 26, 0.6);
-  border-radius: 16px;
-  padding: 16px;
-  text-align: center;
+  background: rgba(26, 26, 26, 0.6); border-radius: 16px;
+  padding: 16px; text-align: center;
   border: 1px solid rgba(12, 115, 254, 0.2);
-  transition: 0.3s;
-  position: relative;
-  cursor: default;
+  transition: 0.3s; position: relative;
 }
-
 .stat-element:hover {
-  border-color: #0C73FE;
-  transform: translateY(-4px);
+  border-color: #0C73FE; transform: translateY(-4px);
 }
-
-.stat-belgi {
-  font-size: 24px;
-  color: #0C73FE;
-  margin-bottom: 8px;
-}
-
-.stat-qiymat {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.stat-izoh {
-  font-size: 12px;
-  color: #aaaaaa;
-  margin-top: 4px;
-}
-
+.stat-belgi { font-size: 24px; color: #0C73FE; margin-bottom: 8px; }
+.stat-qiymat { font-size: 18px; font-weight: 700; }
+.stat-izoh { font-size: 12px; color: #aaaaaa; margin-top: 4px; }
 .ong-belgi {
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
-  color: #666;
-  transition: 0.3s;
+  position: absolute; top: 50%; right: 12px;
+  transform: translateY(-50%); color: #666; transition: 0.3s;
 }
-
 .stat-element:hover .ong-belgi {
-  color: #0C73FE;
-  transform: translateY(-50%) translateX(4px);
+  color: #0C73FE; transform: translateY(-50%) translateX(4px);
 }
+.aylantirilgan { transform: translateY(-50%) rotate(90deg) !important; }
 
-.aylantirilgan {
-  transform: translateY(-50%) rotate(90deg) !important;
-}
-
-/* === TARIX === */
+/* TARIX */
 .tarix-bolimi {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease;
-  background: rgba(26, 26, 26, 0.6);
-  border-radius: 16px;
+  max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+  background: rgba(26, 26, 26, 0.6); border-radius: 16px;
   border: 1px solid rgba(12, 115, 254, 0.2);
 }
-
-.kengaytirilgan {
-  max-height: 600px;
-  padding: 20px;
-  margin-top: 12px;
-}
-
-.tarix-mazmuni {
-  animation: fadeIn 0.4s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.tarix-royxati {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
+.kengaytirilgan { max-height: 600px; padding: 20px; margin-top: 12px; }
+.tarix-mazmuni { animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.tarix-royxati { display: flex; flex-direction: column; gap: 12px; }
 .tarix-band {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: #1a1a1a;
-  border-radius: 12px;
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px; background: #1a1a1a; border-radius: 12px;
 }
-
 .tarix-belgisi {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-
-.tarix-belgisi .kirim {
-  background: rgba(76, 175, 80, 0.2);
-  color: #4caf50;
-}
-
-.tarix-belgisi .chiqim {
-  background: rgba(244, 67, 54, 0.2);
-  color: #f44336;
-}
-
-.tarix-malumot p {
-  margin: 0;
-  line-height: 1.4;
-}
-
-.amal-turi {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.amal-sana {
-  font-size: 12px;
-  color: #888;
-}
-
-.amal-miqdor {
-  margin-left: auto;
-  font-weight: 700;
-  font-size: 15px;
-}
-
+.tarix-belgisi .kirim { background: rgba(76, 175, 80, 0.2); color: #4caf50; }
+.tarix-belgisi .chiqim { background: rgba(244, 67, 54, 0.2); color: #f44336; }
+.amal-turi { font-weight: 600; font-size: 14px; }
+.amal-sana { font-size: 12px; color: #888; }
+.amal-miqdor { margin-left: auto; font-weight: 700; font-size: 15px; }
 .musbat { color: #4caf50; }
 .manfiy { color: #f44336; }
+.tarix-yoq { text-align: center; color: #888; font-style: italic; padding: 20px; }
 
-.tarix-yoq {
-  text-align: center;
-  color: #888;
-  font-style: italic;
-  padding: 20px;
-}
-
-/* === CHIQISH TUGMASI === */
+/* YANGI KUCHLI CHIQISH TUGMASI */
 .chiqish-tugma {
   width: 100%;
-  background: rgba(244, 67, 54, 0.15);
-  color: #f44336;
-  border: 1.5px solid rgba(244, 67, 54, 0.4);
-  padding: 16px;
-  border-radius: 16px;
-  font-size: 16px;
-  font-weight: 600;
+  background: linear-gradient(135deg, #f44336, #d32f2f);
+  color: white !important;
+  border: none;
+  padding: 20px 24px;
+  border-radius: 20px;
+  font-size: 18px;
+  font-weight: 800;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  transition: all 0.3s ease;
-  margin-top: 20px;
+  gap: 14px;
+  margin-top: 32px;
+  box-shadow: 0 10px 30px rgba(244, 67, 54, 0.5);
+  transition: all 0.35s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
 .chiqish-tugma:hover {
-  background: #f44336;
-  color: white;
+  background: linear-gradient(135deg, #e53935, #c62828);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(244, 67, 54, 0.6);
+}
+
+.chiqish-tugma:active {
   transform: translateY(-2px);
 }
 
-/* === YUKLANMOQDA === */
+.chiqish-tugma svg {
+  font-size: 26px;
+}
+
+/* YUKLANMOQDA */
 .yuklanmoqda {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  color: #888;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; height: 100vh; color: #888;
 }
-
 .aylanuvchi {
-  width: 50px;
-  height: 50px;
-  border: 4px solid #333;
-  border-top: 4px solid #0C73FE;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
+  width: 50px; height: 50px; border: 4px solid #333;
+  border-top: 4px solid #0C73FE; border-radius: 50%;
+  animation: spin 1s linear infinite; margin-bottom: 16px;
 }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* === RESPONSIVE === */
+/* RESPONSIVE */
 @media (max-width: 480px) {
   .profil-sahifa { padding: 16px; padding-bottom: 100px; }
   .foydalanuvchi-rasmi, .rasm-orniga { width: 80px; height: 80px; }
   .foydalanuvchi-ism { font-size: 20px; }
   .statistika-setka { grid-template-columns: 1fr 1fr; }
   .stat-element:nth-child(3) { grid-column: span 2; }
+  .chiqish-tugma { padding: 22px; font-size: 17px; }
 }
 
-
-
-
-
-
-
-
-
-
-
-/* ===================== CUSTOM MODAL ===================== */
-.modal-orqa-fon {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease;
+/* MODAL (avvalgidek qoldirdim) */
+.modal-orqa-fon { position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; z-index: 1000;
 }
-
 .modal-konteyner {
-  background: #1a1a1a;
-  border: 1px solid rgba(12, 115, 254, 0.4);
-  border-radius: 20px;
-  padding: 32px 24px;
-  width: 90%;
-  max-width: 380px;
-  text-align: center;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-  animation: modalRise 0.4s ease;
+  background: #1a1a1a; border: 1px solid rgba(12, 115, 254, 0.4);
+  border-radius: 20px; padding: 32px 24px; width: 90%; max-width: 380px;
+  text-align: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
 }
-
-.modal-belgi {
-  margin-bottom: 16px;
-}
-
-.modal-sarlavha {
-  font-size: 20px;
-  font-weight: 700;
-  margin: 12px 0;
-  color: #ffffff;
-}
-
-.modal-matn {
-  font-size: 15px;
-  color: #cccccc;
-  margin-bottom: 24px;
-  line-height: 1.5;
-}
-
-.modal-tugmalar {
-  display: flex;
-  gap: 12px;
-}
-
+.modal-belgi { margin-bottom: 16px; }
+.modal-sarlavha { font-size: 20px; font-weight: 700; margin: 12px 0; color: #ffffff; }
+.modal-matn { font-size: 15px; color: #cccccc; margin-bottom: 24px; line-height: 1.5; }
+.modal-tugmalar { display: flex; gap: 12px; }
 .modal-tugmalar button {
-  flex: 1;
-  padding: 14px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: 0.3s;
-  cursor: pointer;
+  flex: 1; padding: 14px; border-radius: 12px; font-weight: 600;
+  font-size: 15px; display: flex; align-items: center; justify-content: center;
+  gap: 8px; transition: 0.3s; cursor: pointer;
 }
-
-.modal-ha {
-  background: linear-gradient(135deg, #0C73FE, #0056d6);
-  color: white;
-  border: none;
-}
-
-.modal-ha:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(12, 115, 254, 0.4);
-}
-
-.modal-yoq {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid #444;
-}
-
-.modal-yoq:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-@keyframes modalRise {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.modal-ha { background: linear-gradient(135deg, #0C73FE, #0056d6); color: white; border: none; }
+.modal-ha:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(12, 115, 254, 0.4); }
+.modal-yoq { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid #444; }
+.modal-yoq:hover { background: rgba(255, 255, 255, 0.2); }

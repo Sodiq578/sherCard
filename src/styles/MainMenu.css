@@ -63,22 +63,28 @@
   perspective: 1000px;
   margin-bottom: 30px;
 }
-
 .ultra-card {
   width: 100%;
   border-radius: 24px;
   padding: 30px 25px;
-  color: white;
-  background: linear-gradient(135deg, #0C73FE 0%, #5C9DFF 100%);
-  box-shadow: 
+  color: rgb(0, 0, 0);
+
+  background-image: url(../assets/images/cardimgMain.png);
+  background-size: cover;        /* Rasm butun maydonni to‘ldiradi */
+  background-repeat: no-repeat;  /* Takrorlanmaydi */
+  background-position: center;   /* Markazga joylashadi */
+
+  box-shadow:
     0 20px 40px rgba(12, 115, 254, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
   transform-style: preserve-3d;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 }
+
 
 .ultra-card::before {
   content: '';

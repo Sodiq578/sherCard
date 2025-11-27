@@ -1,3 +1,4 @@
+// src/components/MainMenu.js
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/MainMenu.css";
@@ -31,13 +32,13 @@ function MainMenu({ user, updateUser }) {
   const [showCustomAmountModal, setShowCustomAmountModal] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
-  // Token yuborish
+  // Token yuborish uchun
   const [selectedUser, setSelectedUser] = useState(null);
   const [tokenAmount, setTokenAmount] = useState("");
   const [sendTokenSearch, setSendTokenSearch] = useState("");
   const [filteredSendUsers, setFilteredSendUsers] = useState([]);
 
-  // To'ldirish
+  // To'ldirish uchun
   const [tempCustomAmount, setTempCustomAmount] = useState("");
 
   // Universal Alert
@@ -50,28 +51,73 @@ function MainMenu({ user, updateUser }) {
     actionText: "",
   });
 
-  // ==================== KARTA LOGIKASI (ENG MUHIM!) ====================
+  // Main Banner state
+  const [mainBanner, setMainBanner] = useState(null);
+
+  // ==================== KARTA LOGIKASI – YANGILANDI ====================
   const getUserCards = () => {
     if (!user?.cards || user.cards.length === 0) {
       return [{
-        number: "8989 8989 8989",
+        number: "8989 8989 8989 8989",
         holder: user?.profile?.name || "Foydalanuvchi"
       }];
     }
 
-    return user.cards.map(card => {
-      if (typeof card === "string") {
-        return { number: card, holder: user?.profile?.name || "Foydalanuvchi" };
-      }
-      return {
-        number: card.number || card.cardNumber || "**** **** **** ****",
-        holder: card.holder || user?.profile?.name || "Foydalanuvchi"
-      };
-    });
+    return user.cards
+      .filter(card => !card.deleted)
+      .map(card => {
+        let rawNumber = "";
+        if (typeof card === "string") {
+          rawNumber = card.replace(/\s/g, "");
+        } else {
+          rawNumber = (card.number || card.cardNumber || "").replace(/\s/g, "");
+        }
+
+        // Agar raqam 12 yoki 16 bo'lmasa – default
+        if (![12, 16].includes(rawNumber.length)) {
+          rawNumber = "8989898989898989";
+        }
+
+        // 16 ta raqamga to'ldirish
+        const fullNumber = rawNumber.padEnd(16, "0").slice(0, 16);
+        const formatted = fullNumber.replace(/(\d{4})/g, "$1 ").trim();
+
+        return {
+          number: formatted,
+          holder: card.holder || user?.profile?.name || "Foydalanuvchi"
+        };
+      });
   };
 
   const userCards = getUserCards();
-  const [selectedCard, setSelectedCard] = useState(userCards[0]);
+  const [selectedCard, setSelectedCard] = useState(userCards[0] || { number: "8989 8989 8989 8989" });
+
+  // Ultra karta bosilganda → Cards sahifasiga o'tish
+  const goToCards = () => {
+    navigate("/cards");
+  };
+
+  // ==================== BANNER FUNKSIYALARI ====================
+  useEffect(() => {
+    loadMainBanner();
+  }, []);
+
+  const loadMainBanner = () => {
+    const bannerData = JSON.parse(localStorage.getItem('mainBanner') || '{}');
+    if (bannerData.isActive && bannerData.image) {
+      setMainBanner(bannerData);
+    } else {
+      setMainBanner(null);
+    }
+  };
+
+  const handleBannerClick = () => {
+    if (mainBanner?.link) {
+      window.open(mainBanner.link, '_blank');
+    } else {
+      setShowSendTokens(true);
+    }
+  };
 
   // ==================== ALERT FUNKSIYALARI ====================
   const showAlert = (message, type = "success", title = "", action = null, actionText = "OK") => {
@@ -260,11 +306,6 @@ function MainMenu({ user, updateUser }) {
     );
   };
 
-  // ==================== NAVIGATION ====================
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
-
   // ==================== MA'LUMOTLAR ====================
   const displayName = user?.profile?.name || user?.profile?.username || "Foydalanuvchi";
   const username = user?.profile?.username || "username";
@@ -272,7 +313,7 @@ function MainMenu({ user, updateUser }) {
   return (
     <div className="main-menu-container">
 
-      {/* UNIVERSAL ALERT */}
+      {/* UNIVERSAL ALERT MODAL */}
       {alert.show && (
         <div className="menu-alert-modal-overlay" onClick={closeAlert}>
           <div className={`menu-alert-modal menu-alert-${alert.type}`} onClick={e => e.stopPropagation()}>
@@ -295,6 +336,72 @@ function MainMenu({ user, updateUser }) {
                 {alert.action ? "Bekor qilish" : "Yopish"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* HEADER */}
+      <div className="ultra-header">
+        <div className="ultra-avatar" onClick={() => navigate("/profile")}>
+          <img src={user?.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} alt="avatar" />
+        </div>
+        <div className="ultra-username">@{username}</div>
+        {user?.isPremium && <div className="ultra-premium-badge"><RiVipCrownLine /></div>}
+      </div>
+
+      {/* BALANS KARTASI – BOSILSA /cards GA O'TADI */}
+      <div className="ultra-card-wrapper" onClick={goToCards} style={{ cursor: "pointer" }}>
+        <div className="ultra-card">
+          <div className="ultra-card-username">@{username}</div>
+          <div className="ultra-card-balance">
+            {(user?.balance || 0).toLocaleString()}
+            <img src={Logo} alt="token" className="ultra-token-lg" />
+          </div>
+          <div className="ultra-card-number">
+            {selectedCard?.number || "8989 8989 8989 8989"}
+          </div>
+        </div>
+      </div>
+
+      {/* TEZ AMALLAR */}
+      <div className="ultra-actions">
+        <button className="ultra-action" onClick={() => setShowSendTokens(true)}>
+          <div className="ultra-icon"><RiSendPlaneLine size={32} /></div>
+          <span>Ball yuborish</span>
+        </button>
+        <button className="ultra-action" onClick={() => setShowCustomAmountModal(true)}>
+          <div className="ultra-icon blue"><RiAddCircleLine size={32} /></div>
+          <span>To'ldirish</span>
+        </button>
+        <button className="ultra-action" onClick={() => setShowPremiumModal(true)}>
+          <div className="ultra-icon pink"><RiGiftLine size={32} /></div>
+          <span>Premium</span>
+        </button>
+      </div>
+
+      {/* ASOSIY REKLAMA BANNER */}
+      {mainBanner && (
+        <div className="main-banner-container" onClick={handleBannerClick}>
+          <div className="main-banner">
+            <img src={mainBanner.image} alt="Reklama" />
+            <div className="banner-content">
+              {mainBanner.title && <h3>{mainBanner.title}</h3>}
+              {mainBanner.description && <p>{mainBanner.description}</p>}
+              <div className="banner-cta">
+                <RiSendPlaneLine size={16} />
+                <span>Token yuborish</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AGAR BANNER BO'LMASA, STANDART REKLAMA JOYI */}
+      {!mainBanner && (
+        <div className="asosiy-sahifa-reklama" onClick={() => setShowSendTokens(true)}>
+          <div className="reklama-placeholder">
+            <RiSendPlaneLine size={24} />
+            <span>Token yuborish</span>
           </div>
         </div>
       )}
@@ -417,43 +524,6 @@ function MainMenu({ user, updateUser }) {
         </div>
       )}
 
-      {/* HEADER */}
-      <div className="ultra-header">
-        <div className="ultra-avatar" onClick={() => navigate("/profile")}>
-          <img src={user?.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} alt="avatar" />
-        </div>
-        <div className="ultra-username">@{username}</div>
-        {user?.isPremium && <div className="ultra-premium-badge"><RiVipCrownLine /></div>}
-      </div>
-
-      {/* BALANS KARTASI */}
-      <div className="ultra-card-wrapper">
-        <div className="ultra-card">
-          <div className="ultra-card-username">@{username}</div>
-          <div className="ultra-card-balance">
-            {(user?.balance || 0).toLocaleString()}
-            <img src={Logo} alt="token" className="ultra-token-lg" />
-          </div>
-          <div className="ultra-card-number">{selectedCard.number}</div>
-        </div>
-      </div>
-
-      {/* TEZ AMALLAR */}
-      <div className="ultra-actions">
-        <button className="ultra-action" onClick={() => setShowSendTokens(true)}>
-          <div className="ultra-icon"><RiSendPlaneLine size={32} /></div>
-          <span>Ball yuborish</span>
-        </button>
-        <button className="ultra-action" onClick={() => setShowCustomAmountModal(true)}>
-          <div className="ultra-icon blue"><RiAddCircleLine size={32} /></div>
-          <span>To'ldirish</span>
-        </button>
-        <button className="ultra-action" onClick={() => setShowPremiumModal(true)}>
-          <div className="ultra-icon pink"><RiGiftLine size={32} /></div>
-          <span>Premium</span>
-        </button>
-      </div>
-
       {/* BALANS TO'LDIRISH MODAL */}
       {showCustomAmountModal && (
         <div className="menu-modal-overlay">
@@ -525,7 +595,7 @@ function MainMenu({ user, updateUser }) {
           </div>
         </div>
       )}
- 
+
     </div>
   );
 }

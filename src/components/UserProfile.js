@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// UserProfile.jsx
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   RiArrowLeftLine, 
@@ -10,7 +11,12 @@ import {
   RiCloseLine,
   RiCheckLine,
   RiErrorWarningLine,
-  RiInformationLine
+  RiInformationLine,
+  RiUserLine,
+  RiPhoneLine,
+  RiMailLine,
+  RiBankCardLine,
+  RiLogoutBoxRLine   // Chiqish ikonkasi
 } from 'react-icons/ri';
 import Logo from "../assets/images/logo.png";
 import '../styles/UserProfile.css';
@@ -22,12 +28,12 @@ function UserProfile({ user, updateUser }) {
   const [loading, setLoading] = useState(true);
   const [isOwnProfile, setIsOwnProfile] = useState(true);
 
-  // Token yuborish states
+  // Token yuborish
   const [showSendTokens, setShowSendTokens] = useState(false);
   const [tokenAmount, setTokenAmount] = useState("");
   const [selectedCard, setSelectedCard] = useState("");
 
-  // Alert modal states
+  // Alert
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success");
@@ -36,61 +42,44 @@ function UserProfile({ user, updateUser }) {
   const [alertActionText, setAlertActionText] = useState("");
 
   useEffect(() => {
-    const loadUserProfile = () => {
+    const loadUser = () => {
       try {
         const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
-        
-        // Agar login parametri bo'lsa, boshqa foydalanuvchi profili
         if (login && login !== user.login) {
-          const foundUser = allUsers.find(u => u.login === login);
-          if (foundUser) {
-            setProfileUser(foundUser);
+          const found = allUsers.find(u => u.login === login);
+          if (found) {
+            setProfileUser(found);
             setIsOwnProfile(false);
           } else {
             navigate('/main');
           }
         } else {
-          // O'z profili
           setProfileUser(user);
           setIsOwnProfile(true);
         }
-      } catch (error) {
-        console.error('Profil yuklanmadi:', error);
+      } catch (err) {
+        console.error(err);
         navigate('/main');
       } finally {
         setLoading(false);
       }
     };
-
-    loadUserProfile();
+    loadUser();
   }, [login, user, navigate]);
 
-  // Karta raqamlari - obyektlarni qayta ishlash
-  const userCards = React.useMemo(() => {
+  const userCards = useMemo(() => {
     if (!user?.cards) return ["8989 8989 8989"];
-    
-    // Agar cards massiv bo'lsa va ichida obyektlar bo'lsa
-    if (Array.isArray(user.cards)) {
-      return user.cards.map(card => {
-        if (typeof card === 'string') return card;
-        if (card && card.number) return card.number;
-        return "8989 8989 8989";
-      });
-    }
-    
-    return ["8989 8989 8989"];
+    return user.cards.map(c => typeof c === 'string' ? c : (c?.number || "8989 8989 8989"));
   }, [user?.cards]);
 
-  // Boshlang'ich karta raqamini o'rnatish
   useEffect(() => {
     if (userCards.length > 0 && !selectedCard) {
       setSelectedCard(userCards[0]);
     }
-  }, [userCards, selectedCard]);
+  }, [userCards]);
 
-  // Alert funksiyalari
-  const showAlertMessage = (message, type = "success", title = "", action = null, actionText = "") => {
-    setAlertMessage(message);
+  const showAlertMessage = (msg, type = "success", title = "", action = null, actionText = "") => {
+    setAlertMessage(msg);
     setAlertType(type);
     setAlertTitle(title);
     setAlertAction(() => action);
@@ -98,218 +87,139 @@ function UserProfile({ user, updateUser }) {
     setShowAlert(true);
   };
 
-  const handleAlertAction = () => {
-    if (alertAction) alertAction();
-    setShowAlert(false);
-  };
-
-  const closeAlert = () => setShowAlert(false);
-
-  const handleSendTokens = () => {
-    if (profileUser && !isOwnProfile) {
-      setShowSendTokens(true);
-    }
-  };
-
-  const handleStartChat = () => {
-    if (profileUser && !isOwnProfile) {
-      navigate(`/chat/${profileUser.login}`);
-    }
-  };
-
   const handleTokenTransfer = () => {
-    if (!profileUser) {
-      showAlertMessage("Foydalanuvchi topilmadi!", "error", "Xatolik");
-      return;
-    }
-
     const amount = parseInt(tokenAmount);
-    if (!amount || amount <= 0 || isNaN(amount)) {
-      showAlertMessage("To'g'ri miqdor kiriting!", "error", "Xatolik");
-      return;
-    }
-
-    if (amount > user.balance) {
-      showAlertMessage("Balansingizda yetarli token mavjud emas!", "error", "Xatolik");
-      return;
-    }
-
-    if (amount < 100) {
-      showAlertMessage("Minimal yuborish miqdori: 100 token", "error", "Xatolik");
+    if (!amount || amount < 100 || amount > user.balance) {
+      showAlertMessage("Miqdor noto‘g‘ri yoki yetarli balans yo‘q!", "error", "Xatolik");
       return;
     }
 
     const confirmSend = () => {
-      try {
-        // Joriy foydalanuvchi yangilash
-        const updatedCurrentUser = {
-          ...user,
-          balance: user.balance - amount,
-          history: [
-            ...(user.history || []),
-            {
-              time: new Date().toLocaleString("uz-UZ"),
-              action: `${profileUser.profile.username} ga token yuborildi`,
-              amount: `-${amount.toLocaleString()} token`,
-              details: `@${profileUser.profile.username} | Karta: ${selectedCard}`,
-              card: selectedCard
-            }
-          ]
-        };
+      const updatedCurrent = {
+        ...user,
+        balance: user.balance - amount,
+        history: [...(user.history || []), {
+          time: new Date().toLocaleString("uz-UZ"),
+          action: `@${profileUser.profile.username} ga token yuborildi`,
+          amount: `-${amount.toLocaleString()}`,
+          details: `Karta: ${selectedCard}`
+        }]
+      };
 
-        // Qabul qiluvchi foydalanuvchini topish va yangilash
-        const allUsersData = JSON.parse(localStorage.getItem("allUsers") || "[]");
-        let receiverUpdated = false;
-        
-        const updatedAllUsers = allUsersData.map(u => {
-          if (u.login === profileUser.login) {
-            receiverUpdated = true;
-            return {
-              ...u,
+      const allUsers = JSON.parse(localStorage.getItem("allUsers") || "[]");
+      const updatedAll = allUsers.map(u => 
+        u.login === profileUser.login 
+          ? { 
+              ...u, 
               balance: (u.balance || 0) + amount,
-              history: [
-                ...(u.history || []),
-                {
-                  time: new Date().toLocaleString("uz-UZ"),
-                  action: `${user.profile.username} dan token qabul qilindi`,
-                  amount: `+${amount.toLocaleString()} token`,
-                  details: `@${user.profile.username} | Karta: ${selectedCard}`,
-                  card: selectedCard
-                }
-              ],
-              messages: [
-                ...(u.messages || []),
-                {
-                  id: Date.now(),
-                  from: user.login,
-                  to: u.login,
-                  text: `Sizga ${amount.toLocaleString()} token yuborildi!`,
-                  time: new Date().toLocaleString("uz-UZ"),
-                  type: "token",
-                  amount: amount,
-                  read: false,
-                  card: selectedCard
-                }
-              ]
-            };
-          }
-          return u;
-        });
-
-        // Agar qabul qiluvchi allUsers ichida topilmasa, yangi qo'shamiz
-        if (!receiverUpdated) {
-          const newReceiver = {
-            ...profileUser,
-            balance: (profileUser.balance || 0) + amount,
-            history: [
-              ...(profileUser.history || []),
-              {
+              history: [...(u.history || []), {
                 time: new Date().toLocaleString("uz-UZ"),
-                action: `${user.profile.username} dan token qabul qilindi`,
-                amount: `+${amount.toLocaleString()} token`,
-                details: `@${user.profile.username} | Karta: ${selectedCard}`,
-                card: selectedCard
-              }
-            ],
-            messages: [
-              ...(profileUser.messages || []),
-              {
+                action: `@${user.profile.username} dan token keldi`,
+                amount: `+${amount.toLocaleString()}`,
+                details: `Karta: ${selectedCard}`
+              }],
+              messages: [...(u.messages || []), {
                 id: Date.now(),
                 from: user.login,
-                to: profileUser.login,
+                to: u.login,
                 text: `Sizga ${amount.toLocaleString()} token yuborildi!`,
                 time: new Date().toLocaleString("uz-UZ"),
                 type: "token",
-                amount: amount,
+                amount,
                 read: false,
                 card: selectedCard
-              }
-            ]
-          };
-          updatedAllUsers.push(newReceiver);
-        }
+              }]
+            }
+          : u
+      );
 
-        // LocalStorage yangilash
-        localStorage.setItem("userData", JSON.stringify(updatedCurrentUser));
-        localStorage.setItem("allUsers", JSON.stringify(updatedAllUsers));
+      localStorage.setItem("userData", JSON.stringify(updatedCurrent));
+      localStorage.setItem("allUsers", JSON.stringify(updatedAll));
+      updateUser(updatedCurrent);
 
-        // State yangilash
-        updateUser(updatedCurrentUser);
-
-        showAlertMessage(
-          `@${profileUser.profile.username} ga ${amount.toLocaleString()} token muvaffaqiyatli yuborildi!\nKarta: ${selectedCard}`,
-          "success",
-          "Muvaffaqiyatli"
-        );
-
-        setShowSendTokens(false);
-        setTokenAmount("");
-        setSelectedCard(userCards[0] || "8989 8989 8989");
-      } catch (error) {
-        console.error("Token yuborishda xatolik:", error);
-        showAlertMessage("Token yuborishda xatolik yuz berdi!", "error", "Xatolik");
-      }
+      showAlertMessage(
+        `@${profileUser.profile.username} ga ${amount.toLocaleString()} token yuborildi!`,
+        "success",
+        "Muvaffaqiyatli"
+      );
+      setShowSendTokens(false);
+      setTokenAmount("");
     };
 
     showAlertMessage(
-      `@${profileUser.profile.username} ga ${amount.toLocaleString()} token yuborishni tasdiqlaysizmi?\n\nKarta: ${selectedCard}\nJoriy balans: ${user.balance.toLocaleString()} token\nYuborilgandan keyin: ${(user.balance - amount).toLocaleString()} token`,
+      `@${profileUser.profile.username} ga ${amount.toLocaleString()} token yuborilsinmi?\n\nQoladi: ${(user.balance - amount).toLocaleString()} token`,
       "info",
-      "Token yuborish",
+      "Tasdiqlang",
       confirmSend,
-      "Tasdiqlash"
+      "Yuborish"
     );
   };
 
-  // O'z profilidagi kartalarni ko'rsatish
-  const displayCards = React.useMemo(() => {
-    if (!profileUser?.cards) return ["8989 8989 8989"];
-    
-    if (Array.isArray(profileUser.cards)) {
-      return profileUser.cards.map(card => {
-        if (typeof card === 'string') return card;
-        if (card && card.number) return card.number;
-        return "8989 8989 8989";
-      });
-    }
-    
-    return ["8989 8989 8989"];
-  }, [profileUser?.cards]);
+  // CHIqISH FUNKSIYASI – BUTUNLAY TIZIMDAN CHIQIB KETADI
+  const handleLogout = () => {
+    showAlertMessage(
+      "Hisobdan chiqmoqchimisiz?\n\nBarcha ma'lumotlar o‘chib ketadi!",
+      "info",
+      "Chiqish",
+      () => {
+        // BARCHA Foydalanuvchi ma'lumotlarini tozalaymiz
+        localStorage.removeItem("userData");
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("allUsers");
+        localStorage.removeItem("currentUserLogin");
+        localStorage.removeItem("token");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("rememberMe");
+        localStorage.removeItem("lastLoginTime");
 
-  if (loading) {
-    return <div className="user-profile-loading">Yuklanmoqda...</div>;
-  }
+        // SessionStorage ham tozalansin
+        sessionStorage.clear();
 
-  if (!profileUser) {
-    return <div className="user-profile-not-found">Foydalanuvchi topilmadi</div>;
-  }
+        // Barcha cookie larni o'chirish
+        document.cookie.split(";").forEach(cookie => {
+          document.cookie = cookie
+            .replace(/^ +/, "")
+            .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        });
 
-  const userBalance = profileUser.balance || 0;
-  const userHistory = profileUser.history || [];
+        // State ni tozalash
+        updateUser(null);
+
+        // Login sahifasiga yo'naltirish + sahifani yangilash
+        navigate("/login", { replace: true });
+        window.location.reload();
+      },
+      "Ha, chiqish"
+    );
+  };
+
+  if (loading) return <div className="loading">Yuklanmoqda...</div>;
+  if (!profileUser) return <div className="loading">Foydalanuvchi topilmadi</div>;
+
+  const history = (profileUser.history || []).slice(-10).reverse();
 
   return (
-    <div className="user-profile-container">
-      {/* UNIVERSAL ALERT MODAL */}
+    <>
+      {/* ALERT */}
       {showAlert && (
-        <div className="user-alert-modal-overlay">
-          <div className={`user-alert-modal user-alert-${alertType}`}>
-            <div className="user-alert-header">
-              {alertType === "success" && <RiCheckLine className="user-alert-header-icon" />}
-              {alertType === "error" && <RiErrorWarningLine className="user-alert-header-icon" />}
-              {alertType === "info" && <RiInformationLine className="user-alert-header-icon" />}
-              <h3 className="user-alert-title">
-                {alertTitle || (alertType === "success" ? "Muvaffaqiyatli" : alertType === "error" ? "Xatolik" : "Ma'lumot")}
-              </h3>
+        <div className="alert-overlay">
+          <div className={`alert-modal alert-${alertType}`}>
+            <div className="alert-header">
+              {alertType === "success" && <RiCheckLine size={28} color="#4caf50" />}
+              {alertType === "error" && <RiErrorWarningLine size={28} color="#f44336" />}
+              {alertType === "info" && <RiInformationLine size={28} color="#0C73FE" />}
+              <h3>{alertTitle || (alertType === "success" ? "Muvaffaqiyatli" : "Xatolik")}</h3>
             </div>
-            <div className="user-alert-body">
+            <div className="alert-body">
               <p>{alertMessage}</p>
             </div>
-            <div className="user-alert-footer">
+            <div className="alert-footer">
               {alertAction && (
-                <button className="user-alert-action-btn" onClick={handleAlertAction}>
-                  {alertActionText || "Tasdiqlash"}
+                <button onClick={() => { alertAction(); setShowAlert(false); }} className="alert-btn primary">
+                  {alertActionText}
                 </button>
               )}
-              <button className="user-alert-close-btn" onClick={closeAlert}>
+              <button onClick={() => setShowAlert(false)} className="alert-btn secondary">
                 {alertAction ? "Bekor qilish" : "Yopish"}
               </button>
             </div>
@@ -319,206 +229,144 @@ function UserProfile({ user, updateUser }) {
 
       {/* TOKEN YUBORISH MODAL */}
       {showSendTokens && (
-        <div className="user-modal-overlay">
-          <div className="user-modal-content user-send-tokens-modal">
-            <div className="user-modal-header">
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
               <h3>Token yuborish</h3>
-              <button className="user-modal-close-btn" onClick={() => setShowSendTokens(false)}>
-                <RiCloseLine size={20} />
-              </button>
+              <button onClick={() => setShowSendTokens(false)}><RiCloseLine size={22} /></button>
             </div>
-
-            <div className="user-modal-body">
-              <div className="user-selected-user">
-                <div className="user-selected-user-avatar">
-                  <img src={profileUser.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} alt="" />
-                  {profileUser.isPremium && <div className="user-user-premium-indicator"></div>}
-                </div>
-                <div className="user-selected-user-info">
+            <div className="modal-body">
+              <div className="recipient">
+                <img src={profileUser.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} alt="avatar" />
+                <div>
                   <h4>@{profileUser.profile?.username}</h4>
-                  <p>{profileUser.profile?.name || "Foydalanuvchi"}</p>
+                  <p>{profileUser.profile?.name}</p>
                 </div>
               </div>
 
-              {/* Karta tanlash */}
-              <div className="user-card-selection">
-                <label>Yuborish kartasini tanlang</label>
-                <div className="user-card-options">
-                  {userCards.map((card, index) => (
-                    <div
-                      key={index}
-                      className={`user-card-option ${selectedCard === card ? 'selected' : ''}`}
-                      onClick={() => setSelectedCard(card)}
-                    >
-                      <div className="user-card-number">{card}</div>
-                      <div className="user-card-holder">{user.profile?.name}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="user-token-input-section">
-                <label>Yuboriladigan token miqdori</label>
-                <div className="user-token-input-wrapper">
-                  <input
-                    type="number"
-                    placeholder="100"
-                    value={tokenAmount}
-                    onChange={(e) => setTokenAmount(e.target.value)}
-                    className="user-token-input"
-                    min="100"
-                    max={user.balance}
-                  />
-                  <span className="user-token-symbol">
-                    <img src={Logo} alt="token" className="user-token-sm" />
-                  </span>
-                </div>
-                <div className="user-balance-info">
-                  Joriy balans: <strong>{user.balance.toLocaleString()} token</strong>
-                </div>
-                
-                {tokenAmount >= 100 && (
-                  <div className="user-amount-preview">
-                    <div className="user-amount-row">
-                      <span>Yuboriladi:</span>
-                      <strong>{parseInt(tokenAmount || 0).toLocaleString()} token</strong>
-                    </div>
-                    <div className="user-amount-row">
-                      <span>Qoladi:</span>
-                      <strong>{(user.balance - parseInt(tokenAmount || 0)).toLocaleString()} token</strong>
-                    </div>
-                    <div className="user-amount-row">
-                      <span>Karta:</span>
-                      <strong>{selectedCard}</strong>
-                    </div>
+              <div className="card-select">
+                <label>Karta tanlang</label>
+                {userCards.map(card => (
+                  <div key={card} className={`card-opt ${selectedCard === card ? 'sel' : ''}`} onClick={() => setSelectedCard(card)}>
+                    {card}
                   </div>
-                )}
+                ))}
               </div>
-            </div>
 
-            <div className="user-modal-footer">
-              <button
-                className="user-primary-btn"
-                onClick={handleTokenTransfer}
-                disabled={!tokenAmount || tokenAmount < 100 || tokenAmount > user.balance}
-              >
-                Yuborish ({tokenAmount || 0} token)
+              <div className="amount-input">
+                <label>Miqdor</label>
+                <div className="input-wrap">
+                  <input type="number" value={tokenAmount} onChange={e => setTokenAmount(e.target.value)} placeholder="100" />
+                  <img src={Logo} alt="token" className="token-icon" />
+                </div>
+                <p>Joriy balans: <strong>{user.balance.toLocaleString()} token</strong></p>
+              </div>
+
+              {tokenAmount >= 100 && (
+                <div className="preview">
+                  <div><span>Yuboriladi:</span> <strong>{parseInt(tokenAmount || 0).toLocaleString()} token</strong></div>
+                  <div><span>Qoladi:</span> <strong>{(user.balance - parseInt(tokenAmount || 0)).toLocaleString()} token</strong></div>
+                  <div><span>Karta:</span> <strong>{selectedCard}</strong></div>
+                </div>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button className="btn-primary" onClick={handleTokenTransfer} disabled={!tokenAmount || tokenAmount < 100 || tokenAmount > user.balance}>
+                Yuborish
               </button>
-              <button 
-                className="user-secondary-btn" 
-                onClick={() => setShowSendTokens(false)}
-              >
-                Bekor qilish
-              </button>
+              <button className="btn-secondary" onClick={() => setShowSendTokens(false)}>Bekor qilish</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Header */}
-      <div className="user-profile-header">
-        <button className="user-profile-back-btn" onClick={() => navigate(-1)}>
-          <RiArrowLeftLine size={24} />
-        </button>
-        <h2>{isOwnProfile ? 'Mening Profilim' : 'Foydalanuvchi Profili'}</h2>
-      </div>
-
-      {/* Profile Info */}
-      <div className="user-profile-card">
-        <div className="user-profile-avatar">
-          <img 
-            src={profileUser.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} 
-            alt="avatar" 
-          />
-          {profileUser.isPremium && (
-            <div className="user-profile-premium-badge">
-              <RiVipCrownLine size={20} />
-            </div>
-          )}
+      <div className="user-profile-page">
+        <div className="header">
+          <button onClick={() => navigate(-1)} className="back-btn"><RiArrowLeftLine size={24} /></button>
+          <h1>{isOwnProfile ? "Mening profilim" : "Foydalanuvchi"}</h1>
         </div>
-        
-        <div className="user-profile-info">
-          <h3 className="user-profile-name">
-            {profileUser.profile?.name || "Foydalanuvchi"}
-            {profileUser.isPremium && <span className="user-profile-premium-tag">Premium</span>}
-          </h3>
-          <p className="user-profile-username">@{profileUser.profile?.username}</p>
-          
+
+        <div className="main-card">
+          <div className="avatar-section">
+            <div className="avatar">
+              <img src={profileUser.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} alt="avatar" />
+              {profileUser.isPremium && <div className="premium-badge"><RiVipCrownLine size={18} /></div>}
+            </div>
+            <h2>{profileUser.profile?.name || "Foydalanuvchi"}</h2>
+            <p className="username">@{profileUser.profile?.username}</p>
+            <div className="balance">
+              <RiCoinsLine size={20} />
+              <span>{(profileUser.balance || 0).toLocaleString()} token</span>
+              <img src={Logo} alt="logo" className="logo-sm" />
+            </div>
+          </div>
+
+          {/* O'z profilida */}
           {isOwnProfile && (
-            <div className="user-profile-balance">
-              <RiCoinsLine className="user-balance-icon" />
-              <span>{userBalance.toLocaleString()} token</span>
+            <>
+              <div className="info-grid">
+                <div className="info-item"><RiUserLine /> {profileUser.profile?.name || "-"}</div>
+                <div className="info-item"><RiPhoneLine /> {profileUser.profile?.phone || "Yo‘q"}</div>
+                <div className="info-item"><RiMailLine /> {profileUser.profile?.email || "Yo‘q"}</div>
+              </div>
+
+              <div className="cards-section">
+                <h3><RiBankCardLine /> Kartalar</h3>
+                {userCards.map(card => (
+                  <div key={card} className="card-item">{card}</div>
+                ))}
+              </div>
+
+              {/* CHIqISH TUGMASI */}
+              <div className="logout-section">
+                <button onClick={handleLogout} className="btn-logout">
+                  <RiLogoutBoxRLine size={24} />
+                  <span>Chiqish</span>
+                </button>
+                <p style={{textAlign: 'center', marginTop: '12px', color: '#e74c3c', fontSize: '14px', opacity: 0.8}}>
+                  Barcha ma'lumotlar o‘chib ketadi
+                </p>
+              </div>
+            </>
+          )}
+
+          {/* Boshqa foydalanuvchida */}
+          {!isOwnProfile && (
+            <div className="action-buttons">
+              <button onClick={() => setShowSendTokens(true)} className="btn-send">
+                <RiSendPlaneLine /> Token yuborish
+              </button>
+              <button onClick={() => navigate(`/chat/${profileUser.login}`)} className="btn-chat">
+                <RiChat3Line /> Xabar yozish
+              </button>
             </div>
           )}
         </div>
 
-        {/* Action Buttons - faqat boshqa foydalanuvchi profili uchun */}
-        {!isOwnProfile && (
-          <div className="user-profile-actions">
-            <button className="user-profile-action-btn primary" onClick={handleSendTokens}>
-              <RiSendPlaneLine size={18} />
-              Token Yuborish
-            </button>
-           
-          </div>
-        )}
-      </div>
-
-      {/* Karta ma'lumotlari - faqat o'z profili uchun */}
-      {isOwnProfile && (
-        <div className="user-profile-card-info">
-          <div className="user-card-section">
-            <h4>Karta ma'lumotlari</h4>
-            {displayCards.map((card, index) => (
-              <div key={index} className="user-card-item">
-                <div className="user-card-number">{card}</div>
-                <div className="user-card-holder">{profileUser.profile?.name || "Foydalanuvchi"}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* History - faqat o'z profili uchun */}
-      {isOwnProfile && (
-        <div className="user-profile-history">
-          <div className="user-profile-history-header">
-            <RiHistoryLine size={20} />
-            <h3>Oxirgi harakatlar</h3>
-          </div>
-          
-          {userHistory.length > 0 ? (
-            <div className="user-history-list">
-              {userHistory.slice(-10).reverse().map((item, index) => {
-                const amountText = String(item.amount || '');
-                const isPositive = amountText.includes('+');
-                
+        {/* Tarix faqat o‘z profilida */}
+        {isOwnProfile && history.length > 0 && (
+          <div className="history-section">
+            <h3><RiHistoryLine /> So‘nggi tranzaksiyalar</h3>
+            <div className="history-list">
+              {history.map((h, i) => {
+                const positive = String(h.amount || "").includes("+");
                 return (
-                  <div key={index} className="user-history-item">
-                    <div className="user-history-main">
-                      <span className="user-history-action">{item.action || 'Noma\'lum harakat'}</span>
-                      <span className={`user-history-amount ${isPositive ? 'positive' : 'negative'}`}>
-                        {amountText}
-                      </span>
+                  <div key={i} className="history-item">
+                    <div>
+                      <p className="action">{h.action || "Tranzaksiya"}</p>
+                      <p className="time">{h.time}</p>
                     </div>
-                    <div className="user-history-details">
-                      <span className="user-history-time">{item.time || 'Noma\'lum vaqt'}</span>
-                      {item.details && (
-                        <span className="user-history-detail">{item.details}</span>
-                      )}
-                    </div>
+                    <p className={`amount ${positive ? "pos" : "neg"}`}>
+                      {positive ? "+" : "-"}{Math.abs(parseInt(h.amount || 0)).toLocaleString()} token
+                    </p>
                   </div>
                 );
               })}
             </div>
-          ) : (
-            <div className="user-no-history">
-              Hech qanday harakatlar topilmadi
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 

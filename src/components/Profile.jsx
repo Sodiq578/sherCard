@@ -1,4 +1,3 @@
-// src/components/Profile.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -23,7 +22,7 @@ import {
 import "../styles/Profile.css";
 import Logo from "../assets/images/logo.png";
 
-// Custom Modal komponenti
+// Custom Modal
 const CustomModal = ({ isOpen, title, message, type = "info", onConfirm, onCancel }) => {
   if (!isOpen) return null;
 
@@ -70,12 +69,11 @@ function Profile({ user, updateUser, onLogout }) {
   const [kartalarSoni, setKartalarSoni] = useState(0);
   const [tarixKorsat, setTarixKorsat] = useState(false);
 
-  // Modal holati
   const [modal, setModal] = useState({
     ochiq: false,
     sarlavha: "",
     matn: "",
-    turi: "info", // info, success, error, confirm
+    turi: "info",
     onConfirm: null,
   });
 
@@ -152,7 +150,6 @@ function Profile({ user, updateUser, onLogout }) {
 
   const tarixniOchish = () => setTarixKorsat((prev) => !prev);
 
-  // Yuklanmoqda holati
   if (!user) {
     return (
       <div className="yuklanmoqda">
@@ -171,10 +168,7 @@ function Profile({ user, updateUser, onLogout }) {
             <FiArrowLeft size={24} />
           </button>
           <h1>Profil</h1>
-          <button
-            onClick={() => setTahrirlash(!tahrirlash)}
-            className="tahrirlash-tugma"
-          >
+          <button onClick={() => setTahrirlash(!tahrirlash)} className="tahrirlash-tugma">
             {tahrirlash ? <FiX size={22} /> : <FiEdit2 size={20} />}
           </button>
         </div>
@@ -221,9 +215,7 @@ function Profile({ user, updateUser, onLogout }) {
           {/* MA'LUMOTLAR FORMA */}
           <div className="profil-forma">
             <div className="kirish-guruh">
-              <label>
-                <FiUser /> To'liq ism
-              </label>
+              <label><FiUser /> To'liq ism</label>
               <input
                 type="text"
                 value={ism}
@@ -234,9 +226,7 @@ function Profile({ user, updateUser, onLogout }) {
             </div>
 
             <div className="kirish-guruh">
-              <label>
-                <FiPhone /> Telefon raqam
-              </label>
+              <label><FiPhone /> Telefon raqam</label>
               <input
                 type="tel"
                 value={telefon}
@@ -247,9 +237,7 @@ function Profile({ user, updateUser, onLogout }) {
             </div>
 
             <div className="kirish-guruh">
-              <label>
-                <FiMail /> Email
-              </label>
+              <label><FiMail /> Email</label>
               <input
                 type="email"
                 value={email}
@@ -259,16 +247,12 @@ function Profile({ user, updateUser, onLogout }) {
               />
             </div>
 
-            {/* SAQLASH / BEKOR QILISH */}
             {tahrirlash && (
               <div className="forma-harakatlar">
                 <button onClick={saqlash} className="saqlash-tugma">
                   <FiSave /> Saqlash
                 </button>
-                <button
-                  onClick={() => setTahrirlash(false)}
-                  className="bekor-qilish-tugma"
-                >
+                <button onClick={() => setTahrirlash(false)} className="bekor-qilish-tugma">
                   <FiX /> Bekor qilish
                 </button>
               </div>
@@ -285,28 +269,18 @@ function Profile({ user, updateUser, onLogout }) {
               <div className="stat-izoh">Balans</div>
             </div>
 
-            <div
-              className="stat-element"
-              onClick={() => navigate("/cards")}
-              style={{ cursor: "pointer" }}
-            >
+            <div className="stat-element" onClick={() => navigate("/cards")} style={{ cursor: "pointer" }}>
               <FiCreditCard className="stat-belgi" />
               <div className="stat-qiymat">{kartalarSoni}</div>
               <div className="stat-izoh">Kartalar</div>
               <FiChevronRight className="ong-belgi" />
             </div>
 
-            <div
-              className="stat-element"
-              onClick={tarixniOchish}
-              style={{ cursor: "pointer" }}
-            >
+            <div className="stat-element" onClick={tarixniOchish} style={{ cursor: "pointer" }}>
               <FiClock className="stat-belgi" />
               <div className="stat-qiymat">{user.history?.length || 0}</div>
               <div className="stat-izoh">Tarix</div>
-              <FiChevronRight
-                className={`ong-belgi ${tarixKorsat ? "aylantirilgan" : ""}`}
-              />
+              <FiChevronRight className={`ong-belgi ${tarixKorsat ? "aylantirilgan" : ""}`} />
             </div>
           </div>
 
@@ -339,14 +313,10 @@ function Profile({ user, updateUser, onLogout }) {
                               {item.action || item.type || "Noma'lum amal"}
                             </p>
                             <p className="amal-sana">
-                              {item.time ||
-                                new Date(item.date).toLocaleString("uz-UZ")}
+                              {item.time || new Date(item.date).toLocaleString("uz-UZ")}
                             </p>
                           </div>
-                          <div
-                            className={`amal-miqdor ${kirim ? "musbat" : "manfiy"
-                              }`}
-                          >
+                          <div className={`amal-miqdor ${kirim ? "musbat" : "manfiy"}`}>
                             {kirim ? "+" : "-"}
                             {Math.abs(parseInt(item.amount) || 0).toLocaleString()} UZS
                           </div>
@@ -355,21 +325,19 @@ function Profile({ user, updateUser, onLogout }) {
                     })}
                 </div>
               ) : (
-                <p className="tarix-yoq">
-                  Hozircha hech qanday tranzaksiya yo‘q.
-                </p>
+                <p className="tarix-yoq">Hozircha hech qanday tranzaksiya yo‘q.</p>
               )}
             </div>
           </div>
 
-          {/* CHIQISH TUGMASI */}
+          {/* YANGI KATTA CHIQISH TUGMASI */}
           <button onClick={chiqish} className="chiqish-tugma">
-            <FiLogOut /> Chiqish
+            <FiLogOut size={24} />
+            Hisobdan chiqish
           </button>
         </div>
       </div>
 
-      {/* MODAL */}
       <CustomModal
         isOpen={modal.ochiq}
         title={modal.sarlavha}
