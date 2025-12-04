@@ -52,7 +52,11 @@ const BottomNavWrapper = ({ isAuthenticated, isAdmin }) => {
   const isShopPage = /^\/shop\/\d+$/.test(location.pathname);
   const isChatDetailPage = /^\/chat\/[^/]+$/.test(location.pathname);
   const isUserProfilePage = /^\/user-profile\/[^/]+$/.test(location.pathname);
-  const isAllowedPage = allowedPaths.includes(location.pathname) || isChatDetailPage || isUserProfilePage;
+
+  const isAllowedPage =
+    allowedPaths.includes(location.pathname) ||
+    isChatDetailPage ||
+    isUserProfilePage;
 
   const shouldShow = isAuthenticated && !isAdmin && (isAllowedPage || isShopPage);
 
@@ -243,7 +247,7 @@ function App() {
             }
           />
 
-          {/* ADMIN */}
+          {/* ADMIN PANEL */}
           <Route
             path="/admin"
             element={
@@ -278,7 +282,7 @@ function App() {
             }
           />
 
-          {/* CHAT RO'YXATI */}
+          {/* CHAT */}
           <Route
             path="/chat"
             element={
@@ -290,7 +294,6 @@ function App() {
             }
           />
 
-          {/* CHAT DETAIL */}
           <Route
             path="/chat/:userId"
             element={
@@ -302,7 +305,7 @@ function App() {
             }
           />
 
-          {/* O'Z PROFILI */}
+          {/* PROFILES */}
           <Route
             path="/profile"
             element={
@@ -314,7 +317,6 @@ function App() {
             }
           />
 
-          {/* BOSHQA FOYDALANUVCHI PROFILI */}
           <Route
             path="/user-profile/:login"
             element={
@@ -363,7 +365,11 @@ function App() {
           <Route
             path="/all-shops"
             element={
-              isAuthenticated && !isAdmin ? <AllShops user={user} /> : <Navigate to="/" />
+              isAuthenticated && !isAdmin ? (
+                <AllShops user={user} />
+              ) : (
+                <Navigate to="/" />
+              )
             }
           />
 
@@ -381,7 +387,11 @@ function App() {
           <Route
             path="/history"
             element={
-              isAuthenticated && !isAdmin ? <History user={user} /> : <Navigate to="/" />
+              isAuthenticated && !isAdmin ? (
+                <History user={user} />
+              ) : (
+                <Navigate to="/" />
+              )
             }
           />
 
@@ -430,3 +440,5 @@ function App() {
 }
 
 export default App;
+
+

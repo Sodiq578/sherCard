@@ -20,7 +20,14 @@ import {
   RiMoneyDollarCircleLine,
   RiSmartphoneLine,
   RiBankLine,
+  RiImageLine,
+  RiEyeLine,
+  RiExternalLinkLine
 } from "react-icons/ri";
+import {
+  MdCampaign,
+  MdArrowForward
+} from "react-icons/md";
 import Logo from "../assets/images/logo.png";
 
 function MainMenu({ user, updateUser }) {
@@ -31,7 +38,9 @@ function MainMenu({ user, updateUser }) {
   const [showSendTokens, setShowSendTokens] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [showTopupModal, setShowTopupModal] = useState(false); // <-- BALANS TO'LDIRISH MODALI
+  const [showTopupModal, setShowTopupModal] = useState(false);
+  const [showBannerModal, setShowBannerModal] = useState(false);
+  const [selectedBanner, setSelectedBanner] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   
   // Token yuborish
@@ -43,12 +52,16 @@ function MainMenu({ user, updateUser }) {
   // To'lov
   const [selectedProduct, setSelectedProduct] = useState(null);
   
-  // Balans to'ldirish (YANGI STATE'LAR)
-  const [topupStep, setTopupStep] = useState(1); // 1: amount, 2: method, 3: confirm
+  // Balans to'ldirish
+  const [topupStep, setTopupStep] = useState(1);
   const [topupAmount, setTopupAmount] = useState("");
   const [selectedTopupAmount, setSelectedTopupAmount] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [customAmount, setCustomAmount] = useState("");
+  
+  // Asosiy sahifa bannerlari
+  const [mainBanners, setMainBanners] = useState([]);
+  const [activeBanners, setActiveBanners] = useState([]);
   
   // Alert
   const [alert, setAlert] = useState({
@@ -63,6 +76,86 @@ function MainMenu({ user, updateUser }) {
   // Kartalar state
   const [userCards, setUserCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
+
+  // ==================== ASOSIY BANNERLARNI YUKLASH ====================
+  useEffect(() => {
+    const loadBanners = () => {
+      try {
+        const stored = localStorage.getItem('mainPageBanners');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            // Faol bannerlarni filterlash
+            const active = parsed.filter(banner => banner.active);
+            // Order bo'yicha sort
+            const sorted = active.sort((a, b) => (a.order || 0) - (b.order || 0));
+            
+            setMainBanners(parsed);
+            setActiveBanners(sorted.slice(0, 3)); // Faqat 3ta banner ko'rsatamiz
+          }
+        } else {
+          // Default bannerlar
+          const defaultBanners = [
+            {
+              id: 1,
+              title: 'Token bilan to\'lash',
+              description: 'Bir bosishda to\'lov qilish imkoniyati',
+              image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+              link: '/payment',
+              active: true,
+              type: 'payment',
+              buttonText: 'To\'lash',
+              backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              textColor: '#ffffff',
+              createdAt: new Date().toISOString(),
+              order: 1,
+              customImage: false
+            },
+            {
+              id: 2,
+              title: 'Premium kurslar',
+              description: 'Maxsus chegirmalar faqat bugun',
+              image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+              link: '/premium',
+              active: true,
+              type: 'promotion',
+              buttonText: 'Ko\'rish',
+              backgroundColor: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+              textColor: '#ffffff',
+              createdAt: new Date().toISOString(),
+              order: 2,
+              customImage: false
+            },
+            {
+              id: 3,
+              title: 'Market Reklama',
+              description: '30,000+ foydalanuvchiga yetib boring',
+              image: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+              link: '/market',
+              active: true,
+              type: 'advertisement',
+              buttonText: 'Reklama berish',
+              backgroundColor: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+              textColor: '#ffffff',
+              createdAt: new Date().toISOString(),
+              order: 3,
+              customImage: false
+            }
+          ];
+          setMainBanners(defaultBanners);
+          setActiveBanners(defaultBanners);
+          localStorage.setItem('mainPageBanners', JSON.stringify(defaultBanners));
+        }
+      } catch (error) {
+        console.error('Bannerlarni yuklashda xatolik:', error);
+      }
+    };
+
+    loadBanners();
+    // Har 60 soniyada yangilash
+    const interval = setInterval(loadBanners, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   // ==================== ALERT FUNCTIONS ====================
   const showAlert = (msg, type = "success", title = "", action = null, btn = "OK") => {
@@ -83,6 +176,47 @@ function MainMenu({ user, updateUser }) {
       alert.action(); 
     }
     closeAlert(); 
+  };
+
+  // ==================== BANNER BOSILGANDA ====================
+  const handleBannerClick = (banner) => {
+    setSelectedBanner(banner);
+    setShowBannerModal(true);
+    
+    // Banner bosilganlar statistikasini oshirish
+    try {
+      const stored = localStorage.getItem('mainPageBanners');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const updated = parsed.map(b => {
+          if (b.id === banner.id) {
+            return {
+              ...b,
+              clicks: (b.clicks || 0) + 1,
+              lastClicked: Date.now()
+            };
+          }
+          return b;
+        });
+        localStorage.setItem('mainPageBanners', JSON.stringify(updated));
+      }
+    } catch (error) {
+      console.error('Banner statistikasini yangilashda xatolik:', error);
+    }
+  };
+
+  // ==================== BANNER LINK OCHISH ====================
+  const handleBannerLink = (e, banner) => {
+    e.stopPropagation();
+    
+    if (banner.link) {
+      if (banner.link.startsWith('http')) {
+        window.open(banner.link, '_blank', 'noopener,noreferrer');
+      } else {
+        navigate(banner.link);
+      }
+      setShowBannerModal(false);
+    }
   };
 
   // ==================== KARTALAR (12 va 16 raqam uchun) ====================
@@ -254,7 +388,7 @@ function MainMenu({ user, updateUser }) {
     }
   };
 
-  // ==================== TOKEN YUBORISH (TO'G'IRLANGAN) ====================
+  // ==================== TOKEN YUBORISH ====================
   const handleSendTokens = () => {
     const cleanAmount = tokenAmount.replace(/[^0-9]/g, "");
     const amount = parseInt(cleanAmount, 10);
@@ -282,12 +416,9 @@ function MainMenu({ user, updateUser }) {
     const confirm = () => {
       setIsLoading(true);
       try {
-        // 1. Avval current users olish
         const currentUsers = JSON.parse(localStorage.getItem("allUsers") || "[]");
         
-        // 2. Yangilangan foydalanuvchilar massivi yaratish
         const updatedUsers = currentUsers.map(u => {
-          // Yuboruvchini yangilash
           if (u.login === user.login) {
             return {
               ...u,
@@ -308,7 +439,6 @@ function MainMenu({ user, updateUser }) {
             };
           }
           
-          // Qabul qiluvchini yangilash
           if (u.login === selectedUser.login) {
             return {
               ...u,
@@ -347,18 +477,15 @@ function MainMenu({ user, updateUser }) {
           return u;
         });
 
-        // 3. LocalStorage ga saqlash
         const updatedSender = updatedUsers.find(u => u.login === user.login);
         if (updatedSender) {
           localStorage.setItem("userData", JSON.stringify(updatedSender));
           localStorage.setItem("allUsers", JSON.stringify(updatedUsers));
           
-          // 4. Statelarni yangilash
           updateUser(updatedSender);
           setAllUsers(updatedUsers);
         }
 
-        // Muvaffaqiyatli xabar
         showAlert(
           `✅ Tokenlar muvaffaqiyatli yuborildi!\n\n` +
           `👤 Qabul qiluvchi: @${selectedUser.profile?.username || selectedUser.login}\n` +
@@ -369,7 +496,6 @@ function MainMenu({ user, updateUser }) {
           "Muvaffaqiyatli"
         );
 
-        // Holatlarni tozalash
         setShowSendTokens(false);
         setSelectedUser(null);
         setTokenAmount("");
@@ -388,7 +514,6 @@ function MainMenu({ user, updateUser }) {
       }
     };
 
-    // Tasdiqlash xabari
     showAlert(
       `Token yuborishni tasdiqlaysizmi?\n\n` +
       `👤 Qabul qiluvchi: @${selectedUser.profile?.username || selectedUser.login}\n` +
@@ -437,7 +562,6 @@ function MainMenu({ user, updateUser }) {
           ]
         };
 
-        // Barcha foydalanuvchilarni yangilash
         const currentUsers = JSON.parse(localStorage.getItem("allUsers") || "[]");
         const updatedUsers = currentUsers.map(u => 
           u.login === user.login ? updatedUser : u
@@ -516,7 +640,6 @@ function MainMenu({ user, updateUser }) {
           ]
         };
 
-        // Barcha foydalanuvchilarni yangilash
         const currentUsers = JSON.parse(localStorage.getItem("allUsers") || "[]");
         const updatedUsers = currentUsers.map(u => 
           u.login === user.login ? updatedUser : u
@@ -625,7 +748,6 @@ function MainMenu({ user, updateUser }) {
     const confirmTopup = () => {
       setIsLoading(true);
       try {
-        // 1. Yangilangan user yaratish
         const updatedUser = {
           ...user,
           balance: (user.balance || 0) + amount,
@@ -644,21 +766,17 @@ function MainMenu({ user, updateUser }) {
           ]
         };
 
-        // 2. Barcha foydalanuvchilarni yangilash
         const currentUsers = JSON.parse(localStorage.getItem("allUsers") || "[]");
         const updatedUsers = currentUsers.map(u => 
           u.login === user.login ? updatedUser : u
         );
 
-        // 3. LocalStorage ga saqlash
         localStorage.setItem("userData", JSON.stringify(updatedUser));
         localStorage.setItem("allUsers", JSON.stringify(updatedUsers));
         
-        // 4. Statelarni yangilash
         updateUser(updatedUser);
         setAllUsers(updatedUsers);
 
-        // 5. Muvaffaqiyat xabarini ko'rsatish
         showAlert(
           `✅ Balans muvaffaqiyatli to'ldirildi!\n\n` +
           `💰 Miqdor: ${amount.toLocaleString()} token\n` +
@@ -669,7 +787,6 @@ function MainMenu({ user, updateUser }) {
           "Muvaffaqiyatli"
         );
 
-        // 6. Modalni yopish va statelarni tozalash
         setShowTopupModal(false);
         setTopupStep(1);
         setTopupAmount("");
@@ -689,7 +806,6 @@ function MainMenu({ user, updateUser }) {
       }
     };
 
-    // Tasdiqlash xabari
     showAlert(
       `Balans to'ldirishni tasdiqlaysizmi?\n\n` +
       `💰 Miqdor: ${amount.toLocaleString()} token\n` +
@@ -731,17 +847,8 @@ function MainMenu({ user, updateUser }) {
       features: ["Barcha darslarga kirish", "Premium kontent", "Qo'llab-quvvatlash"],
       category: "education",
       icon: "🎓"
-    } 
-  ];
-
-  // ==================== BANNERGA TEZKOR TO'LOV QILISH ====================
-  const handleBannerPaymentClick = () => {
-    setShowPaymentModal(true);
-    // Agar mahsulot tanlanmagan bo'lsa, birinchi mahsulotni tanlash
-    if (products.length > 0 && !selectedProduct) {
-      setSelectedProduct(products[0]);
     }
-  };
+  ];
 
   const username = user?.profile?.username || "username";
 
@@ -880,43 +987,149 @@ function MainMenu({ user, updateUser }) {
         </div>
       </div>
 
-      {/* BANNER CAROUSEL - TEZKOR TO'LOV */}
-      <div className="asosiy-sahifa-reklama" onClick={handleBannerPaymentClick}>
-        <div className="reklama-placeholder">
-          <RiCoinLine size={24} />
-          <span>Token bilan to'lash</span>
-          <div className="banner-payment-indicator">
-            <small>Bir bosishda to'lash imkoniyati</small>
-            <RiArrowRightLine size={12} />
-          </div>
+      {/* ASOSIY REKLAMA BANNERLARI */}
+      <div className="main-banners-section">
+       
+        
+        <div className="main-banners-grid">
+          {activeBanners.length > 0 ? (
+            activeBanners.map((banner, index) => (
+            <div className="banner-image">
+                  <img 
+                    src={banner.image} 
+                    alt={banner.title}
+                    onError={(e) => {
+                      e.target.src = 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80';
+                    }}
+                  />
+                </div>
+            ))
+          ) : (
+            <div className="no-banners-message">
+              <MdCampaign size={48} />
+              <p>Hozircha reklamalar yo'q</p>
+              <small>Admin tomonidan bannerlar qo'shiladi</small>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* TOKEN YUBORISH MODALI - FAQAT KARTA RAQAMI BO'YICHA */}
+      {/* BANNER MODAL */}
+      {showBannerModal && selectedBanner && (
+        <div className="menu-modal-overlay">
+          <div className="menu-modal-content banner-modal">
+            <div className="menu-modal-header">
+              <h3>Banner ma'lumotlari</h3>
+              <button 
+                className="menu-modal-close-btn" 
+                onClick={() => setShowBannerModal(false)}
+              >
+                <RiCloseLine />
+              </button>
+            </div>
+
+            <div className="menu-modal-body">
+              <div 
+                className="banner-modal-preview"
+                style={{ background: selectedBanner.backgroundColor }}
+              >
+                <img 
+                  src={selectedBanner.image} 
+                  alt={selectedBanner.title}
+                  onError={(e) => {
+                    e.target.src = 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w-800&q=80';
+                  }}
+                />
+              </div>
+
+              <div className="banner-modal-info">
+                <div className="banner-modal-title-row">
+                  <h2>{selectedBanner.title}</h2>
+                  <div className="banner-modal-type">
+                    {selectedBanner.type === 'payment' && '💳 To\'lov'}
+                    {selectedBanner.type === 'promotion' && '🎯 Aksiya'}
+                    {selectedBanner.type === 'advertisement' && '📢 Reklama'}
+                  </div>
+                </div>
+                
+                <p className="banner-modal-description">{selectedBanner.description}</p>
+                
+                <div className="banner-modal-stats">
+                  <div className="stat-item">
+                    <RiEyeLine size={16} />
+                    <span>Ko'rishlar: {selectedBanner.clicks || 0}</span>
+                  </div>
+                  {selectedBanner.createdAt && (
+                    <div className="stat-item">
+                      <RiInformationLine size={16} />
+                      <span>
+                        {new Date(selectedBanner.createdAt).toLocaleDateString('uz-UZ')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {selectedBanner.link && (
+                  <div className="banner-modal-link-section">
+                    <h4>Havola ma'lumotlari:</h4>
+                    <div className="link-info">
+                      {selectedBanner.link.startsWith('http') ? (
+                        <a 
+                          href={selectedBanner.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="external-link"
+                        >
+                          <RiExternalLinkLine /> {selectedBanner.link}
+                        </a>
+                      ) : (
+                        <div className="internal-link">
+                          <RiArrowRightLine /> {selectedBanner.link}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="menu-modal-footer">
+              <button
+                className="menu-primary-btn"
+                onClick={(e) => handleBannerLink(e, selectedBanner)}
+              >
+                {selectedBanner.buttonText}
+              </button>
+              <button 
+                className="menu-secondary-btn" 
+                onClick={() => setShowBannerModal(false)}
+              >
+                Yopish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TOKEN YUBORISH MODALI */}
       {showSendTokens && (
         <div className="menu-modal-overlay">
           <div className="menu-modal-content menu-send-tokens-modal">
             <div className="menu-modal-header">
+              <button 
+                className="menu-back-btn" 
+                onClick={() => setShowSendTokens(false)}
+                disabled={isLoading}
+              >
+                <RiArrowLeftLine size={20} />
+              </button>
               <div className="menu-send-tokens-title">
-                <button 
-                  className="menu-back-btn" 
-                  onClick={() => selectedUser ? setSelectedUser(null) : setShowSendTokens(false)}
-                  disabled={isLoading}
-                >
-                  <RiArrowLeftLine />
-                </button>
-                <h3>{selectedUser ? `Token yuborish` : "Kimga yubormoqchisiz?"}</h3>
+                <RiSendPlaneLine size={24} color="#0C73FE" />
+                <h3>Token yuborish</h3>
               </div>
               <button 
                 className="menu-modal-close-btn" 
-                onClick={() => {
-                  if (!isLoading) {
-                    setShowSendTokens(false);
-                    setSelectedUser(null);
-                    setTokenAmount("");
-                    setCardSearch("");
-                  }
-                }}
+                onClick={() => setShowSendTokens(false)}
                 disabled={isLoading}
               >
                 <RiCloseLine />
@@ -924,61 +1137,36 @@ function MainMenu({ user, updateUser }) {
             </div>
 
             <div className="menu-modal-body">
-              {!selectedUser ? (
-                <>
-                  {/* QIDIRUV – faqat karta raqami */}
-                  <div className="menu-search-bar large card-search">
-                    <RiWallet3Line className="menu-search-icon" />
-                    <input
-                      type="text"
-                      placeholder="Qabul qiluvchi karta raqamini kiriting (masalan: 8600)"
-                      value={cardSearch}
-                      onChange={(e) => setCardSearch(e.target.value.replace(/[^0-9\s]/g, ""))}
-                      autoFocus
-                      maxLength="19"
-                      disabled={isLoading}
-                    />
-                  </div>
+              {/* Qidiruv seksiyasi */}
+              <div className="menu-search-section">
+                <div className={`menu-search-bar large card-search`}>
+                  <RiSearchLine className="menu-search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Karta raqami bo'yicha qidirish..."
+                    value={cardSearch}
+                    onChange={(e) => setCardSearch(e.target.value)}
+                    disabled={isLoading}
+                  />
+                </div>
 
-                  {cardSearch && filteredSendUsers.length === 0 ? (
-                    <div className="menu-no-results">
-                      <RiErrorWarningLine size={40} />
-                      <p>Ushbu karta raqamiga ega foydalanuvchi topilmadi</p>
-                      <small>Karta raqamini to'g'ri kiriting (12 yoki 16 raqam)</small>
-                    </div>
-                  ) : filteredSendUsers.length > 0 ? (
-                    <div className="menu-search-user-list scrollable">
-                      {filteredSendUsers.map(u => {
-                        // Tanlangan foydalanuvchining kartasini topish
-                        const userCard = u.cards.find(c => {
-                          if (!c || c.deleted) return false;
-                          let raw = "";
-                          if (typeof c === "string") {
-                            raw = c;
-                          } else if (typeof c === "object") {
-                            raw = c.number || c.cardNumber || "";
-                          }
-                          raw = raw.toString().replace(/\s/g, "");
-                          return raw.includes(cardSearch.replace(/\s/g, ""));
-                        });
-
-                        // Karta raqamini formatlash
-                        const cardDisplay = formatCardNumber(userCard);
-                        const rawCardNumber = userCard ? 
-                          (typeof userCard === "string" ? userCard : (userCard.number || userCard.cardNumber || "")) : "";
-                        const is12Digit = rawCardNumber.toString().replace(/\s/g, "").length === 12;
-
-                        return (
-                          <div 
-                            key={u.login} 
-                            className="menu-search-user-item large" 
-                            onClick={() => !isLoading && setSelectedUser(u)}
-                            style={{ cursor: isLoading ? 'not-allowed' : 'pointer' }}
+                {cardSearch && (
+                  <div className="menu-search-results">
+                    {filteredSendUsers.length > 0 ? (
+                      <div className="menu-search-user-list scrollable">
+                        {filteredSendUsers.map((u) => (
+                          <div
+                            key={u.login}
+                            className="menu-search-user-item large"
+                            onClick={() => {
+                              setSelectedUser(u);
+                              setCardSearch("");
+                            }}
                           >
                             <div className="menu-search-user-avatar">
-                              <img 
-                                src={u.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} 
-                                alt="avatar" 
+                              <img
+                                src={u.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}
+                                alt="avatar"
                                 onError={(e) => {
                                   e.target.src = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
                                 }}
@@ -986,208 +1174,150 @@ function MainMenu({ user, updateUser }) {
                               {u.isPremium && <div className="menu-user-premium-indicator" />}
                             </div>
                             <div className="menu-search-user-info">
-                              <p className="menu-search-username">
+                              <div className="menu-search-username">
                                 @{u.profile?.username || u.login}
-                                {u.isPremium && <span className="menu-premium-dot">Premium</span>}
-                              </p>
-                              <p className="menu-search-card">
-                                <RiWallet3Line size={14} /> {cardDisplay}
-                                {is12Digit && 
-                                  <span className="card-12-badge">12 raqam</span>
-                                }
-                              </p>
-                              <p className="menu-search-name">
-                                {u.profile?.name || "Foydalanuvchi"} {u.profile?.surname || ""}
-                              </p>
+                                {u.isPremium && (
+                                  <span className="menu-premium-dot">PREMIUM</span>
+                                )}
+                              </div>
+                              <div className="menu-search-name">
+                                {u.profile?.name || "Foydalanuvchi"}
+                              </div>
+                              {u.cards && u.cards.length > 0 && (
+                                <div className="menu-search-card">
+                                  <RiBankCardLine size={12} />
+                                  {formatCardNumber(u.cards[0])}
+                                </div>
+                              )}
                             </div>
-                            <RiArrowLeftLine style={{ 
-                              transform: "rotate(180deg)", 
-                              fontSize: 20, 
-                              color: "#888",
-                              opacity: isLoading ? 0.5 : 1 
-                            }} />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : cardSearch === "" && (
-                    <div className="menu-search-hint">
-                      <RiWallet3Line size={32} />
-                      <p>Karta raqamini kiriting (masalan: 8600, 9860, 1234)</p>
-                      <small>12 yoki 16 raqamli kartalar qabul qilinadi</small>
-                    </div>
-                  )}
-                </>
-              ) : (
-                /* 2-bosqich – karta tanlash va miqdor */
-                <>
-                  <div className="selected-recipient-card">
-                    <div className="recipient-avatar-large">
-                      <img 
-                        src={selectedUser.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} 
-                        alt="avatar" 
-                        onError={(e) => {
-                          e.target.src = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
-                        }}
-                      />
-                      {selectedUser.isPremium && (
-                        <div className="premium-crown-large">
-                          <RiVipCrownLine />
-                        </div>
-                      )}
-                    </div>
-                    <div className="recipient-info">
-                      <h3>@{selectedUser.profile?.username || selectedUser.login}</h3>
-                      <p>
-                        {selectedUser.profile?.name || "Foydalanuvchi"} {selectedUser.profile?.surname || ""}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Yuboruvchi karta */}
-                  <div className="menu-card-selection">
-                    <label>Yuboruvchi karta</label>
-                    {userCards.length > 0 ? (
-                      <div className="menu-card-options grid">
-                        {userCards.map((card, i) => (
-                          <div
-                            key={i}
-                            className={`menu-card-option large ${selectedCard?.rawNumber === card.rawNumber ? "selected" : ""}`}
-                            onClick={() => !isLoading && setSelectedCard(card)}
-                            style={{ cursor: isLoading ? 'not-allowed' : 'pointer' }}
-                          >
-                            <div className="card-icon">
-                              <RiWallet3Line />
-                            </div>
-                            <div className="menu-card-number">
-                              {card.number}
-                            </div>
-                            <div className="menu-card-holder">
-                              {card.holder}
-                            </div>
-                            {card.is12Digit && (
-                              <div className="card-12-indicator">12 raqam</div>
-                            )}
-                            {selectedCard?.rawNumber === card.rawNumber && (
-                              <RiCheckLine className="check-mark" />
-                            )}
                           </div>
                         ))}
                       </div>
+                    ) : cardSearch.length >= 4 ? (
+                      <div className="menu-no-results">
+                        <RiErrorWarningLine size={40} color="#95a5a6" />
+                        <p>Foydalanuvchi topilmadi</p>
+                        <small>Karta raqamini tekshirib ko'ring</small>
+                      </div>
                     ) : (
-                      <div className="no-card-warning">
-                        <RiErrorWarningLine size={36} />
-                        <p>Karta topilmadi</p>
-                        <button 
-                          className="menu-primary-btn" 
-                          onClick={goToCards}
-                          disabled={isLoading}
-                        >
-                          <RiAddCircleLine /> Karta qo'shish
-                        </button>
+                      <div className="menu-search-hint">
+                        <RiInformationLine size={40} color="#95a5a6" />
+                        <p>Karta raqami bo'yicha qidiring</p>
+                        <small>Kamida 4 ta raqam kiriting</small>
                       </div>
                     )}
                   </div>
+                )}
+              </div>
 
-                  {/* Token miqdori */}
-                  {userCards.length > 0 && (
-                    <div className="menu-token-input-section large">
-                      <label>Token miqdori (min: 100)</label>
-                      <div className="menu-token-input-wrapper large">
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          pattern="[0-9]*"
-                          placeholder="100"
-                          value={tokenAmount}
-                          onChange={(e) => handleTokenAmountChange(e.target.value)}
-                          min="100"
-                          max={user.balance}
-                          disabled={isLoading}
-                          className={tokenAmount && parseInt(tokenAmount) > user.balance ? "error-input" : ""}
-                        />
-                        <span className="menu-token-symbol large">
-                          <img src={Logo} alt="token" className="ultra-token-md" />
-                        </span>
+              {/* Tanlangan foydalanuvchi */}
+              {selectedUser && (
+                <div className="selected-recipient-card">
+                  <div className="recipient-avatar-large">
+                    <img
+                      src={selectedUser.profile?.avatar || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}
+                      alt="avatar"
+                      onError={(e) => {
+                        e.target.src = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+                      }}
+                    />
+                    {selectedUser.isPremium && (
+                      <div className="premium-crown-large">
+                        <RiVipCrownLine size={12} />
                       </div>
-                      <div className="menu-balance-info large">
-                        Joriy balans: <strong>{user.balance.toLocaleString()} token</strong>
-                      </div>
-                      {tokenAmount && parseInt(tokenAmount) >= 100 && (
-                        <div className="menu-amount-preview large">
-                          <div>
-                            Yuboriladi: <strong>{parseInt(tokenAmount).toLocaleString()} token</strong>
-                          </div>
-                          <div>
-                            Qoladi: 
-                            <strong style={{ 
-                              color: user.balance - parseInt(tokenAmount) < 0 ? "#e74c3c" : "#27ae60",
-                              marginLeft: "5px"
-                            }}>
-                              {(user.balance - parseInt(tokenAmount)).toLocaleString()} token
-                            </strong>
-                          </div>
-                          {user.balance - parseInt(tokenAmount) < 0 && (
-                            <div className="error-message">
-                              <RiErrorWarningLine />
-                              Balans yetarli emas!
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </>
+                    )}
+                  </div>
+                  <div className="recipient-info">
+                    <h3>@{selectedUser.profile?.username || selectedUser.login}</h3>
+                    <p>{selectedUser.profile?.name || "Foydalanuvchi"}</p>
+                  </div>
+                </div>
               )}
+
+              {/* Karta tanlash */}
+              <div className="menu-card-selection">
+                <label>Yuboruvchi karta:</label>
+                {userCards.length > 0 ? (
+                  <div className="menu-card-options grid">
+                    {userCards.map((card) => (
+                      <div
+                        key={card.rawNumber}
+                        className={`menu-card-option large ${selectedCard?.rawNumber === card.rawNumber ? 'selected' : ''}`}
+                        onClick={() => !isLoading && setSelectedCard(card)}
+                      >
+                        <div className="card-icon">
+                          <RiBankCardLine />
+                        </div>
+                        <div className="menu-card-number">{card.number}</div>
+                        <div className="menu-card-holder">{card.holder}</div>
+                        {card.is12Digit && (
+                          <div className="card-12-indicator">12-raqamli</div>
+                        )}
+                        {selectedCard?.rawNumber === card.rawNumber && (
+                          <div className="check-mark">
+                            <RiCheckLine />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-card-message">
+                    <RiErrorWarningLine size={24} />
+                    <p>Karta topilmadi</p>
+                    <small>Token yuborish uchun karta qo'shing</small>
+                  </div>
+                )}
+              </div>
+
+              {/* Token miqdori */}
+              <div className="menu-token-input-section large">
+                <label>Token miqdori:</label>
+                <div className="menu-token-input-wrapper large">
+                  <input
+                    type="text"
+                    value={tokenAmount}
+                    onChange={(e) => handleTokenAmountChange(e.target.value)}
+                    placeholder="Kiriting..."
+                    disabled={isLoading}
+                    className={parseInt(tokenAmount || 0) > user.balance ? 'error-input' : ''}
+                  />
+                  <div className="menu-token-symbol large">
+                    <img src={Logo} alt="token" className="ultra-token-md" />
+                    <span>token</span>
+                  </div>
+                </div>
+                <div className="menu-balance-info large">
+                  Joriy balans: <strong>{user.balance.toLocaleString()} token</strong>
+                </div>
+                {parseInt(tokenAmount || 0) > user.balance && (
+                  <div className="error-message">
+                    <RiErrorWarningLine />
+                    Balansingizda yetarli token yo'q
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* FOOTER */}
-            {selectedUser && userCards.length > 0 && (
-              <div className="menu-modal-footer">
-                <button
-                  className={`menu-primary-btn large ${isLoading ? 'btn-loading' : ''}`}
-                  onClick={handleSendTokens}
-                  disabled={
-                    isLoading || 
-                    !tokenAmount || 
-                    parseInt(tokenAmount) < 100 || 
-                    parseInt(tokenAmount) > user.balance
-                  }
-                >
-                  {isLoading ? (
-                    "Yuborilmoqda..."
-                  ) : (
-                    <>
-                      <RiSendPlaneLine /> 
-                      Yuborish — {tokenAmount ? parseInt(tokenAmount).toLocaleString() : 0} token
-                    </>
-                  )}
-                </button>
-                <button 
-                  className="menu-secondary-btn" 
-                  onClick={() => setSelectedUser(null)}
-                  disabled={isLoading}
-                >
-                  Ortga
-                </button>
-              </div>
-            )}
-
-            {selectedUser && userCards.length === 0 && (
-              <div className="menu-modal-footer no-card">
-                <div className="no-card-message">
-                  <RiErrorWarningLine />
-                  <p>Token yuborish uchun karta kerak</p>
-                </div>
-                <button 
-                  className="menu-primary-btn" 
-                  onClick={goToCards}
-                  disabled={isLoading}
-                >
-                  <RiAddCircleLine /> Karta qo'shish
-                </button>
-              </div>
-            )}
+            <div className="menu-modal-footer">
+              <button
+                className={`menu-primary-btn large ${!selectedUser || !selectedCard || !tokenAmount || parseInt(tokenAmount) < 100 || parseInt(tokenAmount) > user.balance || isLoading ? 'menu-btn-disabled' : ''}`}
+                onClick={handleSendTokens}
+                disabled={!selectedUser || !selectedCard || !tokenAmount || parseInt(tokenAmount) < 100 || parseInt(tokenAmount) > user.balance || isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="btn-loading"></div>
+                    Yuborilmoqda...
+                  </>
+                ) : (
+                  <>
+                    <RiSendPlaneLine size={20} />
+                    Token yuborish
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1198,61 +1328,57 @@ function MainMenu({ user, updateUser }) {
           <div className="menu-modal-content payment-modal">
             <div className="menu-modal-header">
               <div className="payment-modal-title">
-                <RiCoinLine className="payment-icon" />
-                <h3>Token bilan to'lash</h3>
+                <RiShoppingBagLine size={24} color="#3498db" />
+                <h3>Token bilan to'lov</h3>
               </div>
               <button 
                 className="menu-modal-close-btn" 
-                onClick={() => !isLoading && setShowPaymentModal(false)}
-                disabled={isLoading}
+                onClick={() => setShowPaymentModal(false)}
               >
                 <RiCloseLine />
               </button>
             </div>
 
             <div className="menu-modal-body">
-              {/* Balans ma'lumoti */}
+              {/* Balans ko'rsatish */}
               <div className="balance-info-section">
                 <div className="balance-display">
-                  <RiCoinLine className="balance-icon" />
+                  <div className="balance-icon">
+                    <RiWallet3Line />
+                  </div>
                   <div className="balance-details">
-                    <span className="balance-label">Joriy balans</span>
-                    <span className="balance-amount">
-                      {user?.balance?.toLocaleString() || 0} token
-                    </span>
+                    <div className="balance-label">Joriy balans:</div>
+                    <div className="balance-amount">
+                      {user.balance.toLocaleString()} <img src={Logo} alt="token" className="ultra-token-sm" />
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Mahsulotlar ro'yxati */}
+              {/* Mahsulotlar */}
               <div className="products-section">
                 <h4>Mavjud mahsulotlar</h4>
                 <div className="products-grid">
-                  {products.map(product => (
+                  {products.map((product) => (
                     <div
                       key={product.id}
                       className={`product-card ${selectedProduct?.id === product.id ? 'selected' : ''}`}
-                      onClick={() => !isLoading && setSelectedProduct(product)}
-                      style={{ cursor: isLoading ? 'not-allowed' : 'pointer' }}
+                      onClick={() => setSelectedProduct(product)}
                     >
                       <div className="product-header">
-                        <h5 className="product-name">
-                          {product.icon} {product.name}
-                        </h5>
+                        <h4 className="product-name">{product.name}</h4>
                         <div className="product-price">
                           <RiCoinLine size={16} />
-                          <span>{product.tokens.toLocaleString()} token</span>
+                          {product.tokens.toLocaleString()}
                         </div>
                       </div>
                       <p className="product-description">{product.description}</p>
-                      <div className="product-duration">
-                        <span>Davomiylik: {product.duration}</span>
-                      </div>
+                      <div className="product-duration">Davomiylik: {product.duration}</div>
                       <div className="product-features">
-                        {product.features.map((feature, index) => (
-                          <div key={index} className="product-feature">
-                            <RiCheckLine size={14} />
-                            <span>{feature}</span>
+                        {product.features.map((feature, idx) => (
+                          <div key={idx} className="product-feature">
+                            <RiCheckLine size={14} color="#27ae60" />
+                            {feature}
                           </div>
                         ))}
                       </div>
@@ -1261,31 +1387,31 @@ function MainMenu({ user, updateUser }) {
                 </div>
               </div>
 
-              {/* Tanlangan mahsulot ma'lumotlari */}
+              {/* Tanlangan mahsulot */}
               {selectedProduct && (
                 <div className="selected-product-preview">
-                  <h4>Tanlangan mahsulot</h4>
+                  <h4>Tanlangan mahsulot:</h4>
                   <div className="selected-product-details">
                     <div className="selected-product-info">
-                      <h5>{selectedProduct.icon} {selectedProduct.name}</h5>
+                      <h5>{selectedProduct.name}</h5>
                       <p>{selectedProduct.description}</p>
                     </div>
                     <div className="selected-product-price">
                       <div className="token-price">
                         <RiCoinLine size={20} />
-                        <span>{selectedProduct.tokens.toLocaleString()} token</span>
+                        {selectedProduct.tokens.toLocaleString()} token
                       </div>
-                      <div className="balance-check">
+                      <div className={`balance-check ${user.balance >= selectedProduct.tokens ? 'sufficient-balance' : 'insufficient-balance'}`}>
                         {user.balance >= selectedProduct.tokens ? (
-                          <div className="sufficient-balance">
+                          <>
                             <RiCheckLine size={16} />
-                            <span>Balansingiz yetarli</span>
-                          </div>
+                            Balansingiz yetarli
+                          </>
                         ) : (
-                          <div className="insufficient-balance">
+                          <>
                             <RiErrorWarningLine size={16} />
-                            <span>Balansingiz yetarli emas</span>
-                          </div>
+                            Balansingiz yetarli emas
+                          </>
                         )}
                       </div>
                     </div>
@@ -1296,25 +1422,16 @@ function MainMenu({ user, updateUser }) {
 
             <div className="menu-modal-footer">
               <button
-                className={`menu-primary-btn payment-btn ${isLoading ? 'btn-loading' : ''}`}
+                className={`menu-primary-btn ${!selectedProduct || user.balance < selectedProduct.tokens ? 'menu-btn-disabled' : ''}`}
                 onClick={() => selectedProduct && handleTokenPayment(selectedProduct)}
-                disabled={isLoading || !selectedProduct || user.balance < selectedProduct.tokens}
+                disabled={!selectedProduct || user.balance < selectedProduct.tokens}
               >
-                {isLoading ? (
-                  "To'lanmoqda..."
-                ) : selectedProduct ? (
-                  <>
-                    <RiCoinLine size={18} />
-                    To'lash ({selectedProduct.tokens.toLocaleString()} token)
-                  </>
-                ) : (
-                  "Mahsulot tanlang"
-                )}
+                <RiShoppingBagLine size={20} />
+                Token bilan to'lash
               </button>
               <button 
                 className="menu-secondary-btn" 
-                onClick={() => !isLoading && setShowPaymentModal(false)}
-                disabled={isLoading}
+                onClick={() => setShowPaymentModal(false)}
               >
                 Bekor qilish
               </button>
@@ -1328,23 +1445,24 @@ function MainMenu({ user, updateUser }) {
         <div className="menu-modal-overlay">
           <div className="menu-modal-content menu-send-tokens-modal">
             <div className="menu-modal-header">
+              <button 
+                className="menu-back-btn" 
+                onClick={topupStep > 1 ? handlePrevStep : () => setShowTopupModal(false)}
+                disabled={isLoading}
+              >
+                <RiArrowLeftLine size={20} />
+              </button>
               <div className="menu-send-tokens-title">
-                <button 
-                  className="menu-back-btn" 
-                  onClick={topupStep === 1 ? () => setShowTopupModal(false) : handlePrevStep}
-                  disabled={isLoading}
-                >
-                  <RiArrowLeftLine />
-                </button>
+                <RiCoinLine size={24} color="#FFD700" />
                 <h3>
-                  {topupStep === 1 && "Token miqdorini tanlang"}
-                  {topupStep === 2 && "To'lov usulini tanlang"}
-                  {topupStep === 3 && "To'lovni tasdiqlash"}
+                  {topupStep === 1 && "Balans to'ldirish"}
+                  {topupStep === 2 && "To'lov usuli"}
+                  {topupStep === 3 && "Tasdiqlash"}
                 </h3>
               </div>
               <button 
                 className="menu-modal-close-btn" 
-                onClick={() => !isLoading && setShowTopupModal(false)}
+                onClick={() => setShowTopupModal(false)}
                 disabled={isLoading}
               >
                 <RiCloseLine />
@@ -1352,163 +1470,185 @@ function MainMenu({ user, updateUser }) {
             </div>
 
             <div className="menu-modal-body">
-              {/* Step Indicator */}
+              {/* Qadamlar */}
               <div className="topup-steps">
                 <div className={`topup-step ${topupStep >= 1 ? 'active' : ''} ${topupStep > 1 ? 'completed' : ''}`}>
-                  {topupStep > 1 ? <RiCheckLine size={16} /> : "1"}
+                  {topupStep > 1 ? <RiCheckLine size={20} /> : '1'}
                 </div>
                 <div className={`topup-step ${topupStep >= 2 ? 'active' : ''} ${topupStep > 2 ? 'completed' : ''}`}>
-                  {topupStep > 2 ? <RiCheckLine size={16} /> : "2"}
+                  {topupStep > 2 ? <RiCheckLine size={20} /> : '2'}
                 </div>
                 <div className={`topup-step ${topupStep >= 3 ? 'active' : ''}`}>3</div>
               </div>
 
-              {/* Step 1: Amount Selection */}
+              {/* 1-qadam: Miqdor tanlash */}
               {topupStep === 1 && (
                 <>
+                  <h4 style={{ marginBottom: '20px', textAlign: 'center' }}>Miqdor tanlang</h4>
                   <div className="topup-amount-grid">
                     {topupAmounts.map((item) => (
                       <div
                         key={item.value}
-                        className={`topup-amount-option ${
-                          selectedTopupAmount === item.value ? 'selected' : ''
-                        }`}
+                        className={`topup-amount-option ${selectedTopupAmount === item.value ? 'selected' : ''}`}
                         onClick={() => handleAmountSelect(item.value, item.bonus)}
-                        style={{ cursor: isLoading ? 'not-allowed' : 'pointer' }}
                       >
                         <div className="topup-amount-value">{item.label}</div>
-                        <div className="topup-amount-bonus">{item.bonusLabel}</div>
+                        {item.bonus > 0 && (
+                          <div className="topup-amount-bonus">{item.bonusLabel}</div>
+                        )}
                       </div>
                     ))}
                   </div>
 
+                  {/* Maxsus miqdor */}
                   <div className="custom-topup-input">
-                    <label>Yoki o'zingiz miqdor kiriting:</label>
+                    <label>Yoki maxsus miqdor kiriting:</label>
                     <input
                       type="text"
-                      inputMode="numeric"
-                      placeholder="Masalan: 15000"
                       value={customAmount}
                       onChange={(e) => handleCustomAmountChange(e.target.value)}
-                      disabled={isLoading}
+                      placeholder="Masalan: 15000"
                     />
                   </div>
 
-                  {topupAmount && (
+                  {/* Ko'rish */}
+                  {(selectedTopupAmount || customAmount) && (
                     <div className="topup-summary">
                       <div className="topup-summary-item">
-                        <span>To'ldiriladi:</span>
-                        <span>{parseInt(topupAmount).toLocaleString()} token</span>
+                        <span>Asosiy miqdor:</span>
+                        <span>{(parseInt(topupAmount) || 0).toLocaleString()} token</span>
                       </div>
+                      {selectedTopupAmount && topupAmounts.find(a => a.value === selectedTopupAmount)?.bonus > 0 && (
+                        <div className="topup-summary-item">
+                          <span>Bonus:</span>
+                          <span style={{ color: '#27ae60' }}>
+                            +{topupAmounts.find(a => a.value === selectedTopupAmount)?.bonus.toLocaleString()} token
+                          </span>
+                        </div>
+                      )}
                       <div className="topup-summary-item">
-                        <span>Komissiya (1%):</span>
-                        <span>{Math.round(parseInt(topupAmount) * 0.01).toLocaleString()} token</span>
-                      </div>
-                      <div className="topup-summary-item">
-                        <span>Jami to'lov:</span>
-                        <span>{Math.round(parseInt(topupAmount) * 1.01).toLocaleString()} token</span>
+                        <span>Jami:</span>
+                        <span style={{ fontWeight: 'bold' }}>
+                          {(parseInt(topupAmount) + (selectedTopupAmount ? topupAmounts.find(a => a.value === selectedTopupAmount)?.bonus || 0 : 0)).toLocaleString()} token
+                        </span>
                       </div>
                     </div>
                   )}
                 </>
               )}
 
-              {/* Step 2: Payment Method */}
+              {/* 2-qadam: To'lov usuli */}
               {topupStep === 2 && (
-                <div className="payment-method-options">
-                  {paymentMethods.map((method) => (
-                    <div
-                      key={method.id}
-                      className={`payment-method-card ${
-                        selectedPaymentMethod?.id === method.id ? 'selected' : ''
-                      }`}
-                      onClick={() => !isLoading && handlePaymentMethodSelect(method)}
-                      style={{ cursor: isLoading ? 'not-allowed' : 'pointer' }}
-                    >
-                      <div className="payment-method-icon">{method.icon}</div>
-                      <div className="payment-method-info">
-                        <div className="payment-method-name">{method.name}</div>
-                        <div className="payment-method-desc">{method.desc}</div>
+                <>
+                  <h4 style={{ marginBottom: '20px', textAlign: 'center' }}>To'lov usulini tanlang</h4>
+                  <div className="payment-method-options">
+                    {paymentMethods.map((method) => (
+                      <div
+                        key={method.id}
+                        className={`payment-method-card ${selectedPaymentMethod?.id === method.id ? 'selected' : ''}`}
+                        onClick={() => handlePaymentMethodSelect(method)}
+                      >
+                        <div className="payment-method-icon">{method.icon}</div>
+                        <div className="payment-method-info">
+                          <div className="payment-method-name">{method.name}</div>
+                          <div className="payment-method-desc">{method.desc}</div>
+                        </div>
+                        {selectedPaymentMethod?.id === method.id && (
+                          <div className="payment-checkmark">
+                            <RiCheckLine />
+                          </div>
+                        )}
                       </div>
-                      {selectedPaymentMethod?.id === method.id && (
-                        <RiCheckLine className="payment-checkmark" />
-                      )}
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               )}
 
-              {/* Step 3: Confirmation */}
-              {topupStep === 3 && (
-                <div className="selected-recipient-card">
-                  <div className="topup-summary" style={{ width: '100%' }}>
+              {/* 3-qadam: Tasdiqlash */}
+              {topupStep === 3 && selectedPaymentMethod && (
+                <>
+                  <h4 style={{ marginBottom: '20px', textAlign: 'center' }}>To'lovni tasdiqlang</h4>
+                  
+                  <div className="topup-summary">
                     <div className="topup-summary-item">
-                      <span>Token miqdori:</span>
+                      <span>Miqdor:</span>
                       <span>{parseInt(topupAmount).toLocaleString()} token</span>
+                    </div>
+                    {selectedTopupAmount && topupAmounts.find(a => a.value === selectedTopupAmount)?.bonus > 0 && (
+                      <div className="topup-summary-item">
+                        <span>Bonus:</span>
+                        <span style={{ color: '#27ae60' }}>
+                          +{topupAmounts.find(a => a.value === selectedTopupAmount)?.bonus.toLocaleString()} token
+                        </span>
+                      </div>
+                    )}
+                    <div className="topup-summary-item">
+                      <span>Komissiya:</span>
+                      <span style={{ color: '#e74c3c' }}>
+                        {Math.floor(parseInt(topupAmount) * 0.01).toLocaleString()} token (1%)
+                      </span>
                     </div>
                     <div className="topup-summary-item">
                       <span>To'lov usuli:</span>
-                      <span>{selectedPaymentMethod?.name}</span>
+                      <span>{selectedPaymentMethod.name}</span>
                     </div>
                     <div className="topup-summary-item">
-                      <span>Komissiya (1%):</span>
-                      <span>{Math.round(parseInt(topupAmount) * 0.01).toLocaleString()} token</span>
-                    </div>
-                    <div className="topup-summary-item">
-                      <span>Jami to'lanadi:</span>
-                      <span>{Math.round(parseInt(topupAmount) * 1.01).toLocaleString()} token</span>
-                    </div>
-                    <div className="topup-summary-item">
-                      <span>Joriy balans:</span>
-                      <span>{user.balance.toLocaleString()} token</span>
-                    </div>
-                    <div className="topup-summary-item">
-                      <span>Yangi balans:</span>
-                      <span style={{ color: '#27ae60', fontWeight: 'bold' }}>
-                        {(user.balance + parseInt(topupAmount)).toLocaleString()} token
+                      <span>Jami olinadi:</span>
+                      <span style={{ fontWeight: 'bold', color: '#27ae60', fontSize: '18px' }}>
+                        {(parseInt(topupAmount) + (selectedTopupAmount ? topupAmounts.find(a => a.value === selectedTopupAmount)?.bonus || 0 : 0)).toLocaleString()} token
                       </span>
                     </div>
                   </div>
-                </div>
+
+                  <div style={{ marginTop: '20px', padding: '15px', background: '#f8f9fa', borderRadius: '12px', fontSize: '14px', color: '#666' }}>
+                    <RiInformationLine style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+                    To'lov amalga oshirilgach, tokenlar darhol hisobingizga qo'shiladi.
+                  </div>
+                </>
               )}
             </div>
 
             <div className="menu-modal-footer">
               {topupStep < 3 ? (
-                <>
-                  <button
-                    className={`menu-primary-btn ${isLoading ? 'btn-loading' : ''}`}
-                    onClick={handleNextStep}
-                    disabled={isLoading || !topupAmount || parseInt(topupAmount) < 1000 || (topupStep === 2 && !selectedPaymentMethod)}
-                  >
-                    {isLoading ? "Yuklanmoqda..." : topupStep === 1 ? "Davom etish" : "Tasdiqlash"}
-                  </button>
-                  <button 
-                    className="menu-secondary-btn" 
-                    onClick={handlePrevStep}
-                    disabled={isLoading || topupStep === 1}
-                  >
-                    Ortga
-                  </button>
-                </>
+                <button
+                  className="menu-primary-btn"
+                  onClick={handleNextStep}
+                  disabled={
+                    (topupStep === 1 && !topupAmount) ||
+                    (topupStep === 2 && !selectedPaymentMethod) ||
+                    isLoading
+                  }
+                >
+                  {topupStep === 1 ? 'Keyingi' : 'Tasdiqlash'}
+                  <RiArrowRightLine size={20} />
+                </button>
               ) : (
-                <>
-                  <button
-                    className={`menu-primary-btn ${isLoading ? 'btn-loading' : ''}`}
-                    onClick={handleConfirmTopup}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "To'lanmoqda..." : "To'ldirish"}
-                  </button>
-                  <button 
-                    className="menu-secondary-btn" 
-                    onClick={handlePrevStep}
-                    disabled={isLoading}
-                  >
-                    Ortga
-                  </button>
-                </>
+                <button
+                  className="menu-primary-btn"
+                  onClick={handleConfirmTopup}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="btn-loading"></div>
+                      To'lanmoqda...
+                    </>
+                  ) : (
+                    <>
+                      <RiBankCardLine size={20} />
+                      To'lovni amalga oshirish
+                    </>
+                  )}
+                </button>
               )}
+              
+              <button 
+                className="menu-secondary-btn" 
+                onClick={topupStep > 1 ? handlePrevStep : () => setShowTopupModal(false)}
+                disabled={isLoading}
+              >
+                {topupStep > 1 ? 'Orqaga' : 'Bekor qilish'}
+              </button>
             </div>
           </div>
         </div>
@@ -1520,77 +1660,121 @@ function MainMenu({ user, updateUser }) {
           <div className="menu-modal-content menu-premium-modal">
             <div className="menu-modal-header">
               <div className="menu-premium-modal-title">
-                <RiVipCrownLine className="menu-premium-star-icon" />
+                <RiVipCrownLine size={24} color="#FFD700" />
                 <h3>Premium Obuna</h3>
               </div>
               <button 
                 className="menu-modal-close-btn" 
-                onClick={() => !isLoading && setShowPremiumModal(false)}
-                disabled={isLoading}
+                onClick={() => setShowPremiumModal(false)}
               >
                 <RiCloseLine />
               </button>
             </div>
+
             <div className="menu-modal-body">
               {user.isPremium ? (
-                <div className="menu-premium-price-section">
-                  <div className="menu-premium-price" style={{ color: "#FFD700" }}>
-                    Premium faol
+                <div style={{ textAlign: 'center', padding: '30px 20px' }}>
+                  <div style={{ marginBottom: '20px' }}>
+                    <RiVipCrownLine size={60} color="#FFD700" />
                   </div>
-                  <div className="menu-premium-balance-info">
-                    Sizda Premium obuna faol
-                  </div>
-                  {user.premiumSince && (
-                    <div style={{ 
-                      marginTop: "15px", 
-                      fontSize: "14px", 
-                      color: "#7f8c8d" 
-                    }}>
-                      Faollashtirilgan: {new Date(user.premiumSince).toLocaleDateString("uz-UZ")}
-                    </div>
-                  )}
+                  <h3 style={{ color: '#2c3e50', marginBottom: '10px' }}>🎉 Siz Premium foydalanuvchisisiz!</h3>
+                  <p style={{ color: '#7f8c8d', lineHeight: '1.5' }}>
+                    Premium obuna {user.premiumSince ? 
+                      new Date(user.premiumSince).toLocaleDateString('uz-UZ') + " dan boshlab faol" : 
+                      "faol holatda"}
+                  </p>
                 </div>
               ) : (
                 <>
-                  <div className="menu-premium-price-section">
-                    <div className="menu-premium-price">10 000 token</div>
-                    <div className="menu-premium-balance-info">
-                      Joriy balans: {(user?.balance || 0).toLocaleString()} token
-                    </div>
-                    {user.balance < 10000 && (
-                      <div className="menu-insufficient-balance">
-                        Yetarli token mavjud emas!
-                      </div>
-                    )}
-                  </div>
-                  
+                  {/* Premium afzalliklari */}
                   <div className="menu-premium-features-list">
+                    <h4 style={{ marginBottom: '20px', color: '#2c3e50' }}>Premium imkoniyatlar:</h4>
                     <div className="menu-premium-feature-item">
-                      <RiCheckLine className="menu-premium-feature-check" />
-                      <span>Barcha kurslarga cheksiz kirish</span>
+                      <div className="menu-premium-feature-check">
+                        <RiCheckLine />
+                      </div>
+                      <span>Cheksiz token yuborish</span>
                     </div>
                     <div className="menu-premium-feature-item">
-                      <RiCheckLine className="menu-premium-feature-check" />
-                      <span>Premium kontent va materiallar</span>
+                      <div className="menu-premium-feature-check">
+                        <RiCheckLine />
+                      </div>
+                      <span>Maxsus karta dizaynlari</span>
                     </div>
                     <div className="menu-premium-feature-item">
-                      <RiCheckLine className="menu-premium-feature-check" />
-                      <span>Shaxsiy mentorlik</span>
+                      <div className="menu-premium-feature-check">
+                        <RiCheckLine />
+                      </div>
+                      <span>Premium mijozlar qo'llab-quvvatlash</span>
                     </div>
                     <div className="menu-premium-feature-item">
-                      <RiCheckLine className="menu-premium-feature-check" />
-                      <span>Maxsus imkoniyatlar</span>
+                      <div className="menu-premium-feature-check">
+                        <RiCheckLine />
+                      </div>
+                      <span>Reklamalarsiz ishlash</span>
+                    </div>
+                    <div className="menu-premium-feature-item">
+                      <div className="menu-premium-feature-check">
+                        <RiCheckLine />
+                      </div>
+                      <span>Maxsus aksiyalar va chegirmalar</span>
                     </div>
                   </div>
 
+                  {/* Narx */}
+                  <div className="menu-premium-price-section">
+                    <div className="menu-premium-price">10,000 token</div>
+                    <div className="menu-premium-balance-info">
+                      Joriy balans: {user.balance.toLocaleString()} token
+                    </div>
+                  </div>
+
+                  {/* Balans yetarli emas xabari */}
+                  {user.balance < 10000 && (
+                    <div className="menu-insufficient-balance">
+                      <RiErrorWarningLine size={20} style={{ marginRight: '8px' }} />
+                      Premium obuna uchun balansingiz yetarli emas
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            <div className="menu-modal-footer">
+              {!user.isPremium ? (
+                <>
                   <button
-                    className={`menu-primary-btn ${user.balance < 10000 ? "menu-btn-disabled" : ""} ${isLoading ? 'btn-loading' : ''}`}
+                    className={`menu-primary-btn ${user.balance < 10000 ? 'menu-btn-disabled' : ''}`}
                     onClick={handlePremiumPurchase}
-                    disabled={user.balance < 10000 || user.isPremium || isLoading}
+                    disabled={user.balance < 10000 || isLoading}
                   >
-                    {isLoading ? "Amalga oshirilmoqda..." : "Sotib olish"}
+                    {isLoading ? (
+                      <>
+                        <div className="btn-loading"></div>
+                        Amalga oshirilmoqda...
+                      </>
+                    ) : (
+                      <>
+                        <RiVipCrownLine size={20} />
+                        Premium sotib olish
+                      </>
+                    )}
+                  </button>
+                  <button 
+                    className="menu-secondary-btn" 
+                    onClick={() => setShowPremiumModal(false)}
+                    disabled={isLoading}
+                  >
+                    Bekor qilish
                   </button>
                 </>
+              ) : (
+                <button 
+                  className="menu-primary-btn" 
+                  onClick={() => setShowPremiumModal(false)}
+                >
+                  Tushunarli
+                </button>
               )}
             </div>
           </div>
